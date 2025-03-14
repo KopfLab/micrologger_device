@@ -4,7 +4,7 @@ This repository holds the code, schematics, and documentation to build a ***M**o
 
 To cite **µLogger** in publications use:
 
-> Kopf S, Younkin A (2025). _µLogger: a Modular Internet Controllable Real-time Optical-density Logger_. <https://github.com/KopfLab/micrologger_device>
+> Kopf S and Younkin A, 2025. _µLogger: a Modular Internet Controllable Real-time Optical-density Logger_. <https://github.com/KopfLab/micrologger_device>
 
 A BibTeX entry for LaTeX users is
 
