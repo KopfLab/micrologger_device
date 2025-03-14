@@ -16,7 +16,7 @@ CU DISCLAIMS, ANY AND ALL OTHER WARRANTIES, CONDITIONS, OR REPRESENTATIONS (EXPR
 
 You are solely responsible for any and all losses or expenses arising from or otherwise in respect of Your use of the Program or derivative works of the Program. 
 
-# Appendix
+## Appendix
 
 The following third-party software were used in the creation of microLogger:
 

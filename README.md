@@ -1,10 +1,10 @@
 # µLogger
 
-This repository holds the code, schematics, and documentation to build a Modular Internet Controllable Real-time Optical-density Logger (microLogger/µLogger for short). All content of this repository is free to use for noncommercial research and development efforts as outlined in the terms of the included [LICENSE file](LICENSE.md).
+This repository holds the code, schematics, and documentation to build a ***M**odular **I**nternet **C**ontrollable **R**eal-time **O**ptical-density Logger* (**microLogger** / **µLogger** for short). All content of this repository is free to use for noncommercial research and development efforts as outlined in the terms of the included [LICENSE file](LICENSE.md).
 
-To cite ‘µLogger’ in publications use:
+To cite **µLogger** in publications use:
 
-  Kopf S, Younkin A (2025). _µLogger: a Modular Internet Controllable Real-time Optical-density Logger_. <https://github.com/KopfLab/micrologger_device>.
+> Kopf S, Younkin A (2025). _µLogger: a Modular Internet Controllable Real-time Optical-density Logger_. <https://github.com/KopfLab/micrologger_device>
 
 A BibTeX entry for LaTeX users is
 
