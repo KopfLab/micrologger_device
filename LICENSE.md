@@ -1,0 +1,28 @@
+# License
+
+Copyright © 2025 The Regents of the University of Colorado All Rights Reserved. This is for noncommercial use only. For commercial copyright licensing information, please contact vpcontact@colorado.edu.
+
+---
+
+The Regents of the University of Colorado (CU) hereby reserve all rights in this Program not expressly granted herein. CU owns the “Program,” namely the collection of code that runs the microLogger device, as well as the 3D-printing design files, hardware schematics, assembly instructions, and the documentation associated with the microLogger device. You (the user or recipient of the Program) desire to acquire a license to use the Program in accordance with the terms set forth below (the “Notice”).
+
+BY DOWNLOADING AND USING THIS PROGRAM YOU AGREE TO COMPLY WITH AND BE BOUND BY ALL TERMS IN THIS NOTICE. IF YOU DO NOT WISH TO COMPLY WITH OR BE BOUND WITH THE TERMS OF THIS NOTICE YOU MUST IMMEDIATELY CEASE USE OF THE PROGRAM AND DELETE ALL COPIES OR MODIFICATIONS OF THE PROGRAM COMPLETELY. If You agree to these terms on behalf of an organization, You hereby represent to Licensor that You are authorized to accept these terms on its behalf. 
+
+Subject to the terms and conditions of this Agreement, CU hereby grants to You a non-exclusive internal use license under CU’s copyright subject to the following terms and restrictions. 
+
+You may only use this Program for your personal noncommercial research and development efforts on behalf of a nonprofit organization, or noncommercial research within and on behalf of a nonprofit organization. You may make derivative works or modifications to the Programs, but only for your noncommercial research and development efforts within or on behalf of a nonprofit academic or research organization. You may not remove or modify the copyright, trademarks, or other proprietary notices and disclaimers as they appear in the Program. You may distribute or publish the Program or any derivative works of the Program made by You, provided that You must limit any further use of the Program or derivative works to only noncommercial research and development on behalf of a nonprofit academic or research organization. You shall not use the Program, any portion thereof or any derivative works of the Program for any commercial purposes. Commercial purposes for the purpose of this Notice include, but are not limited to, providing services for others, distributing larger programs that contain this Program and exchanging this Program or derivative works of the Program in any manner for any form of compensation, in-kind or otherwise. To the extent that You publish any results from the use of the Program or derivative works of the Program, You must properly acknowledge the Program as developed by Sebastian Kopf and Adam Younkin at the University of Colorado Boulder. The recommended reference for the Program is provided in the Program documentation. This Notice is limited to the rights of The Regents of the University of Colorado in the Program and does not include any rights to other intellectual property. Your rights under this Notice will terminate immediately and automatically if you fail to comply with any of the terms and conditions of this Notice. Immediately upon termination, you must cease all use of the Program and any derivative works of the Program, destroy all copies of the Program and any derivative works of the Program in your possession or control. Termination of this Notice will not limit any of CU’s rights or remedies at law or in equity. You acknowledge that the Program is subject to U.S. export jurisdiction. You agree to comply with all applicable international and national laws that apply to the Program, including the U.S. Export Administration Regulations, as well as end-user, end-use, and destination restrictions issued by U.S. and other governments. The Program is distributed “as-is”, and CU has no obligation to provide any maintenance, updates, additional documentation or services. 
+
+CU DISCLAIMS, ANY AND ALL OTHER WARRANTIES, CONDITIONS, OR REPRESENTATIONS (EXPRESS OR IMPLIED, ORAL OR WRITTEN), WITH RESPECT TO THE PROGRAM OR ANY PART THEREOF, INCLUDING ANY AND ALL IMPLIED WARRANTIES OR CONDITIONS OF TITLE, NONINFRINGEMENT, MERCHANTABILITY, OR FITNESS OR SUITABILITY FOR ANY PURPOSE (WHETHER OR NOT CU KNOWS, HAS REASON TO KNOW, HAS BEEN ADVISED, OR IS OTHERWISE IN FACT AWARE OF ANY SUCH PURPOSE), WHETHER ALLEGED TO ARISE BY LAW, BY REASON OF CUSTOM OR USAGE IN THE TRADE, OR BY COURSE OF DEALING. 
+
+You are solely responsible for any and all losses or expenses arising from or otherwise in respect of Your use of the Program or derivative works of the Program. 
+
+# Appendix
+
+The following third-party software were used in the creation of microLogger:
+
+| **  Name of program   **   | **  Link to program webpage   **                           | **  License terms   **   |
+|----------------------------|------------------------------------------------------------|--------------------------|
+|     Microcontroller p2     |     https://github.com/particle-iot/p2-reference-design    |     Apache 2.0           |
+|     Particle firmware      |     https://github.com/particle-iot/device-os              |     LGPL 3.0             |
+|     Adafruit_SSD1306       |     https://github.com/adafruit/Adafruit_SSD1306           |     BSD                  |
+|     OpenSCAD               |     https://openscad.org/about.html                        |     GPL 2                |
