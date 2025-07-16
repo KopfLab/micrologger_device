@@ -6,7 +6,7 @@ on:
   push:
     paths:
       - micrologger.cpp
-      - src
+      - src/*
       - .github/workflows/compile.yaml
       - .github/workflows/compile-micrologger.yaml
 

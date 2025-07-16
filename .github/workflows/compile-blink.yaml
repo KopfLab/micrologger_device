@@ -5,7 +5,7 @@ name: Blink test
 on:
   push:
     paths:
-      - tests/blink
+      - tests/blink/*
       - .github/workflows/compile.yaml
       - .github/workflows/compile-blink.yaml
 
