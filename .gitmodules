@@ -1,0 +1,6 @@
+[submodule "lib/SDDS"]
+	path = lib/SDDS
+	url = https://github.com/mLamneck/SDDS.git
+[submodule "lib/SDDS_particleSpike"]
+	path = lib/SDDS_particleSpike
+	url = https://github.com/KopfLab/SDDS_particleSpike.git
