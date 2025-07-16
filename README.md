@@ -1,3 +1,6 @@
+[![microloggger](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-micrologger.yaml/badge.svg?branch=main)](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-micrologger.yaml)
+[![blink](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-blink.yaml/badge.svg?branch=main)](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-blink.yaml)
+
 # *µLogger*
 
 This repository holds the code, schematics, and documentation to build a ***M**odular **I**nternet **C**ontrollable **R**eal-time **O**ptical-density Logger* (***microLogger*** or ***µLogger*** for short). All content of this repository is free to use for noncommercial research and development efforts as outlined in the terms of the included [LICENSE file](LICENSE.md).
