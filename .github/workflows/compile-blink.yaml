@@ -1,0 +1,40 @@
+# name of the job
+name: Blink test
+
+# specify which paths to watch for changes
+on:
+  push:
+    paths:
+      - tests/blink
+      - .github/workflows/compile.yaml
+      - .github/workflows/compile-blink.yaml
+
+# run compile via the compile.yaml
+jobs:
+  compile:
+    strategy:
+      fail-fast: false
+      matrix:
+        # CHANGE program and specify lib/aux and non-default src as needed
+        program:
+          - name: 'blink'
+            lib: 'SDDS SDDS_particleSpike'
+        # CHANGE platforms as needed
+        platform: 
+          - {name: 'p2', version: '6.3.2'}
+          - {name: 'boron', version: '6.3.2'}
+          - {name: 'msom', version: '6.3.2'}
+
+    # program name
+    name: ${{ matrix.program.name }}-${{ matrix.platform.name }}-${{ matrix.platform.version }}
+
+    # workflow call
+    uses: ./.github/workflows/compile.yaml
+    secrets: inherit
+    with:
+      platform: ${{ matrix.platform.name }}
+      version: ${{ matrix.platform.version }}      
+      program: ${{ matrix.program.name }}
+      src: ${{ matrix.program.src || '' }}
+      lib: ${{ matrix.program.lib || '' }}
+      aux: ${{ matrix.program.aux || '' }}
