@@ -48,8 +48,12 @@
 .vscode
 target
 
+# temp files
+tmp/
+backup/
+
 # Compiled firmware
-*.bin
+bin/*.bin
 
 # Keys
 *.der
@@ -57,3 +61,9 @@ target
 
 # OS
 .DS_Store
+
+# gemfile
+Gemfile.lock
+
+# credentials
+credentials
