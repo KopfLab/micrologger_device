@@ -395,3 +395,14 @@ task :tinker do
   puts "\nINFO: flashing tinker..."
   sh "particle flash --usb tinker"
 end
+
+### DEV MODE ###
+
+desc "Development mode"
+task :dev do
+    if Rake.application.top_level_tasks.length < 2
+      raise "Error: missing program"
+    end
+    sh "rake cleanLocal"
+    sh "rake local #{Rake.application.top_level_tasks[1]} autoCompile autoFlash"
+end

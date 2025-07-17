@@ -6,10 +6,12 @@
 ### STANDARD RAKE TARGETS ###
 import 'particle_rake.rb'
 
-### PROGRAMS ###
+### MAIN PROGRAM ###
 
 desc "Main proggram: micrologger"
 task :micrologger => :compile
+
+### TEST PROGRAMS ###
 
 desc "Test program: I2C port scanner"
 task :i2c_scanner => :compile
