@@ -1,44 +1,38 @@
-#include "Particle.h"
-#include "uTypedef.h"
-#include "uCoreEnums.h"
-#include "uMultask.h"
-
 // self-describing data structure (SDDS) tree
-class TsddsTree : public TmenuHandle{
-    public:
-        // ADD SDDS VARS HERE
-        sdds_var(Tuint8,xyz)
-
-        TsddsTree(){
-            // ADD EVENT HANDLERS
-            on(xyz) {
-            };
-        }
-} sddsTree;
+#include "uMicroLogger.h"
+TmicroLogger micrologger;
 
 // serial spike for communication via serial (with baud rate)
 #include "uSerialSpike.h"
-TserialSpike serialSpike(sddsTree, 115200);
+TserialSpike serialSpike(micrologger, 115200);
 
 // particle spike for particle communication (with sdds name and version)
 #include "uParticleSpike.h"
-static TparticleSpike particleSpike(sddsTree, "project", 1);
+static TparticleSpike particleSpike(micrologger, "project", 1);
 
-// optional: log handler for debugging
-/*
+// logging
 SerialLogHandler logHandler(
-    LOG_LEVEL_INFO, { // INFO for non-app messages
+    LOG_LEVEL_WARN, { // WARN for non-app messages
     { "app", LOG_LEVEL_TRACE } // TRACE for app
 });
-*/
 
 // setup
 void setup(){
-    // setup particle spike
-    particleSpike.setup();
+    // setup particle communication
+    using publish = sdds::particle::publish;
+    particleSpike.setup({
+        // set default publishing intervals for anything that should be different from publish::OFF
+        // --> all variables that are stored in EEPROM (saveeval option) should report all changes
+        {publish::ALWAYS, sdds::opt::saveval},
+        // --> all floats should inherit from the globalInterval
+        {publish::GLOBAL, {sdds::Ttype::FLOAT32, sdds::Ttype::FLOAT64}},
+        // --> stirrer speed should inherit from the globalInterval
+        {publish::GLOBAL, &micrologger.stirrer.speed}
+    });
 }
 
-// loop
+// loop: task handler
+#include "uMultask.h"
 void loop(){
     // handle all events
     TtaskHandler::handleEvents();
