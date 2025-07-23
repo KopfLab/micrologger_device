@@ -1,6 +1,7 @@
 #pragma once
 #include "uTypedef.h"
 #include "uCoreEnums.h"
+#include "uHardware.h"
 
 /**
  * @brief stirrer class
@@ -25,6 +26,7 @@ class Tstirrer : public TmenuHandle{
          * @brief set a new target speed
          */
         void changeSpeed(dtypes::uint16 _speed) {
+            FvortexEndTimer.stop();
             FspeedChangeTimer.stop();
             FspeedTarget = _speed;
             adjustSpeed();
@@ -48,7 +50,7 @@ class Tstirrer : public TmenuHandle{
                     setMotorSpeed(FspeedTarget);
                     return;
                 }
-                // time to accelerate
+                // time to inccrease the speed
                 setMotorSpeed(FspeedNow + change);
             } else if (FspeedNow > FspeedTarget) {
                 if (FspeedNow < FspeedTarget + change) {
@@ -56,7 +58,7 @@ class Tstirrer : public TmenuHandle{
                     setMotorSpeed(FspeedTarget);
                     return;
                 }
-                // time to decelerate
+                // time to decrease the speed
                 setMotorSpeed(FspeedNow - change);
             }
             // there's more to do
@@ -70,12 +72,21 @@ class Tstirrer : public TmenuHandle{
             FspeedNow = _speed;
             if (FspeedNow == FspeedTarget) {
                 // reached target
-                if (motor == Tmotor::e::vortexing) {
+                motor = (FspeedNow > 0) ? Tmotor::e::running : Tmotor::e::idle;
+                if (event == TstirEvent::e::vortexing) {
                     // we were vortexing so let's start the vortex timer if it isn't already running
                     if (!FvortexEndTimer.running())
                         FvortexEndTimer.start(settings.vortexTimeS * 1000);
                 }
+            } else if (FspeedNow < FspeedTarget) {
+                // still accelerating
+                motor = Tmotor::e::accelerating;
+            } else if (FspeedNow > FspeedTarget) {
+                // still decelerating
+                motor = Tmotor::e::decelerating;
             }
+            // tell the harwdare the speed (it will fine tune)
+            hardware().motor.setSpeed(_speed);
             // FIXME: this is just to debug, this should actually show the measured speed
             speed = _speed;
         }
@@ -86,8 +97,17 @@ class Tstirrer : public TmenuHandle{
         sdds_var(TonOff, state, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), TonOff::e::OFF);
 
         // details on what the motor is doing
-        sdds_enum(idle, running, paused, vortexing) Tmotor; 
+        // FIXME: switch motor to idle, accel, decel, running to 
+        // better reflect the actual state of the motor so other
+        // modules can check on it
+        // FIXME: instead introduce an additional "event" that has
+        // none, pausing, vortexing
+        sdds_enum(idle, accelerating, decelerating, running) Tmotor; 
         sdds_var(Tmotor, motor, sdds::opt::readonly, Tmotor::e::idle);
+
+        // stir event
+        sdds_enum(none, pausing, vortexing) TstirEvent;
+        sdds_var(TstirEvent, event, sdds::opt::readonly, TstirEvent::e::none);
 
         // user actions
         sdds_enum(___, start, stop, vortex) Taction;
@@ -109,6 +129,12 @@ class Tstirrer : public TmenuHandle{
         sdds_var(Tsettings, settings);
 
         Tstirrer() {
+
+            // setup
+            on(sdds::setup()) {
+                // initialize hardware
+                hardware().init();
+            };
 
             // startup/state change
             on(state) {
@@ -142,7 +168,7 @@ class Tstirrer : public TmenuHandle{
             // change vortex speed
             on(settings.vortexSpeed) {
                 if (settings.vortexSpeed > settings.maxSpeed) settings.vortexSpeed = settings.maxSpeed;
-                if (motor == Tmotor::e::vortexing) {
+                if (event == TstirEvent::e::vortexing) {
                     // currently vortexing -- change the speed
                     vortex();
                 }
@@ -166,22 +192,19 @@ class Tstirrer : public TmenuHandle{
         }
 
         // actions
-        void start() {
-            FvortexEndTimer.stop();
-            motor = Tmotor::e::running;
+        void start() {  
+            event = TstirEvent::e::none;
             changeSpeed(setpoint);
         }
 
         void stop() {
-            FvortexEndTimer.stop();
-            motor = Tmotor::e::idle;
+            event = TstirEvent::e::none;
             changeSpeed(0);
         }
 
         void pause() {
             if (state == TonOff::e::ON) {
-                FvortexEndTimer.stop();
-                motor = Tmotor::e::paused;
+                event = TstirEvent::e::pausing;
                 changeSpeed(0);
             }
         }
@@ -191,8 +214,7 @@ class Tstirrer : public TmenuHandle{
         }
 
         void vortex() {
-            FvortexEndTimer.stop();
-            motor = Tmotor::e::vortexing;
+            event = TstirEvent::e::vortexing;
             changeSpeed(settings.vortexSpeed);
         }
 
