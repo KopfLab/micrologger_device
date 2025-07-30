@@ -2,6 +2,9 @@
 #include "uTypedef.h"
 #include "uCoreEnums.h"
 #include "uHardware.h"
+#ifdef SDDS_ON_PARTICLE
+#include "uParticleSystem.h"
+#endif
 
 /**
  * @brief stirrer class
@@ -18,9 +21,14 @@ class Tstirrer : public TmenuHandle{
         dtypes::uint16 FspeedNow = 0;
         
         // timers
+        const dtypes::TtickCount FrestartDelay = 1000; // ms
+        Ttimer FrestartTimer;
         const dtypes::TtickCount FspeedChangeInterval = 100; // ms
         Ttimer FspeedChangeTimer;
         Ttimer FvortexEndTimer;
+
+        // reached vortex peak?
+        bool vortexPeak = false;
 
         /**
          * @brief set a new target speed
@@ -36,6 +44,12 @@ class Tstirrer : public TmenuHandle{
          * @brief adjust speed towards the speed target
          */
         void adjustSpeed() {
+
+            if (FspeedNow == FspeedTarget) {
+                // already at target, nothing to do
+                return;
+            }
+
             if (settings.acceleration == 0) {
                 // no accelerationg setting, change speed immediately
                 setMotorSpeed(FspeedTarget);
@@ -50,7 +64,7 @@ class Tstirrer : public TmenuHandle{
                     setMotorSpeed(FspeedTarget);
                     return;
                 }
-                // time to inccrease the speed
+                // time to increase the speed
                 setMotorSpeed(FspeedNow + change);
             } else if (FspeedNow > FspeedTarget) {
                 if (FspeedNow < FspeedTarget + change) {
@@ -61,7 +75,12 @@ class Tstirrer : public TmenuHandle{
                 // time to decrease the speed
                 setMotorSpeed(FspeedNow - change);
             }
-            // there's more to do
+            // check for issues
+            if (hardware().motor.error != Thardware::Tmotor::Terror::e::none) {
+                return; // there are motor errors
+            }
+
+            // there's more to do, start timer
             FspeedChangeTimer.start(FspeedChangeInterval);
         }
 
@@ -69,53 +88,68 @@ class Tstirrer : public TmenuHandle{
          * @brief set the actual motor speed
          */
         void setMotorSpeed(dtypes::uint16 _speed) {
+            // tell the hardware the speed (it will fine tune)
+            hardware().motor.setSpeed(_speed);
+
+            // check for issues
+            if (hardware().motor.error != Thardware::Tmotor::Terror::e::none) {
+                // there are motor errors
+                return; 
+            }
+
+            // update speed info
             FspeedNow = _speed;
             if (FspeedNow == FspeedTarget) {
                 // reached target
                 motor = (FspeedNow > 0) ? Tmotor::e::running : Tmotor::e::idle;
                 if (event == TstirEvent::e::vortexing) {
-                    // we were vortexing so let's start the vortex timer if it isn't already running
-                    if (!FvortexEndTimer.running())
+                    if (!vortexPeak) {
+                        // we're vortexing and just reached the peak so let's start the vortex timer
+                        vortexPeak = true;
                         FvortexEndTimer.start(settings.vortexTimeS * 1000);
+                    } else {
+                        // vortex event finished
+                        vortexPeak = false;
+                        event = TstirEvent::e::none;
+                    }
+                } else if (event == TstirEvent::e::pausing && FspeedNow > 0) {
+                    // pausing is done
+                    event = TstirEvent::e::none;
                 }
             } else if (FspeedNow < FspeedTarget) {
                 // still accelerating
-                motor = Tmotor::e::accelerating;
+                if (motor != Tmotor::e::accelerating)
+                    motor = Tmotor::e::accelerating;
             } else if (FspeedNow > FspeedTarget) {
                 // still decelerating
-                motor = Tmotor::e::decelerating;
+                if (motor != Tmotor::e::decelerating)
+                    motor = Tmotor::e::decelerating;
             }
-            // tell the harwdare the speed (it will fine tune)
-            hardware().motor.setSpeed(_speed);
-            // FIXME: this is just to debug, this should actually show the measured speed
-            speed = _speed;
         }
 
     public:
+
+        // user actions
+        sdds_enum(___, start, stop, pause, resume, vortex) Taction;
+        sdds_var(Taction, action);
 
         // keeps track in memory where the microcontroller is at
         sdds_var(TonOff, state, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), TonOff::e::OFF);
 
         // details on what the motor is doing
-        // FIXME: switch motor to idle, accel, decel, running to 
-        // better reflect the actual state of the motor so other
-        // modules can check on it
-        // FIXME: instead introduce an additional "event" that has
-        // none, pausing, vortexing
-        sdds_enum(idle, accelerating, decelerating, running) Tmotor; 
+        sdds_enum(idle, accelerating, decelerating, running, error) Tmotor; 
         sdds_var(Tmotor, motor, sdds::opt::readonly, Tmotor::e::idle);
 
-        // stir event
+        // motor error
+        sdds_var(Thardware::Tmotor::Terror, motorError, sdds::opt::readonly);
+
+        // stir events
         sdds_enum(none, pausing, vortexing) TstirEvent;
         sdds_var(TstirEvent, event, sdds::opt::readonly, TstirEvent::e::none);
-
-        // user actions
-        sdds_enum(___, start, stop, vortex) Taction;
-        sdds_var(Taction, action);
         
         // speed details
-        sdds_var(Tuint16, setpoint, sdds::opt::saveval, 0);
-        sdds_var(Tuint16, speed, sdds::opt::readonly);
+        sdds_var(Tuint16, setpoint, sdds::opt::saveval, 500);
+        sdds_var(Tuint16, speed, sdds::opt::readonly); 
         sdds_var(Tstring, unit, sdds::opt::readonly, "rpm");
         
         // additional settings
@@ -130,36 +164,112 @@ class Tstirrer : public TmenuHandle{
 
         Tstirrer() {
 
-            // setup
-            on(sdds::setup()) {
-                // initialize hardware
-                hardware().init();
-            };
+            // make sure hardware is initalized
+            hardware();
 
-            // startup/state change
-            on(state) {
-                (state == TonOff::e::ON) ? start() : stop();
-            };
+            #ifdef SDDS_ON_PARTICLE
+                // if on a particle system, start motor when startup is complete
+                on(particleSystem().startup) {
+                    if (particleSystem().startup == TparticleSystem::TstartupStatus::e::complete) {
+                        (state == TonOff::e::ON) ? changeSpeed(setpoint) : changeSpeed(0);
+                    }
+                };
+            #else
+                // start motor during setup
+                on(sdds::setup()) {
+                    (state == TonOff::e::ON) ? changeSpeed(setpoint) : changeSpeed(0);
+                };
+            #endif
 
             // action events
             on(action) {
                 if (action == Taction::e::start) {
-                    // state change
-                    state = TonOff::e::ON;
+                    // state change needed or just speed change?
+                    if (state != TonOff::e::ON)
+                        state = TonOff::e::ON;
+                    if (event != TstirEvent::e::none)
+                        event = TstirEvent::e::none;
+                    changeSpeed(setpoint);
                 } else if (action == Taction::e::stop) {
-                    // state change
-                    state = TonOff::e::OFF;
+                    // state change needed or just speed change?
+                    if (state != TonOff::e::OFF)
+                        state = TonOff::e::OFF;
+                    if (event != TstirEvent::e::none)
+                        event = TstirEvent::e::none;
+                    changeSpeed(0);
+                } else if (action == Taction::e::pause) {
+                    if (state == TonOff::e::ON) {
+                        // no state change but stopping the motor
+                        if (event != TstirEvent::e::pausing)
+                            event = TstirEvent::e::pausing;
+                        changeSpeed(0);
+                    }
+                } else if (action == Taction::e::resume) {
+                    if (state == TonOff::e::ON) {
+                        // no state change but restarting the motor
+                        changeSpeed(setpoint);
+                    }
                 } else if (action == Taction::e::vortex) {
-                    // no state change but running a vortex
-                    vortex();
+                    // no state change but running the vortex
+                    if (event != TstirEvent::e::vortexing)
+                        event = TstirEvent::e::vortexing;
+                    vortexPeak = false;
+                    changeSpeed(settings.vortexSpeed);
                 }
                 if (action != Taction::e::___) action = Taction::e::___;
+            };
+
+            // vortex end timer
+            on(FvortexEndTimer) {
+                // resume where we were before the vortex
+                (state == TonOff::e::ON) ? 
+                    changeSpeed(setpoint) : 
+                    changeSpeed(0);
+            };
+
+            // update speed from hardware
+            on(hardware().motor.speed) {
+                if (speed != hardware().motor.speed)
+                    speed = hardware().motor.speed;
+            };
+
+            // reset motor error when publish is turned on
+            // this ensures it gets logged when the next error occurs
+            // FIXME: is this the best strategy to make sure errors
+            // are logged as soon as publish is turned on?
+            on(particleSystem().publishing.publish) {
+                if (particleSystem().publishing.publish == TonOff::e::ON) {
+                    motorError = Thardware::Tmotor::Terror::e::none;
+                }
+            };
+
+            // update motor error from hardware
+            on(hardware().motor.error) {
+                // only record one when there's a change
+                if (motorError != hardware().motor.error)
+                    motorError = hardware().motor.error;
+                if (motorError != Thardware::Tmotor::Terror::e::none) {
+                    // error, stop operations
+                    FvortexEndTimer.stop();
+                    FspeedChangeTimer.stop();
+                    if (motor != Tmotor::e::error)
+                        motor = Tmotor::e::error;
+                    if (event != TstirEvent::e::none)
+                        event = TstirEvent::e::none;
+                    if (!FrestartTimer.running())
+                        FrestartTimer.start(FrestartDelay);
+                }
+            };
+
+            // restart motor after error
+            on(FrestartTimer) {
+                (state == TonOff::e::ON) ? changeSpeed(setpoint) : changeSpeed(0);
             };
 
             // change setpoint
             on(setpoint) {
                 if (setpoint > settings.maxSpeed) setpoint = settings.maxSpeed;
-                if (state == TonOff::e::ON && motor == Tmotor::e::running) {
+                if (state == TonOff::e::ON && event == TstirEvent::e::none) {
                     // don't adjust if we're off, paused or vortexing
                     changeSpeed(setpoint);
                 }
@@ -168,9 +278,9 @@ class Tstirrer : public TmenuHandle{
             // change vortex speed
             on(settings.vortexSpeed) {
                 if (settings.vortexSpeed > settings.maxSpeed) settings.vortexSpeed = settings.maxSpeed;
-                if (event == TstirEvent::e::vortexing) {
-                    // currently vortexing -- change the speed
-                    vortex();
+                if (event == TstirEvent::e::vortexing && !vortexPeak) {
+                    // currently vortexing and not yet at the peak -- change to the new speed
+                    changeSpeed(settings.vortexSpeed);
                 }
             };
 
@@ -185,37 +295,6 @@ class Tstirrer : public TmenuHandle{
                 adjustSpeed();
             };
 
-            // vortex end timer
-            on(FvortexEndTimer) {
-                (state == TonOff::e::ON) ? start() : stop();
-            };
-        }
-
-        // actions
-        void start() {  
-            event = TstirEvent::e::none;
-            changeSpeed(setpoint);
-        }
-
-        void stop() {
-            event = TstirEvent::e::none;
-            changeSpeed(0);
-        }
-
-        void pause() {
-            if (state == TonOff::e::ON) {
-                event = TstirEvent::e::pausing;
-                changeSpeed(0);
-            }
-        }
-
-        void resume() {
-            if (state == TonOff::e::ON) start();
-        }
-
-        void vortex() {
-            event = TstirEvent::e::vortexing;
-            changeSpeed(settings.vortexSpeed);
         }
 
 };

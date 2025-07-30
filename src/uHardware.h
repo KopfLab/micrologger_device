@@ -1,47 +1,108 @@
 #pragma once
 
 #include "uTypedef.h"
+#include "uMultask.h"
+#ifdef SDDS_ON_PARTICLE
+#include "uParticleSystem.h"
+#endif
 
 /**
  * @brief hardware handler
+ * uses a TmenuHandle for the convenience of sdds_vars but is not usually
+ * included in the tree except for stand-alone testing
  */
-class Thardware{
+class Thardware : public TmenuHandle{
 
     private:
 
         bool initialized = false;
+		
+        // in case it is used in a tree
+		Tmeta meta() override { return Tmeta{TYPE_ID, 0, "hardware"}; }
+
+         /**
+         * @brief initialize the hardware
+         */
+        void init() {
+            if (!initialized) {
+                // initialize
+                Wire.begin();
+                motor.init();
+                beam.init();
+            }
+        }
 
     public:
 
         // stirrer motor
-        class Tmotor {
+        class Tmotor : public TmenuHandle {
+
+            private:
+
+                // speed
+                dtypes::uint16 FtargetSpeed = 0;
+                Ttimer FspeedFinetuneTimer;
+
+                // decoder for speed measurement
+                TisrEvent decoderISR; 
+                dtypes::TtickCount FdecoderStart = 0;
+                dtypes::uint32 FdecoderCounter = 0;
+                const dtypes::uint8 FdecoderPin = D6;
+
+                void decoderChangeISR(){ 
+                    decoderISR.signal(); 
+                };
+
+                void resetDecoder() {
+                    FdecoderStart = millis();
+                    FdecoderCounter = 0;
+                }
 
             public:
 
-                void init() {
+                sdds_var(Tuint16, speed, sdds::opt::readonly);
+                sdds_enum(none, noResponse) Terror;
+                sdds_var(Terror, error, sdds::opt::readonly);
+                
+                Tmotor() {
+                    // decoder interrupt triggered
+                    on(decoderISR){
+                        FdecoderCounter++;
+                    };
                 }
 
-                void setSpeed(dtypes::uint16) {
+                void init() {
+                    // attach the encoder interrupt
+                    attachInterrupt(FdecoderPin, &Tmotor::decoderChangeISR, this, RISING);
+                }
+
+                void setSpeed(dtypes::uint16 _speed) {
+                    FtargetSpeed = _speed;
                     // FIXME: set the speed and finetune with the speed measurement
+                    // every time a new speed is set, the decoder resets
+                    // calculate speed each time
+                    speed = _speed; // FIXME read the actual speed
+                    resetDecoder();
                 }
 
                 dtypes::uint16 getSpeed() {
                     // return the speed
-                    // FIXME: should this habe a Tdescr* pointer to set whenever the
-                    // speed is updated or should that happen on the otherside with
-                    // an update timer? maybe tending towards the latte
+                        // decoder info: rpm = freq (in Hz) / 100 * 60 = counts / dt.ms * 1000 * 1/100 * 60 = count / dt.ms * 600.
+                    //float rpm = (600. * decoder_steps) / (millis() - last_speed);
                     return 0;
                 }
 
-        } motor;
+        };
+
+        sdds_var(Tmotor, motor);
 
         // beam
-        class Tbeam {
+        class Tbeam : public TmenuHandle {
 
             private:
 
                 // beam runs through a TCA9534 multiplexer over 1 wire commms
-                bool working = false;
+                bool initialized = false;
                 bool on = false;
                 byte FmplexAddress = 0x20; // default TCA9534 address
                 byte FmplexPinConfigRegister = 0x03; // pin config register
@@ -59,63 +120,93 @@ class Thardware{
 
             public:
 
-                void init() {
+                sdds_enum(none, failedInit, failedSet) Terror;
+                sdds_var(Terror, error, sdds::opt::readonly);
+
+                /**
+                 * @brief is beam on?
+                 */
+                bool isOn() {
+                    return on;
+                }
+
+                bool init() {
+                    initialized = true;
                     // check if device is present
                     Wire.beginTransmission(FmplexAddress);
-                    if(Wire.endTransmission() != 0) return;
-
+                    if(Wire.endTransmission() != 0) {
+                        error = Terror::e::failedInit;
+                        return false;
+                    }
+                
                     // configure pin inputs/outputs (only beam pin as output)
                     FmplexPinConfig = FmplexPinConfig & ~(0x01 << FbeamPin);
                     if (!transmit(FmplexPinConfigRegister, FmplexPinConfig)) {
-                        // couldn't set inputs/outputs mode
-                        return;
+                        error = Terror::e::failedInit;
+                        return false;
                     }
 
                     // set all pins to off
                     if (!transmit(FmplexPinStateRegister, FmplexPinState)) {
-                        // couldn't set all to off
-                        return;
+                        error = Terror::e::failedSet;
+                        return false;
                     }
-                    // fully initialized, setting working to true
-                    working = true;
+            
+                    // successfully initialized, set error to none
+                    error = Terror::e::none;
+                    return true;
                 }
 
-                bool isWorking() {
-                    return working;
-                }
-
-                bool turnOn() {
-                    if (!isWorking()) return false;
-                    if (!on) {
+                void turnOn() {
+                    // init if needed
+                    if (!initialized || error == Terror::e::failedInit) {
+                        if (!init()) return;
+                    }
+                    // set if off or last command failed
+                    if (!on || error == Terror::e::failedSet) {
                         FmplexPinState = FmplexPinState | (0x01 << FbeamPin);
                         on = transmit(FmplexPinStateRegister, FmplexPinState);
+                        error = !on ? 
+                            Terror::e::failedSet :
+                            Terror::e::none;
                     }
-                    return on;
                 }
 
-                bool turnOff() {
-                    if (!isWorking()) return false;
-                    if (on) {
+                void turnOff() {
+                    // init if needed
+                    if (!initialized || error == Terror::e::failedInit) {
+                        if (!init()) return;
+                    }
+                    // set if on or last command failed
+                    if (on || error == Terror::e::failedSet) {
                         FmplexPinState = FmplexPinState & ~(0x01 << FbeamPin);
                         on = !transmit(FmplexPinStateRegister, FmplexPinState);
+                        error = on ? 
+                            Terror::e::failedSet :
+                            Terror::e::none;
                     }
-                    return !on;
                 }
 
-        } beam;
+        };
 
-        
+        sdds_var(Tbeam, beam);
 
-        /**
-         * @brief initialize the hardware
-         */
-        void init() {
-            if (!initialized) {
-                // initialize
-                Wire.begin();
-                motor.init();
-                beam.init();
-            }
+        Thardware() {
+
+            #ifdef SDDS_ON_PARTICLE
+                // if on a particle system, initialize once startup is complete
+                on(particleSystem().startup) {
+                    if (particleSystem().startup == TparticleSystem::TstartupStatus::e::complete) {
+                        init();
+                    }
+                };
+            #else
+                // initialize during setup
+                on(sdds::setup()) {
+                    init();
+                };
+            #endif
+
         }
 
 };

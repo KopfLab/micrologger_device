@@ -22,33 +22,52 @@ class TmicroLogger : public TmenuHandle {
         class TopticalDensity : public TmenuHandle{
 
             public:
-
-                // this should not be saved
+            
+                // this should not be saved in state!
                 sdds_var(TonOff, beam, 0, TonOff::e::OFF);
+                sdds_var(Thardware::Tbeam::Terror, beamError, sdds::opt::readonly);
 
                 TopticalDensity() {
 
-                    // setup
-                    on(sdds::setup()) {
-                        // initialize hardware
-                        hardware().init();
-                        if (!hardware().beam.isWorking()) {
-                            // FIXME: what to do if the beam is not working?
+                    // make sure hardware is initalized
+                    hardware();
+
+                    // reset beam error when publish is turned on
+                    // this ensures it gets logged when the next error occurs
+                    // FIXME: is this the best strategy to make sure errors
+                    // are logged as soon as publish is turned on?
+                    on(particleSystem().publishing.publish) {
+                        if (particleSystem().publishing.publish == TonOff::e::ON) {
+                            beamError = Thardware::Tbeam::Terror::e::none;
                         }
+                    };
+
+                    // update beam error from hardware
+                    on(hardware().beam.error) {
+                        // only report changes
+                        if (beamError != hardware().beam.error)
+                            beamError = hardware().beam.error;
                     };
 
                     // turn beam on and off
                     on(beam) {
                         if (beam == TonOff::e::ON) {
-                            if (!hardware().beam.turnOn()) {
-                                // FIXME: what to do if turning on the beam is not working?
+                            hardware().beam.turnOn();
+                            if (!hardware().beam.isOn()) {
+                                Log.error("could not turn beam ON, check beamError");
+                                // FIXME: ideally should set Fvalue or use .__setValue() with signal = false
+                                // NOTE: only matters if beam status interval is set to 1 (always publish)
+                                beam = TonOff::e::OFF; 
                             }
                         } else {
-                            if (!hardware().beam.turnOff()) {
-                                // FIXME: what to do if turning off the beam is not working
+                            hardware().beam.turnOff();
+                            if (hardware().beam.isOn()) {
+                                Log.error("could not turn beam OFF, check beamError");
+                                // FIXME: ideally should set Fvalue or use .__setValue() with signal = false
+                                // NOTE: only matters if beam status interval is set to 1 (always publish)
+                                beam = TonOff::e::ON;
                             }
                         }
-                            
                     };
                 }
 
@@ -71,5 +90,8 @@ class TmicroLogger : public TmenuHandle {
 
 
         TmicroLogger() {
+            // add hardware menu item?
+            // --> no just updating in the other menus instead
+            //addDescr(hardware());
         }
 };
