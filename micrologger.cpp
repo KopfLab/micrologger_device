@@ -1,3 +1,5 @@
+#define SDDS_PARTICLE_DEBUG 1
+
 // self-describing data structure (SDDS) tree
 #include "uMicroLogger.h"
 TmicroLogger micrologger;
@@ -19,15 +21,18 @@ SerialLogHandler logHandler(
 // setup
 void setup(){
     // setup particle communication
-    using publish = sdds::particle::publish;
+    using publish = TparticleSpike::publish;
     particleSpike.setup({
         // set default publishing intervals for anything that should be different from publish::OFF
         // --> all variables that are stored in EEPROM (saveeval option) should report all changes
-        {publish::ALWAYS, sdds::opt::saveval},
+        {publish::IMMEDIATELY, sdds::opt::saveval},
+        // --> errors should always be published
+        {publish::IMMEDIATELY, &micrologger.stirrer.motorError},
+        {publish::IMMEDIATELY, &micrologger.OD.beamError},
         // --> all floats should inherit from the globalInterval
-        {publish::GLOBAL, {sdds::Ttype::FLOAT32, sdds::Ttype::FLOAT64}},
-        // --> stirrer speed should inherit from the globalInterval
-        {publish::GLOBAL, &micrologger.stirrer.speed}
+        {publish::INHERIT, {sdds::Ttype::FLOAT32, sdds::Ttype::FLOAT64}},
+        // --> motor speed is an integer but should still inherit from the globalInterval
+        {publish::INHERIT, &micrologger.stirrer.speed}
     });
 }
 
