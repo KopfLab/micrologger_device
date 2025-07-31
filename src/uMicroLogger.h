@@ -33,20 +33,17 @@ class TmicroLogger : public TmenuHandle {
                     hardware();
 
                     // reset beam error when publish is turned on
-                    // this ensures it gets logged when the next error occurs
-                    // FIXME: is this the best strategy to make sure errors
-                    // are logged as soon as publish is turned on?
+                    // this ensures it gets logged when a new error occurs
+                    // FIXME: use the final implementation for change detection in sdds
                     on(particleSystem().publishing.publish) {
-                        if (particleSystem().publishing.publish == TonOff::e::ON) {
+                        if (particleSystem().publishing.publish == TonOff::e::ON && _changed) {
                             beamError = Thardware::Tbeam::Terror::e::none;
                         }
                     };
 
                     // update beam error from hardware
                     on(hardware().beam.error) {
-                        // only report changes
-                        if (beamError != hardware().beam.error)
-                            beamError = hardware().beam.error;
+                       beamError = hardware().beam.error;
                     };
 
                     // turn beam on and off

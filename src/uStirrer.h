@@ -118,12 +118,10 @@ class Tstirrer : public TmenuHandle{
                 }
             } else if (FspeedNow < FspeedTarget) {
                 // still accelerating
-                if (motor != Tmotor::e::accelerating)
-                    motor = Tmotor::e::accelerating;
+                motor = Tmotor::e::accelerating;
             } else if (FspeedNow > FspeedTarget) {
                 // still decelerating
-                if (motor != Tmotor::e::decelerating)
-                    motor = Tmotor::e::decelerating;
+                motor = Tmotor::e::decelerating;
             }
         }
 
@@ -184,24 +182,17 @@ class Tstirrer : public TmenuHandle{
             // action events
             on(action) {
                 if (action == Taction::e::start) {
-                    // state change needed or just speed change?
-                    if (state != TonOff::e::ON)
-                        state = TonOff::e::ON;
-                    if (event != TstirEvent::e::none)
-                        event = TstirEvent::e::none;
+                    state = TonOff::e::ON;
+                    event = TstirEvent::e::none;
                     changeSpeed(setpoint);
                 } else if (action == Taction::e::stop) {
-                    // state change needed or just speed change?
-                    if (state != TonOff::e::OFF)
-                        state = TonOff::e::OFF;
-                    if (event != TstirEvent::e::none)
-                        event = TstirEvent::e::none;
+                    state = TonOff::e::OFF;
+                    event = TstirEvent::e::none;
                     changeSpeed(0);
                 } else if (action == Taction::e::pause) {
                     if (state == TonOff::e::ON) {
                         // no state change but stopping the motor
-                        if (event != TstirEvent::e::pausing)
-                            event = TstirEvent::e::pausing;
+                        event = TstirEvent::e::pausing;
                         changeSpeed(0);
                     }
                 } else if (action == Taction::e::resume) {
@@ -211,8 +202,7 @@ class Tstirrer : public TmenuHandle{
                     }
                 } else if (action == Taction::e::vortex) {
                     // no state change but running the vortex
-                    if (event != TstirEvent::e::vortexing)
-                        event = TstirEvent::e::vortexing;
+                    event = TstirEvent::e::vortexing;
                     vortexPeak = false;
                     changeSpeed(settings.vortexSpeed);
                 }
@@ -222,40 +212,32 @@ class Tstirrer : public TmenuHandle{
             // vortex end timer
             on(FvortexEndTimer) {
                 // resume where we were before the vortex
-                (state == TonOff::e::ON) ? 
-                    changeSpeed(setpoint) : 
-                    changeSpeed(0);
+                (state == TonOff::e::ON) ? changeSpeed(setpoint) : changeSpeed(0);
             };
 
             // update speed from hardware
             on(hardware().motor.speed) {
-                if (speed != hardware().motor.speed)
-                    speed = hardware().motor.speed;
+                speed = hardware().motor.speed;
             };
 
             // reset motor error when publish is turned on
             // this ensures it gets logged when the next error occurs
-            // FIXME: is this the best strategy to make sure errors
-            // are logged as soon as publish is turned on?
+            // FIXME: use the final implementation for change detection in sdds
             on(particleSystem().publishing.publish) {
-                if (particleSystem().publishing.publish == TonOff::e::ON) {
+                if (particleSystem().publishing.publish == TonOff::e::ON && _changed) {
                     motorError = Thardware::Tmotor::Terror::e::none;
                 }
             };
 
             // update motor error from hardware
             on(hardware().motor.error) {
-                // only record one when there's a change
-                if (motorError != hardware().motor.error)
-                    motorError = hardware().motor.error;
+                motorError = hardware().motor.error;
                 if (motorError != Thardware::Tmotor::Terror::e::none) {
                     // error, stop operations
                     FvortexEndTimer.stop();
                     FspeedChangeTimer.stop();
-                    if (motor != Tmotor::e::error)
-                        motor = Tmotor::e::error;
-                    if (event != TstirEvent::e::none)
-                        event = TstirEvent::e::none;
+                    motor = Tmotor::e::error;
+                    event = TstirEvent::e::none;
                     if (!FrestartTimer.running())
                         FrestartTimer.start(FrestartDelay);
                 }
