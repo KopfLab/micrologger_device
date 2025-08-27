@@ -4,6 +4,7 @@
 #include "uStirrer.h"
 #include "uHardware.h"
 
+
 /**
  * @brief 
  */
@@ -21,10 +22,15 @@ class TmicroLogger : public TmenuHandle {
          */
         class TopticalDensity : public TmenuHandle{
 
+            private:
+
+                // keep track of publishing to detect when it switches from OFF to ON
+		        bool FisPublishing = particleSystem().publishing.publish == TonOff::ON;
+
             public:
             
                 // this should not be saved in state!
-                sdds_var(TonOff, beam, 0, TonOff::e::OFF);
+                sdds_var(TonOff, beam, 0, TonOff::OFF);
                 sdds_var(Thardware::Tbeam::Terror, beamError, sdds::opt::readonly);
 
                 TopticalDensity() {
@@ -34,11 +40,11 @@ class TmicroLogger : public TmenuHandle {
 
                     // reset beam error when publish is turned on
                     // this ensures it gets logged when a new error occurs
-                    // FIXME: use the final implementation for change detection in sdds
                     on(particleSystem().publishing.publish) {
-                        if (particleSystem().publishing.publish == TonOff::e::ON && _changed) {
-                            beamError = Thardware::Tbeam::Terror::e::none;
+                        if (!FisPublishing && particleSystem().publishing.publish == TonOff::ON) {
+                            beamError = Thardware::Tbeam::Terror::none;
                         }
+                        FisPublishing = particleSystem().publishing.publish == TonOff::ON;
                     };
 
                     // update beam error from hardware
@@ -48,21 +54,17 @@ class TmicroLogger : public TmenuHandle {
 
                     // turn beam on and off
                     on(beam) {
-                        if (beam == TonOff::e::ON) {
+                        if (beam == TonOff::ON) {
                             hardware().beam.turnOn();
                             if (!hardware().beam.isOn()) {
                                 Log.error("could not turn beam ON, check beamError");
-                                // FIXME: ideally should set Fvalue or use .__setValue() with signal = false
-                                // NOTE: only matters if beam status interval is set to 1 (always publish)
-                                beam = TonOff::e::OFF; 
+                                beam = TonOff::OFF; 
                             }
                         } else {
                             hardware().beam.turnOff();
                             if (hardware().beam.isOn()) {
                                 Log.error("could not turn beam OFF, check beamError");
-                                // FIXME: ideally should set Fvalue or use .__setValue() with signal = false
-                                // NOTE: only matters if beam status interval is set to 1 (always publish)
-                                beam = TonOff::e::ON;
+                                beam = TonOff::ON;
                             }
                         }
                     };

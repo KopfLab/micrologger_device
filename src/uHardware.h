@@ -135,55 +135,55 @@ class Thardware : public TmenuHandle{
                     // check if device is present
                     Wire.beginTransmission(FmplexAddress);
                     if(Wire.endTransmission() != 0) {
-                        error = Terror::e::failedInit;
+                        error = Terror::failedInit;
                         return false;
                     }
                 
                     // configure pin inputs/outputs (only beam pin as output)
                     FmplexPinConfig = FmplexPinConfig & ~(0x01 << FbeamPin);
                     if (!transmit(FmplexPinConfigRegister, FmplexPinConfig)) {
-                        error = Terror::e::failedInit;
+                        error = Terror::failedInit;
                         return false;
                     }
 
                     // set all pins to off
                     if (!transmit(FmplexPinStateRegister, FmplexPinState)) {
-                        error = Terror::e::failedSet;
+                        error = Terror::failedSet;
                         return false;
                     }
             
                     // successfully initialized, set error to none
-                    error = Terror::e::none;
+                    error = Terror::none;
                     return true;
                 }
 
                 void turnOn() {
                     // init if needed
-                    if (!initialized || error == Terror::e::failedInit) {
+                    if (!initialized || error == Terror::failedInit) {
                         if (!init()) return;
                     }
                     // set if off or last command failed
-                    if (!on || error == Terror::e::failedSet) {
+                    if (!on || error == Terror::failedSet) {
                         FmplexPinState = FmplexPinState | (0x01 << FbeamPin);
                         on = transmit(FmplexPinStateRegister, FmplexPinState);
                         error = !on ? 
-                            Terror::e::failedSet :
-                            Terror::e::none;
+                            Terror::failedSet :
+                            Terror::none;
                     }
                 }
 
                 void turnOff() {
                     // init if needed
-                    if (!initialized || error == Terror::e::failedInit) {
+                    if (!initialized || error == Terror::failedInit) {
                         if (!init()) return;
                     }
                     // set if on or last command failed
-                    if (on || error == Terror::e::failedSet) {
+                    if (on || error == Terror::failedSet) {
                         FmplexPinState = FmplexPinState & ~(0x01 << FbeamPin);
                         on = !transmit(FmplexPinStateRegister, FmplexPinState);
                         error = on ? 
-                            Terror::e::failedSet :
-                            Terror::e::none;
+                            Terror::failedSet :
+                            Terror::none;
                     }
                 }
 
@@ -196,7 +196,7 @@ class Thardware : public TmenuHandle{
             #ifdef SDDS_ON_PARTICLE
                 // if on a particle system, initialize once startup is complete
                 on(particleSystem().startup) {
-                    if (particleSystem().startup == TparticleSystem::TstartupStatus::e::complete) {
+                    if (particleSystem().startup == TparticleSystem::TstartupStatus::complete) {
                         init();
                     }
                 };
