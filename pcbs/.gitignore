@@ -1,3 +1,17 @@
-# gerber files
+# Manufacturing files
+images
+production
 *.cam
 *.zip
+
+# KiCad settings files
+*.kicad_prl
+*.json
+
+# Temp files
+*.lck
+*.bak
+fp-info-cache
+
+# Explicitly include
+!*.pdf
