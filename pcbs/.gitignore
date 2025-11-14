@@ -3,6 +3,7 @@ images
 production
 *.cam
 *.zip
+*.html
 
 # KiCad settings files
 *.kicad_prl
