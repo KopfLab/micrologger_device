@@ -1,0 +1,5 @@
+﻿Designator,Quantity,Value,Footprint,Package,MPN,DNP,Mount_Type,Description,DigiKey,URL
+J1,1,JST S2B-ZR,JST_ZH_2POS_RA_S2B-ZR,,,,tht,"Connector Header Through Hole, Right Angle 2 position 0.059"" (1.50mm)",455-1669-ND,https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576
+LED1,1,630NM MTE7063NK2-UR,TO-46-2,,,,tht,Visible Emitter 630nm 1.9V 50mA 5° TO-46-2 Lens Top Metal Can,1125-1382-ND,https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919
+R1,1,47Ω,R_1206_3216Metric_Pad1.30x1.75mm_HandSolder,,,,smt,"Resistor, US symbol",,
+U1,1,BCR401UW6Q-7,LED_driver_SOT-23-6_SOT95P285X140-6N,,,,tht,LED Driver IC 1 Output Linear PWM Dimming 100mA SOT-26,BCR401UW6Q-7DICT-ND,https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843

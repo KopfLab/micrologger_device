@@ -144,14 +144,14 @@
 			)
 		)
 		(property "Value" "BCR401UW6Q-7"
-			(at 1.0087 3.516 0)
+			(at 3.238 0.016 0)
 			(unlocked yes)
-			(layer "F.Fab")
+			(layer "Cmts.User")
 			(uuid "f8b43809-26f9-4664-bcf2-a29c0898a08e")
 			(effects
 				(font
-					(size 0.2 0.2)
-					(thickness 0.05)
+					(size 0.5 0.5)
+					(thickness 0.1)
 					(bold yes)
 				)
 			)
@@ -180,7 +180,7 @@
 				)
 			)
 		)
-		(property "Digikey" "https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843"
+		(property "DigiKey" "BCR401UW6Q-7DICT-ND"
 			(at 0 0 270)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -193,25 +193,12 @@
 				)
 			)
 		)
-		(property "DigiKey" "BCR401UW6Q-7DICT-ND"
-			(at 0 0 270)
-			(unlocked yes)
-			(layer "F.Fab")
-			(hide yes)
-			(uuid "65728e7a-350b-4c72-b5b4-ca25fd230c99")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property "URL" "https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843"
 			(at 0 0 270)
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "6f560f80-13d9-49b4-ad3f-9ba5b49639b1")
+			(uuid "65728e7a-350b-4c72-b5b4-ca25fd230c99")
 			(effects
 				(font
 					(size 1 1)
@@ -795,7 +782,7 @@
 		(property "Value" "JST S2B-ZR"
 			(at 0.768719 -3.16982 0)
 			(unlocked yes)
-			(layer "F.Fab")
+			(layer "Cmts.User")
 			(uuid "4cea44b1-9d3f-409b-a5a4-8badbe695a8b")
 			(effects
 				(font
@@ -1026,7 +1013,7 @@
 		)
 		(property "Value" "630NM MTE7063NK2-UR"
 			(at 1.163079 0.917784 0)
-			(layer "F.Fab")
+			(layer "Cmts.User")
 			(uuid "8eea4cc6-4306-4435-b467-0829174665e2")
 			(effects
 				(font
@@ -1062,7 +1049,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Sim.Pins" "1=K 2=A"
+		(property "DigiKey" "1125-1382-ND"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "B.Fab")
@@ -1076,26 +1063,12 @@
 				(justify mirror)
 			)
 		)
-		(property "DigiKey" "1125-1382-ND"
-			(at 0 0 180)
-			(unlocked yes)
-			(layer "B.Fab")
-			(hide yes)
-			(uuid "a43dd540-8d20-4328-8b72-d92423000147")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-				(justify mirror)
-			)
-		)
 		(property "URL" "https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "B.Fab")
 			(hide yes)
-			(uuid "c628d9a2-cc95-49a2-a4c7-27b352e4ac8c")
+			(uuid "a43dd540-8d20-4328-8b72-d92423000147")
 			(effects
 				(font
 					(size 1 1)
@@ -1311,21 +1284,9 @@
 			(justify bottom)
 		)
 	)
-	(gr_text ".401"
-		(at 149.302948 108.202566 0)
-		(layer "F.Fab")
-		(uuid "390f3c76-4e31-483c-9f52-504e7c0d2c0f")
-		(effects
-			(font
-				(size 0.373888 0.373888)
-				(thickness 0.032512)
-			)
-			(justify left bottom)
-		)
-	)
 	(gr_text "+"
 		(at 151.4989 100.7464 0)
-		(layer "F.Fab")
+		(layer "B.SilkS")
 		(uuid "412ce3e0-35e6-4f86-a5be-670060cf6dca")
 		(effects
 			(font
@@ -1337,7 +1298,7 @@
 	)
 	(gr_text "-"
 		(at 159 101 0)
-		(layer "F.Fab")
+		(layer "B.SilkS")
 		(uuid "d69c1e92-bb96-43e2-983c-3c67b9b9cbd3")
 		(effects
 			(font
