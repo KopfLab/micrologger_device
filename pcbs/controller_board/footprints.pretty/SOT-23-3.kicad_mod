@@ -3,8 +3,8 @@
 	(generator "pcbnew")
 	(generator_version "9.0")
 	(layer "F.Cu")
-	(property "Reference" "**REF"
-		(at 1.651 0.8255 0)
+	(property "Reference" "REF**"
+		(at 0 -2.5 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "0d3feea9-9bde-4604-8ded-aea3d4bc4458")
@@ -13,20 +13,19 @@
 				(size 1 1)
 				(thickness 0.1)
 			)
-			(justify left bottom)
 		)
 	)
-	(property "Value" "**VAL"
-		(at -1.14184 0.35735 0)
+	(property "Value" "VAL**"
+		(at 0 2.5 0)
 		(unlocked yes)
 		(layer "Cmts.User")
+		(hide yes)
 		(uuid "f96472a7-1aed-4a27-ab0a-6c040ecc613d")
 		(effects
 			(font
 				(size 0.5 0.5)
 				(thickness 0.05)
 			)
-			(justify left bottom)
 		)
 	)
 	(property "Datasheet" ""
@@ -41,7 +40,7 @@
 			)
 		)
 	)
-	(property "Description" "Surface Mount SOT-23-3"
+	(property "Description" ""
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
@@ -50,6 +49,29 @@
 			(font
 				(size 1.27 1.27)
 				(thickness 0.15)
+			)
+		)
+	)
+	(property "MPN" "${MPN}"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(uuid "e449e4cb-b518-4b36-bed7-bf74b84f6071")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.05)
+			)
+		)
+	)
+	(property "SK" "done"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "6af17015-4656-44c0-9c9c-5cf58517879c")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
 			)
 		)
 	)
@@ -103,25 +125,16 @@
 		(layer "F.SilkS")
 		(uuid "319c8cbb-9a70-426b-876f-a1f74d64acb8")
 	)
-	(fp_line
-		(start -1.524 -0.6985)
-		(end -1.524 0.6985)
+	(fp_rect
+		(start -1.5 -2)
+		(end 1.6202 1.975)
 		(stroke
-			(width 0.1524)
-			(type solid)
+			(width 0.05)
+			(type default)
 		)
-		(layer "F.Fab")
-		(uuid "e5c60a3c-fd93-44f1-ae26-33a6ba24b3e1")
-	)
-	(fp_line
-		(start -1.524 0.6985)
-		(end 1.524 0.6985)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(layer "F.Fab")
-		(uuid "3595c6ff-2291-4726-bace-5f95156d5520")
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "1fb8c81f-99b6-4aae-8f4d-6b7524182436")
 	)
 	(fp_line
 		(start -1.2065 0.6985)
@@ -242,26 +255,6 @@
 		)
 		(layer "F.Fab")
 		(uuid "c4e43731-2402-4ece-8d92-10fb08787fed")
-	)
-	(fp_line
-		(start 1.524 -0.6985)
-		(end -1.524 -0.6985)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(layer "F.Fab")
-		(uuid "3f7fd080-6089-4da8-9096-043dc943c089")
-	)
-	(fp_line
-		(start 1.524 0.6985)
-		(end 1.524 -0.6985)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(layer "F.Fab")
-		(uuid "44c56973-5283-4fef-8276-0bf8a5c0a6b7")
 	)
 	(pad "1" smd rect
 		(at -0.9525 1.0414)

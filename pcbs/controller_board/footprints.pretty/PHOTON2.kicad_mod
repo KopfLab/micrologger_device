@@ -3,7 +3,7 @@
 	(generator "pcbnew")
 	(generator_version "9.0")
 	(layer "F.Cu")
-	(descr "PHOTON 2")
+	(descr "Photon2 Boron")
 	(property "Reference" "REF**"
 		(at 0 1.27 0)
 		(unlocked yes)
@@ -12,13 +12,13 @@
 		(uuid "fb0d66ba-ac98-41ee-8a2f-8a9504fe365c")
 		(effects
 			(font
-				(size 1.1684 1.1684)
-				(thickness 0.1016)
+				(size 1.5 1.5)
+				(thickness 0.2)
 			)
 			(justify left bottom)
 		)
 	)
-	(property "Value" "PHOTON2"
+	(property "Value" "VAL**"
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
@@ -43,7 +43,7 @@
 			)
 		)
 	)
-	(property "Description" "#{Description}"
+	(property "Description" ""
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)

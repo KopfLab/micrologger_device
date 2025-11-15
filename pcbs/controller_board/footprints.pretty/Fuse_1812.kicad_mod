@@ -1,0 +1,159 @@
+(footprint "Fuse_1812"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(tags "SparkFun")
+	(property "Reference" "REF**"
+		(at 3.332882 -0.011612 0)
+		(layer "F.SilkS")
+		(uuid "b1ac9c98-27e8-4af2-91f5-5f6fd5187788")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.2)
+				(bold yes)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "VAL**"
+		(at 0 2.5 0)
+		(layer "Cmts.User")
+		(uuid "266f9c98-6042-4272-832b-0021a91707af")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.05)
+				(bold yes)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "de3443a3-273b-421f-8181-25e6ce751663")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "9d092b3b-f18c-4eba-bf7d-510ce1f3bedf")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "MPN" "${MPN}"
+		(at 0 3.5 0)
+		(layer "Cmts.User")
+		(uuid "e2a8a8e9-1338-4e98-86b3-3687c3e319b4")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.05)
+			)
+		)
+	)
+	(property "SK" "done"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "4cda79ba-a1f5-4528-8f45-1d490e81b102")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -3.321269 1.524)
+		(end -3.321269 -1.524)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ce08dfe6-f956-4ed0-8b5a-9206ebf52ed1")
+	)
+	(fp_line
+		(start -3.309656 -1.524)
+		(end 3.332882 -1.524)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "cae1fed7-b1c0-4335-93b5-2eb1e44ca79a")
+	)
+	(fp_line
+		(start 3.332882 -1.535612)
+		(end 3.332882 1.512388)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "84b61173-3b2f-40f9-a198-b072d691104f")
+	)
+	(fp_line
+		(start 3.332882 1.532893)
+		(end -3.286431 1.532893)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "6791a59f-a4e0-4e6f-a9fc-0839fec1172d")
+	)
+	(fp_rect
+		(start -3.4 -1.7)
+		(end 3.4 1.7)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "9ca2128c-f09f-49dc-8f17-597394c5bb73")
+	)
+	(pad "1" smd rect
+		(at -2.3876 0)
+		(size 1.6764 2.8956)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(thermal_bridge_angle 0)
+		(uuid "71bbf98b-1d18-420e-9a31-263aa8edb86e")
+	)
+	(pad "2" smd rect
+		(at 2.3876 0)
+		(size 1.6764 2.8956)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(thermal_bridge_angle 0)
+		(uuid "0ef6a654-d235-4122-b46c-4165c83a7b01")
+	)
+	(embedded_fonts no)
+	(model "${KICAD9_3RD_PARTY}/3dmodels/com_github_sparkfun_SparkFun-KiCad-Libraries/Fuse.3dshapes/Fuse_1812_4532Metric.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 0 0)
+		)
+	)
+)

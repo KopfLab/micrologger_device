@@ -4,29 +4,28 @@
 	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "REF**"
-		(at 0 -3.5 0)
+		(at 2.5 -5 0)
 		(unlocked yes)
-		(layer "F.SilkS")
+		(layer "B.SilkS")
 		(uuid "0cc30347-21ab-4dae-bf67-ebb84f37e0b0")
 		(effects
 			(font
 				(size 1.5 1.5)
-				(thickness 0.1)
+				(thickness 0.2)
 			)
-			(justify left bottom)
+			(justify mirror)
 		)
 	)
-	(property "Value" "R-78E5.0-1.0"
-		(at -2.5 -1.5 0)
+	(property "Value" "VAL**"
+		(at 2.5 -3.5 0)
 		(unlocked yes)
 		(layer "Cmts.User")
 		(uuid "ff2ab9d8-2394-444b-8d81-68b67e3c8d65")
 		(effects
 			(font
-				(size 0.9 0.9)
-				(thickness 0.05)
+				(size 0.6 0.6)
+				(thickness 0.06)
 			)
-			(justify left bottom)
 		)
 	)
 	(property "Datasheet" ""
@@ -42,7 +41,7 @@
 		)
 	)
 	(property "Description" ""
-		(at 0 0 0)
+		(at 3 4 0)
 		(layer "F.Fab")
 		(hide yes)
 		(uuid "f973578c-fb31-4f83-94e1-ce2ae9db364b")
@@ -50,6 +49,18 @@
 			(font
 				(size 1.27 1.27)
 				(thickness 0.15)
+			)
+		)
+	)
+	(property "MPN" "${MPN}"
+		(at 2.5 -2.5 0)
+		(unlocked yes)
+		(layer "Cmts.User")
+		(uuid "46dfc069-1e87-453b-9141-eca1d742026b")
+		(effects
+			(font
+				(size 0.6 0.6)
+				(thickness 0.06)
 			)
 		)
 	)
@@ -133,17 +144,17 @@
 		(layer "F.Fab")
 		(uuid "dfdfd33e-d9a6-4682-bee7-5fe0299da8d8")
 	)
-	(fp_text user "*"
-		(at -4.9062 0.635 0)
+	(fp_text user "${Reference}"
+		(at -4 -2 0)
 		(unlocked yes)
 		(layer "F.SilkS")
-		(uuid "1734146d-2222-499a-b690-33c4cc6e88f5")
+		(uuid "277df1a6-10d0-41ff-8509-e03e11184a66")
 		(effects
 			(font
-				(size 1.1938 1.1938)
-				(thickness 0.0762)
+				(size 1.5 1.5)
+				(thickness 0.2)
 			)
-			(justify left bottom)
+			(justify right)
 		)
 	)
 	(pad "1" thru_hole rect

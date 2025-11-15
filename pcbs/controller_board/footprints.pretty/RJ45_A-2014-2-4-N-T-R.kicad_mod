@@ -1,32 +1,31 @@
-(footprint "ASSMANN_A-2014-2-4-N-T-R"
+(footprint "RJ45_A-2014-2-4-N-T-R"
 	(version 20241229)
 	(generator "pcbnew")
 	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "REF**"
-		(at 2.635892 -1.937966 180)
+		(at 0 3 180)
 		(unlocked yes)
-		(layer "F.SilkS")
+		(layer "B.SilkS")
 		(uuid "659faad8-27fe-4deb-a0b5-0817959d766c")
 		(effects
 			(font
 				(size 1.5 1.5)
-				(thickness 0.1)
+				(thickness 0.2)
 			)
-			(justify left bottom)
+			(justify mirror)
 		)
 	)
 	(property "Value" "VAL**"
-		(at -3 -3 180)
+		(at 0 0 180)
 		(unlocked yes)
 		(layer "Cmts.User")
 		(uuid "1bad370c-908b-497d-acf7-e583f20c0caf")
 		(effects
 			(font
-				(size 0.8 0.8)
-				(thickness 0.05)
+				(size 1 1)
+				(thickness 0.1)
 			)
-			(justify right top)
 		)
 	)
 	(property "Datasheet" ""
@@ -53,14 +52,14 @@
 			)
 		)
 	)
-	(property "Type" "RJ45"
-		(at 0 1.5 180)
+	(property "MPN" "${MPN}"
+		(at 0 5.5 180)
 		(layer "Cmts.User")
 		(uuid "4c946b5b-cd76-437d-a90f-66dd1c255205")
 		(effects
 			(font
-				(size 1.5 1.5)
-				(thickness 0.1)
+				(size 0.6 0.6)
+				(thickness 0.06)
 			)
 		)
 	)
@@ -123,17 +122,6 @@
 		)
 		(layer "F.SilkS")
 		(uuid "600e4e44-556e-44f3-a828-1d4489406f1c")
-	)
-	(fp_circle
-		(center -8.6 -6.2)
-		(end -8.5 -6.2)
-		(stroke
-			(width 0.2)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.SilkS")
-		(uuid "468614c4-c832-40da-8392-e97d0ae16519")
 	)
 	(fp_line
 		(start -8 -10.27)
@@ -214,17 +202,6 @@
 		)
 		(layer "F.Fab")
 		(uuid "1e131fc3-e81d-4483-8666-d362480dd8a0")
-	)
-	(fp_circle
-		(center -8.6 -6.2)
-		(end -8.5 -6.2)
-		(stroke
-			(width 0.2)
-			(type solid)
-		)
-		(fill no)
-		(layer "F.Fab")
-		(uuid "2011ae61-1078-4d94-a950-efaec9de9100")
 	)
 	(pad "" np_thru_hole circle
 		(at -5.715 0)

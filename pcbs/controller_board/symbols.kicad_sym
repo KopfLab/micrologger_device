@@ -377,666 +377,25 @@
 		)
 		(embedded_fonts no)
 	)
-	(symbol "BSS138_SOT-23-3"
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(property "Reference" "U"
-			(at 8.128 -7.112 0)
-			(effects
-				(font
-					(size 2.083 1.7705)
-					(thickness 0.3541)
-					(bold yes)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Value" "BSS138"
-			(at 8.382 3.048 0)
-			(effects
-				(font
-					(size 1 1)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Footprint" "footprints:SOT-23-3"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.onsemi.jp/pdf/datasheet/bss138-d.pdf"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "N-Channel 50 V 170mA 350mW (Ta) Surface Mount SOT-23-3"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "DigiKey" "BSS138CT-ND"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "URL" "https://www.digikey.com/en/products/detail/onsemi/BSS138/244210"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Info" "info"
-			(at 18.034 7.62 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
-				(justify left top)
-			)
-		)
-		(symbol "BSS138_SOT-23-3_1_0"
-			(polyline
-				(pts
-					(xy 7.62 5.08) (xy 7.62 -7.62)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 7.62 -7.62) (xy 33.02 -7.62)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 11.43 0) (xy 7.62 0)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 11.43 -3.81) (xy 11.43 0)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.145 1.27) (xy 17.145 -3.81)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.145 -3.81) (xy 11.43 -3.81)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.78 1.905) (xy 17.78 0.635)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.78 1.27) (xy 20.955 1.27)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.78 1.27) (xy 19.05 1.905) (xy 19.05 0.635)
-				)
-				(stroke
-					(width 0.0254)
-					(type solid)
-				)
-				(fill
-					(type outline)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.78 -0.635) (xy 17.78 -1.905)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.78 -1.27) (xy 19.05 -0.635)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.78 -3.175) (xy 17.78 -4.445)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 17.78 -3.81) (xy 20.955 -3.81)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 19.05 -0.635) (xy 19.05 -1.905)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 19.05 -1.905) (xy 17.78 -1.27)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 20.32 3.81)
-				(mid 25.4 -1.27)
-				(end 20.32 -6.35)
-				(stroke
-					(width 0.127)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 20.32 -6.35)
-				(mid 15.24 -1.27)
-				(end 20.32 3.81)
-				(stroke
-					(width 0.127)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 20.955 4.445) (xy 20.955 1.27)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 20.955 2.54) (xy 22.86 2.54)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 20.701 2.54)
-				(mid 20.955 2.794)
-				(end 21.209 2.54)
-				(stroke
-					(width 0.381)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 21.209 2.54)
-				(mid 20.955 2.286)
-				(end 20.701 2.54)
-				(stroke
-					(width 0.381)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 20.955 -1.27) (xy 17.78 -1.27)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 20.955 -1.27) (xy 20.955 -6.985)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 20.701 -3.81)
-				(mid 20.955 -3.556)
-				(end 21.209 -3.81)
-				(stroke
-					(width 0.381)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 21.209 -3.81)
-				(mid 20.955 -4.064)
-				(end 20.701 -3.81)
-				(stroke
-					(width 0.381)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 20.701 -5.08)
-				(mid 20.955 -4.826)
-				(end 21.209 -5.08)
-				(stroke
-					(width 0.381)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(arc
-				(start 21.209 -5.08)
-				(mid 20.955 -5.334)
-				(end 20.701 -5.08)
-				(stroke
-					(width 0.381)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 20.955 -6.985) (xy 29.21 -6.985)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 22.225 1.27) (xy 23.495 1.27) (xy 22.86 0)
-				)
-				(stroke
-					(width 0.0254)
-					(type solid)
-				)
-				(fill
-					(type outline)
-				)
-			)
-			(polyline
-				(pts
-					(xy 22.225 0) (xy 23.495 0)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 22.225 -1.27) (xy 23.495 -1.27)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 22.86 2.54) (xy 22.86 -5.08)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 22.86 0) (xy 22.225 -1.27)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 22.86 -5.08) (xy 20.955 -5.08)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 23.495 -1.27) (xy 22.86 0)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 29.21 4.445) (xy 20.955 4.445)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 29.21 0) (xy 29.21 4.445)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 29.21 -6.985) (xy 29.21 -2.54)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 33.02 5.08) (xy 7.62 5.08)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 33.02 0) (xy 29.21 0)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 33.02 -2.54) (xy 29.21 -2.54)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 33.02 -7.62) (xy 33.02 5.08)
-				)
-				(stroke
-					(width 0.1524)
-					(type solid)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(pin passive line
-				(at 2.54 0 0)
-				(length 5.08)
-				(name "G"
-					(effects
-						(font
-							(size 1.524 1.524)
-						)
-					)
-				)
-				(number "1"
-					(effects
-						(font
-							(size 1.524 1.524)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 38.1 0 180)
-				(length 5.08)
-				(name "D"
-					(effects
-						(font
-							(size 1.524 1.524)
-						)
-					)
-				)
-				(number "3"
-					(effects
-						(font
-							(size 1.524 1.524)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 38.1 -2.54 180)
-				(length 5.08)
-				(name "S"
-					(effects
-						(font
-							(size 1.524 1.524)
-						)
-					)
-				)
-				(number "2"
-					(effects
-						(font
-							(size 1.524 1.524)
-						)
-					)
-				)
-			)
-		)
-		(embedded_fonts no)
-	)
 	(symbol "DC_DC_converter_R-78E5.0-1.0"
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "U"
-			(at 18.034 -1.27 0)
+			(at 19.304 -0.254 0)
 			(effects
 				(font
 					(size 1.5 1.5)
 					(thickness 0.3)
 					(bold yes)
 				)
-				(justify left bottom)
 			)
 		)
-		(property "Value" "R-78E5.0-1.0"
-			(at 11.938 -7.112 0)
+		(property "Value" "8-28V in / 5V 5W out"
+			(at 10.922 -6.858 0)
 			(effects
 				(font
-					(size 1.5 1.5)
+					(size 1 1)
 				)
 				(justify left bottom)
 			)
@@ -1068,6 +427,14 @@
 				(hide yes)
 			)
 		)
+		(property "MPN" "R-78E5.0-1.0"
+			(at 19.812 -9.144 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
 		(property "DigiKey" "945-2201-ND"
 			(at 0 0 0)
 			(effects
@@ -1077,21 +444,13 @@
 				(hide yes)
 			)
 		)
-		(property "URL" "https://www.digikey.com/en/products/detail/recom-power/R-78E5-0-1-0/4930585"
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/recom-power/R-78E5-0-1-0/4930585"
 			(at 0 0 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
-			)
-		)
-		(property "Info" "DC/DC converter"
-			(at 20.066 6.858 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
 			)
 		)
 		(symbol "DC_DC_converter_R-78E5.0-1.0_1_0"
@@ -1200,7 +559,7 @@
 		)
 		(embedded_fonts no)
 	)
-	(symbol "D_SS36"
+	(symbol "D_Schottky_1A_40V_500mV"
 		(pin_numbers
 			(hide yes)
 		)
@@ -1212,7 +571,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "D"
-			(at -0.508 2.54 0)
+			(at 0 2.54 0)
 			(effects
 				(font
 					(size 1.5 1.5)
@@ -1221,15 +580,50 @@
 				)
 			)
 		)
-		(property "Value" "SS36"
+		(property "Value" "1A/40V/500mV"
 			(at 0 -2.54 0)
 			(effects
 				(font
-					(size 1.5 1.5)
+					(size 1 1)
 				)
 			)
 		)
-		(property "Footprint" "footprints:D_SS36"
+		(property "Footprint" "footprints:D_DO-214AC_SMA"
+			(at 0 -15.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/ss19-d.pdf"
+			(at 1.27 -17.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Diode 40 V 1A Surface Mount DO-214AC (SMA)"
+			(at 0 -20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SS14"
+			(at -0.254 -4.318 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "DigiKey" "SS14CT-ND"
 			(at 0 0 0)
 			(effects
 				(font
@@ -1238,7 +632,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/ss39-d.pdf"
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/onsemi/SS14/965474"
 			(at 0 0 0)
 			(effects
 				(font
@@ -1247,7 +641,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Diode 60 V 3A Surface Mount DO-214AB (SMC)"
+		(property "ki_keywords" "diode Schottky"
 			(at 0 0 0)
 			(effects
 				(font
@@ -1256,7 +650,7 @@
 				(hide yes)
 			)
 		)
-		(property "DigiKey" "SS36FSCT-ND"
+		(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
 			(at 0 0 0)
 			(effects
 				(font
@@ -1265,28 +659,10 @@
 				(hide yes)
 			)
 		)
-		(property "URL" "https://www.digikey.com/en/products/detail/onsemi/SS36/1053019"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ki_keywords" "diode"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(symbol "D_SS36_0_1"
+		(symbol "D_Schottky_1A_40V_500mV_0_1"
 			(polyline
 				(pts
-					(xy -1.27 1.27) (xy -1.27 -1.27)
+					(xy -1.27 0.762) (xy -1.27 1.016) (xy -0.762 1.016) (xy -0.762 -1.016) (xy -0.254 -1.016) (xy -0.254 -0.762)
 				)
 				(stroke
 					(width 0.254)
@@ -1298,19 +674,7 @@
 			)
 			(polyline
 				(pts
-					(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
-				)
-				(stroke
-					(width 0.254)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 1.27 0) (xy -1.27 0)
+					(xy -0.762 0) (xy 0.762 0)
 				)
 				(stroke
 					(width 0)
@@ -1320,11 +684,23 @@
 					(type none)
 				)
 			)
+			(polyline
+				(pts
+					(xy 0.762 -1.016) (xy -0.762 0) (xy 0.762 1.016) (xy 0.762 -1.016)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
 		)
-		(symbol "D_SS36_1_1"
+		(symbol "D_Schottky_1A_40V_500mV_1_1"
 			(pin passive line
-				(at -3.81 0 0)
-				(length 2.54)
+				(at -2.54 0 0)
+				(length 1.778)
 				(name "K"
 					(effects
 						(font
@@ -1341,9 +717,538 @@
 				)
 			)
 			(pin passive line
-				(at 3.81 0 180)
-				(length 2.54)
+				(at 2.54 0 180)
+				(length 1.778)
 				(name "A"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+	(symbol "D_Schottky_3A_60V_750mV"
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 1.016)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "D"
+			(at 0 2.54 0)
+			(effects
+				(font
+					(size 1.5 1.5)
+					(thickness 0.3)
+					(bold yes)
+				)
+			)
+		)
+		(property "Value" "3A/60V/750mV"
+			(at 0 -2.54 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" "footprints:D_DO-214AB_SMC"
+			(at 0 -15.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/ss39-d.pdf"
+			(at 1.27 -17.78 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Diode 60 V 3A Surface Mount DO-214AB (SMC)"
+			(at 0 -20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SS36"
+			(at -0.254 -4.318 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "DigiKey" "SS36FSCT-ND"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/onsemi/SS36/1053019"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "diode Schottky"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "D_Schottky_3A_60V_750mV_0_1"
+			(polyline
+				(pts
+					(xy -1.27 0.762) (xy -1.27 1.016) (xy -0.762 1.016) (xy -0.762 -1.016) (xy -0.254 -1.016) (xy -0.254 -0.762)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy -0.762 0) (xy 0.762 0)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 -1.016) (xy -0.762 0) (xy 0.762 1.016) (xy 0.762 -1.016)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "D_Schottky_3A_60V_750mV_1_1"
+			(pin passive line
+				(at -2.54 0 0)
+				(length 1.778)
+				(name "K"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 2.54 0 180)
+				(length 1.778)
+				(name "A"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+	(symbol "D_Zener_40V"
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 1.016)
+			(hide yes)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "D"
+			(at 0 2.54 0)
+			(effects
+				(font
+					(size 1.5 1.5)
+					(thickness 0.3)
+					(bold yes)
+				)
+			)
+		)
+		(property "Value" "40V"
+			(at 0 -2.54 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" "footprints:D_DO-214AA_SMB"
+			(at 0 -7.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.littelfuse.com/assetdocs/tvs-diodes-smbj-series-datasheet?assetguid=ba555e99-a12d-4f72-a0b6-86b06c67171e"
+			(at 0 -5.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "58.1V Clamp 10.4A Ipp Tvs Diode Surface Mount DO-214AA (SMBJ)"
+			(at 0 -12.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "SMBJ36A"
+			(at 0 -4.318 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "DigiKey" "SMBJ36ALFCT-ND"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/littelfuse-inc/SMBJ36A/286010"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "SparkFun diode zener"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "D_Zener_40V_0_1"
+			(polyline
+				(pts
+					(xy -0.254 1.016) (xy -0.762 1.016) (xy -0.762 -1.016)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 1.016) (xy -0.762 0) (xy 0.762 -1.016) (xy 0.762 1.016)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 0.762 0) (xy -0.762 0)
+				)
+				(stroke
+					(width 0)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "D_Zener_40V_1_1"
+			(pin passive line
+				(at -2.54 0 0)
+				(length 1.778)
+				(name "K"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 2.54 0 180)
+				(length 1.778)
+				(name "A"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "2"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+		)
+		(embedded_fonts no)
+	)
+	(symbol "Fuse_33V_750mA_1.5A"
+		(pin_numbers
+			(hide yes)
+		)
+		(pin_names
+			(offset 0)
+		)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(property "Reference" "F"
+			(at 0 2.54 0)
+			(effects
+				(font
+					(size 1.5 1.5)
+					(thickness 0.3)
+					(bold yes)
+				)
+			)
+		)
+		(property "Value" "33V/750mA/1.5A"
+			(at 0 -2.54 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "Footprint" "footprints:Fuse_1812"
+			(at 0 -7.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.bourns.com/docs/product-datasheets/mf-msmf.pdf"
+			(at 1.016 -5.588 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Polymeric PTC Resettable Fuse 33V 760 mA Ih Surface Mount 1812"
+			(at 0 -12.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "MF-MSMF075/33X-2"
+			(at 0.254 -4.318 0)
+			(effects
+				(font
+					(size 0.8 0.8)
+				)
+			)
+		)
+		(property "DigiKey" "118-MF-MSMF075/33X-2CT-ND"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/bourns-inc/MF-MSMF075-33X-2/16357034"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "UnitPrice" "0.91"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_keywords" "SparkFun resettable fuse PTC PPTC polyfuse polyswitch"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "ki_fp_filters" "*polyfuse* *PTC*"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(symbol "Fuse_33V_750mA_1.5A_0_1"
+			(rectangle
+				(start -1.905 0.635)
+				(end 1.905 -0.635)
+				(stroke
+					(width 0.2032)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy -1.905 -1.27) (xy -1.27 -1.27) (xy 1.27 1.27) (xy 1.905 1.27)
+				)
+				(stroke
+					(width 0.254)
+					(type default)
+				)
+				(fill
+					(type none)
+				)
+			)
+		)
+		(symbol "Fuse_33V_750mA_1.5A_1_1"
+			(pin passive line
+				(at -2.54 0 0)
+				(length 0.635)
+				(name "~"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "1"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 2.54 0 180)
+				(length 0.635)
+				(name "~"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -1467,23 +1372,21 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "U"
-			(at -1.778 0.508 0)
+			(at 0 0 0)
 			(effects
 				(font
 					(size 1.5 1.5)
 					(thickness 0.3)
 					(bold yes)
 				)
-				(justify left top)
 			)
 		)
-		(property "Value" "Photon2"
+		(property "Value" "Particle2 / Boron"
 			(at -0.254 21.59 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1 1)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "footprints:PHOTON2"
@@ -1495,7 +1398,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://docs.particle.io/reference/datasheets/wi-fi/photon-2-datasheet/"
 			(at 0 0 0)
 			(effects
 				(font
@@ -1513,12 +1416,21 @@
 				(hide yes)
 			)
 		)
-		(property "Info" "MCU"
-			(at -0.254 21.59 0)
+		(property "MPN" "PHN2MEA / BRN404"
+			(at 0 -24.638 0)
 			(effects
 				(font
-					(size 1.5 1.5)
+					(size 1 1)
 				)
+			)
+		)
+		(property "ParticleURL" "https://store.particle.io/collections/wifi/products/photon-2"
+			(at 0 0 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
 			)
 		)
 		(symbol "PHOTON2_1_0"
@@ -2118,14 +2030,14 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "J"
-			(at -2.032 12.446 0)
+			(at 0.762 13.208 0)
 			(effects
 				(font
 					(size 1.5 1.5)
 					(thickness 0.3)
 					(bold yes)
 				)
-				(justify left bottom)
+				(justify right)
 			)
 		)
 		(property "Value" ""
@@ -2163,14 +2075,6 @@
 					(size 1.27 1.27)
 				)
 				(hide yes)
-			)
-		)
-		(property "Info" "info"
-			(at -2.54 16.764 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
 			)
 		)
 		(symbol "PINHD-1X12_1_0"
@@ -2446,14 +2350,14 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "J"
-			(at -2.032 5.08 0)
+			(at 0.762 5.842 0)
 			(effects
 				(font
 					(size 1.5 1.5)
 					(thickness 0.3)
 					(bold yes)
 				)
-				(justify left bottom)
+				(justify right)
 			)
 		)
 		(property "Value" ""
@@ -2491,14 +2395,6 @@
 					(size 1.27 1.27)
 				)
 				(hide yes)
-			)
-		)
-		(property "Info" "info"
-			(at -2.286 9.652 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
 			)
 		)
 		(symbol "PINHD-1X4_1_0"
@@ -2630,14 +2526,14 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "J"
-			(at -2.286 7.366 0)
+			(at 0.762 8.382 0)
 			(effects
 				(font
 					(size 1.5 1.5)
 					(thickness 0.3)
 					(bold yes)
 				)
-				(justify left bottom)
+				(justify right)
 			)
 		)
 		(property "Value" ""
@@ -2675,14 +2571,6 @@
 					(size 1.27 1.27)
 				)
 				(hide yes)
-			)
-		)
-		(property "Info" "info"
-			(at -2.794 11.684 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
 			)
 		)
 		(symbol "PINHD-1X7_1_0"
@@ -2868,23 +2756,21 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "P"
-			(at -2.794 5.08 0)
+			(at 0 6.604 0)
 			(effects
 				(font
 					(size 1.5 1.5)
 					(thickness 0.3)
 					(bold yes)
 				)
-				(justify left bottom)
 			)
 		)
-		(property "Value" "PJ-064A"
-			(at -6.35 -5.588 0)
+		(property "Value" "24V / 5A"
+			(at -0.254 -4.318 0)
 			(effects
 				(font
-					(size 1.5 1.5)
+					(size 1 1)
 				)
-				(justify left bottom)
 			)
 		)
 		(property "Footprint" "footprints:PWR_JACK_PJ-064A"
@@ -2914,6 +2800,14 @@
 				(hide yes)
 			)
 		)
+		(property "MPN" "PJ-064A"
+			(at -0.254 -6.096 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
 		(property "DigiKey" "CP-064A-ND"
 			(at 0 0 0)
 			(effects
@@ -2923,21 +2817,13 @@
 				(hide yes)
 			)
 		)
-		(property "URL" "https://www.digikey.com/en/products/detail/cui-devices/PJ-064A/2627221"
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/cui-devices/PJ-064A/2627221"
 			(at 0 0 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
-			)
-		)
-		(property "Info" "power supply"
-			(at -1.016 9.144 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
 			)
 		)
 		(symbol "PWR_JACK_PJ-064A_1_0"
@@ -3166,45 +3052,31 @@
 		)
 		(embedded_fonts no)
 	)
-	(symbol "Polyfuse_PFSM.075.2"
-		(pin_numbers
-			(hide yes)
-		)
-		(pin_names
-			(offset 0)
-		)
+	(symbol "Q_NMOS_220mA_50V"
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(property "Reference" "F"
-			(at -2.54 -0.508 90)
+		(property "Reference" "Q"
+			(at 8.128 -7.112 0)
 			(effects
 				(font
 					(size 1.5 1.5)
-					(thickness 0.3)
+					(thickness 0.3541)
 					(bold yes)
 				)
+				(justify left bottom)
 			)
 		)
-		(property "Value" "PFSM.075.2"
-			(at 3.048 0 90)
+		(property "Value" "220mA / 50V"
+			(at 8.382 3.048 0)
 			(effects
 				(font
-					(size 1.5 1.5)
+					(size 1 1)
 				)
+				(justify left bottom)
 			)
 		)
-		(property "Footprint" "footprints:POLYFUSE_SMD075F-2"
-			(at 1.27 -5.08 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://us.schurter.com/en/datasheet/typ_PFSM.pdf"
+		(property "Footprint" "footprints:SOT-23-3"
 			(at 0 0 0)
 			(effects
 				(font
@@ -3213,7 +3085,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+		(property "Datasheet" "https://www.onsemi.jp/pdf/datasheet/bss138-d.pdf"
 			(at 0 0 0)
 			(effects
 				(font
@@ -3222,7 +3094,7 @@
 				(hide yes)
 			)
 		)
-		(property "DigiKey" "486-1176-1-ND"
+		(property "Description" "N-Channel 50 V 2200mA 350mW (Ta) Surface Mount SOT-23-3"
 			(at 0 0 0)
 			(effects
 				(font
@@ -3231,7 +3103,15 @@
 				(hide yes)
 			)
 		)
-		(property "URL" "https://www.digikey.com/en/products/detail/schurter-inc/PFSM-075-2/639775"
+		(property "MPN" "BSS138"
+			(at 20.066 -9.144 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigiKey" "BSS138CT-ND"
 			(at 0 0 0)
 			(effects
 				(font
@@ -3240,23 +3120,7 @@
 				(hide yes)
 			)
 		)
-		(property "Type" "Polyfuse"
-			(at -4.826 -0.254 90)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
-			)
-		)
-		(property "Info" "30V 750 mA"
-			(at 5.842 0.254 90)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
-			)
-		)
-		(property "JLCPCB Part#" "C70135"
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/onsemi/BSS138/244210"
 			(at 0 0 0)
 			(effects
 				(font
@@ -3265,61 +3129,14 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCB URL" "https://jlcpcb.com/partdetail/TECHFUSE-SMD075L/C70135"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCB Datasheet" "https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8586194474875146240"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ki_keywords" "resettable fuse PTC PPTC polyfuse polyswitch"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ki_fp_filters" "*polyfuse* *PTC*"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(symbol "Polyfuse_PFSM.075.2_0_1"
+		(symbol "Q_NMOS_220mA_50V_1_0"
 			(polyline
 				(pts
-					(xy -1.524 2.54) (xy -1.524 1.524) (xy 1.524 -1.524) (xy 1.524 -2.54)
+					(xy 7.62 5.08) (xy 7.62 -7.62)
 				)
 				(stroke
-					(width 0)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(rectangle
-				(start -0.762 2.54)
-				(end 0.762 -2.54)
-				(stroke
-					(width 0.254)
-					(type default)
+					(width 0.1524)
+					(type solid)
 				)
 				(fill
 					(type none)
@@ -3327,50 +3144,546 @@
 			)
 			(polyline
 				(pts
-					(xy 0 2.54) (xy 0 -2.54)
+					(xy 7.62 -7.62) (xy 33.02 -7.62)
 				)
 				(stroke
-					(width 0)
-					(type default)
+					(width 0.1524)
+					(type solid)
 				)
 				(fill
 					(type none)
 				)
 			)
-		)
-		(symbol "Polyfuse_PFSM.075.2_1_1"
+			(polyline
+				(pts
+					(xy 11.43 0) (xy 7.62 0)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 11.43 -3.81) (xy 11.43 0)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.145 1.27) (xy 17.145 -3.81)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.145 -3.81) (xy 11.43 -3.81)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.78 1.905) (xy 17.78 0.635)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.78 1.27) (xy 20.955 1.27)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.78 1.27) (xy 19.05 1.905) (xy 19.05 0.635)
+				)
+				(stroke
+					(width 0.0254)
+					(type solid)
+				)
+				(fill
+					(type outline)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.78 -0.635) (xy 17.78 -1.905)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.78 -1.27) (xy 19.05 -0.635)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.78 -3.175) (xy 17.78 -4.445)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 17.78 -3.81) (xy 20.955 -3.81)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 19.05 -0.635) (xy 19.05 -1.905)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 19.05 -1.905) (xy 17.78 -1.27)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 20.32 3.81)
+				(mid 25.4 -1.27)
+				(end 20.32 -6.35)
+				(stroke
+					(width 0.127)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 20.32 -6.35)
+				(mid 15.24 -1.27)
+				(end 20.32 3.81)
+				(stroke
+					(width 0.127)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 20.955 4.445) (xy 20.955 1.27)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 20.955 2.54) (xy 22.86 2.54)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 20.701 2.54)
+				(mid 20.955 2.794)
+				(end 21.209 2.54)
+				(stroke
+					(width 0.381)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 21.209 2.54)
+				(mid 20.955 2.286)
+				(end 20.701 2.54)
+				(stroke
+					(width 0.381)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 20.955 -1.27) (xy 17.78 -1.27)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 20.955 -1.27) (xy 20.955 -6.985)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 20.701 -3.81)
+				(mid 20.955 -3.556)
+				(end 21.209 -3.81)
+				(stroke
+					(width 0.381)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 21.209 -3.81)
+				(mid 20.955 -4.064)
+				(end 20.701 -3.81)
+				(stroke
+					(width 0.381)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 20.701 -5.08)
+				(mid 20.955 -4.826)
+				(end 21.209 -5.08)
+				(stroke
+					(width 0.381)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(arc
+				(start 21.209 -5.08)
+				(mid 20.955 -5.334)
+				(end 20.701 -5.08)
+				(stroke
+					(width 0.381)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 20.955 -6.985) (xy 29.21 -6.985)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 22.225 1.27) (xy 23.495 1.27) (xy 22.86 0)
+				)
+				(stroke
+					(width 0.0254)
+					(type solid)
+				)
+				(fill
+					(type outline)
+				)
+			)
+			(polyline
+				(pts
+					(xy 22.225 0) (xy 23.495 0)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 22.225 -1.27) (xy 23.495 -1.27)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 22.86 2.54) (xy 22.86 -5.08)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 22.86 0) (xy 22.225 -1.27)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 22.86 -5.08) (xy 20.955 -5.08)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 23.495 -1.27) (xy 22.86 0)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 29.21 4.445) (xy 20.955 4.445)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 29.21 0) (xy 29.21 4.445)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 29.21 -6.985) (xy 29.21 -2.54)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 33.02 5.08) (xy 7.62 5.08)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 33.02 0) (xy 29.21 0)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 33.02 -2.54) (xy 29.21 -2.54)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
+			(polyline
+				(pts
+					(xy 33.02 -7.62) (xy 33.02 5.08)
+				)
+				(stroke
+					(width 0.1524)
+					(type solid)
+				)
+				(fill
+					(type none)
+				)
+			)
 			(pin passive line
-				(at 0 3.81 270)
-				(length 1.27)
-				(name "~"
+				(at 2.54 0 0)
+				(length 5.08)
+				(name "G"
 					(effects
 						(font
-							(size 1.27 1.27)
+							(size 1.524 1.524)
 						)
 					)
 				)
 				(number "1"
 					(effects
 						(font
-							(size 1.27 1.27)
+							(size 1.524 1.524)
 						)
 					)
 				)
 			)
 			(pin passive line
-				(at 0 -3.81 90)
-				(length 1.27)
-				(name "~"
+				(at 38.1 0 180)
+				(length 5.08)
+				(name "D"
 					(effects
 						(font
-							(size 1.27 1.27)
+							(size 1.524 1.524)
+						)
+					)
+				)
+				(number "3"
+					(effects
+						(font
+							(size 1.524 1.524)
+						)
+					)
+				)
+			)
+			(pin passive line
+				(at 38.1 -2.54 180)
+				(length 5.08)
+				(name "S"
+					(effects
+						(font
+							(size 1.524 1.524)
 						)
 					)
 				)
 				(number "2"
 					(effects
 						(font
-							(size 1.27 1.27)
+							(size 1.524 1.524)
 						)
 					)
 				)
@@ -3383,26 +3696,25 @@
 		(in_bom yes)
 		(on_board yes)
 		(property "Reference" "J"
-			(at -1.524 9.398 0)
+			(at -0.254 10.16 0)
 			(effects
 				(font
 					(size 1.5 1.5)
 					(thickness 0.3)
 					(bold yes)
 				)
-				(justify left bottom)
 			)
 		)
-		(property "Value" "A-2014-2-4-N-T-R"
-			(at 4.318 -8.382 90)
+		(property "Value" "RJ45"
+			(at -2.286 -12.192 0)
 			(effects
 				(font
-					(size 1.2 1.2)
+					(size 1 1)
 				)
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" "footprints:ASSMANN_A-2014-2-4-N-T-R"
+		(property "Footprint" "footprints:RJ45_A-2014-2-4-N-T-R"
 			(at 0 0 0)
 			(effects
 				(font
@@ -3429,6 +3741,14 @@
 				(hide yes)
 			)
 		)
+		(property "MPN" "A-2014-2-4-N-T-R"
+			(at 3.556 1.27 90)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
 		(property "DigiKey" "AE10396-ND"
 			(at 0 0 0)
 			(effects
@@ -3438,21 +3758,13 @@
 				(hide yes)
 			)
 		)
-		(property "URL" "https://www.digikey.com/en/products/detail/assmann-wsw-components/A-2014-2-4-N-T-R/2183647"
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/assmann-wsw-components/A-2014-2-4-N-T-R/2183647"
 			(at 0 0 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
-			)
-		)
-		(property "Type" "RJ45"
-			(at 0 14.478 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
 			)
 		)
 		(symbol "RJ45_A-2014-2-4-N-T-R_1_0"
@@ -3679,7 +3991,7 @@
 				)
 			)
 		)
-		(property "Footprint" "footprints:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
+		(property "Footprint" "footprints:R_1206"
 			(at 1.016 -0.254 90)
 			(effects
 				(font
@@ -3816,167 +4128,6 @@
 					)
 				)
 				(number "1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-		)
-		(embedded_fonts no)
-	)
-	(symbol "TVS_SMBJ36A"
-		(pin_numbers
-			(hide yes)
-		)
-		(pin_names
-			(offset 1.016)
-			(hide yes)
-		)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(property "Reference" "D"
-			(at -0.508 2.54 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-					(thickness 0.3)
-					(bold yes)
-				)
-			)
-		)
-		(property "Value" "SMBJ36A"
-			(at 0 -2.54 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
-			)
-		)
-		(property "Footprint" "footprints:TVS_SMBJ36A"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.littelfuse.com/assetdocs/tvs-diodes-smbj-series-datasheet?assetguid=ba555e99-a12d-4f72-a0b6-86b06c67171e"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Zener diode"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "DigiKey" "SMBJ36ALFCT-ND"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "URL" "https://www.digikey.com/en/products/detail/littelfuse-inc/SMBJ36A/286010"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ki_keywords" "diode"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(symbol "TVS_SMBJ36A_0_1"
-			(polyline
-				(pts
-					(xy -1.7744 -1.2699) (xy -1.27 -1.27) (xy -1.27 1.27) (xy -0.762 1.27)
-				)
-				(stroke
-					(width 0.254)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 1.27 0) (xy -1.27 0)
-				)
-				(stroke
-					(width 0)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 1.27 -1.27) (xy 1.27 1.27) (xy -1.27 0) (xy 1.27 -1.27)
-				)
-				(stroke
-					(width 0.254)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-		)
-		(symbol "TVS_SMBJ36A_1_1"
-			(pin passive line
-				(at -3.81 0 0)
-				(length 2.54)
-				(name "K"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "1"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 3.81 0 180)
-				(length 2.54)
-				(name "A"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "2"
 					(effects
 						(font
 							(size 1.27 1.27)
