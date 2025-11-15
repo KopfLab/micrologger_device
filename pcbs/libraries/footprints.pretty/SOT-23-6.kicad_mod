@@ -1,30 +1,30 @@
-(footprint "LED_driver_SOT-23-6_SOT95P285X140-6N"
+(footprint "SOT-23-6"
 	(version 20241229)
 	(generator "pcbnew")
 	(generator_version "9.0")
 	(layer "F.Cu")
-	(descr "SOT26 (SC74R)")
+	(descr "SOT26 SC74R SOT95P285X140-6N")
 	(property "Reference" "REF**"
-		(at 0 0 0)
+		(at 0 -2.5 0)
 		(unlocked yes)
 		(layer "F.SilkS")
 		(uuid "1cc4cee0-c921-4361-ba8c-41732ded51ea")
 		(effects
 			(font
-				(size 1.1684 1.1684)
-				(thickness 0.1016)
+				(size 1 1)
+				(thickness 0.1)
 			)
 		)
 	)
-	(property "Value" "LED driver (SOT-23-6 / SOT95P285X140-6N)"
-		(at 0 0 0)
+	(property "Value" "Val**"
+		(at 0 2.5 0)
 		(unlocked yes)
-		(layer "F.Fab")
+		(layer "Cmts.User")
 		(uuid "eb2dbe6f-2912-432d-ae9b-e6f852226117")
 		(effects
 			(font
-				(size 1.1684 1.1684)
-				(thickness 0.1016)
+				(size 0.6 0.6)
+				(thickness 0.06)
 			)
 		)
 	)
@@ -49,6 +49,42 @@
 			(font
 				(size 1.27 1.27)
 				(thickness 0.15)
+			)
+		)
+	)
+	(property "MPN" "${MPN}"
+		(at 0 3.5 0)
+		(unlocked yes)
+		(layer "Cmts.User")
+		(uuid "f06decf5-527d-42e4-be66-52f330eed1fd")
+		(effects
+			(font
+				(size 0.6 0.6)
+				(thickness 0.06)
+			)
+		)
+	)
+	(property "Format" "SOT-23-6_SOT95P285X140-6N"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "524db4fc-9bc8-4637-8f02-baf183465226")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "FP_Status" "done"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "2af35446-08ee-4898-aef2-f5524db98b5a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
 			)
 		)
 	)
@@ -93,8 +129,8 @@
 		(uuid "c6a0d2f7-b53b-403e-b652-c723b72cfbbd")
 	)
 	(fp_circle
-		(center -2.579614 -0.9377)
-		(end -2.329614 -0.9377)
+		(center -2.440206 -1.392431)
+		(end -2.190206 -1.392431)
 		(stroke
 			(width 0.1)
 			(type solid)
@@ -110,7 +146,7 @@
 			(width 0.05)
 			(type solid)
 		)
-		(layer "F.Fab")
+		(layer "F.CrtYd")
 		(uuid "094f01af-f2b5-4655-9a83-19bc39820491")
 	)
 	(fp_line
@@ -120,8 +156,28 @@
 			(width 0.05)
 			(type solid)
 		)
-		(layer "F.Fab")
+		(layer "F.CrtYd")
 		(uuid "c48f4715-6643-4778-80b0-54fd42256406")
+	)
+	(fp_line
+		(start 2.125 -1.8)
+		(end 2.125 1.8)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "a5587187-e12f-4705-b8a4-ecf8635fe3b6")
+	)
+	(fp_line
+		(start 2.125 1.8)
+		(end -2.125 1.8)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "46881fcf-f6b7-47df-8d0b-ab17246cd09d")
 	)
 	(fp_line
 		(start -0.8 -1.5)
@@ -172,26 +228,6 @@
 		)
 		(layer "F.Fab")
 		(uuid "21f833ae-6398-4cc1-8027-eafcea2e0037")
-	)
-	(fp_line
-		(start 2.125 -1.8)
-		(end 2.125 1.8)
-		(stroke
-			(width 0.05)
-			(type solid)
-		)
-		(layer "F.Fab")
-		(uuid "a5587187-e12f-4705-b8a4-ecf8635fe3b6")
-	)
-	(fp_line
-		(start 2.125 1.8)
-		(end -2.125 1.8)
-		(stroke
-			(width 0.05)
-			(type solid)
-		)
-		(layer "F.Fab")
-		(uuid "46881fcf-f6b7-47df-8d0b-ab17246cd09d")
 	)
 	(pad "1" smd rect
 		(at -1.3 -0.95)
