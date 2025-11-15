@@ -1,6 +1,7 @@
 # Manufacturing files
 images
 production
+pcbway_production
 *.cam
 *.zip
 *.html
