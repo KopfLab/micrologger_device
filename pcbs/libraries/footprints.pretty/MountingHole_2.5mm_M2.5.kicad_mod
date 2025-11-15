@@ -53,6 +53,18 @@
 			)
 		)
 	)
+	(property "FP_Status" "done"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "0068c194-1b6a-4204-b56d-f095976c4578")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
 	(attr exclude_from_pos_files exclude_from_bom)
 	(fp_circle
 		(center 0 0)

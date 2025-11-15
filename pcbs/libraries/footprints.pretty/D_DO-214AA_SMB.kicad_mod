@@ -64,7 +64,7 @@
 			)
 		)
 	)
-	(property "SK" "done"
+	(property "FP_Status" "done"
 		(at 0 0 0)
 		(layer "F.SilkS")
 		(hide yes)

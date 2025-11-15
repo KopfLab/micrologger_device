@@ -63,7 +63,7 @@
 			)
 		)
 	)
-	(property "SK" "done"
+	(property "FP_Status" "done"
 		(at 0 0 0)
 		(layer "Cmts.User")
 		(hide yes)
@@ -107,6 +107,18 @@
 		(fill no)
 		(layer "F.Fab")
 		(uuid "e5b3ffa9-f595-4651-85c5-85568b60ac51")
+	)
+	(fp_text user "${Reference}"
+		(at 3.5 7.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "2547a532-5014-4d92-a6f5-71bc5d370498")
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.2)
+			)
+		)
 	)
 	(pad "1" thru_hole oval
 		(at 0 0 90)

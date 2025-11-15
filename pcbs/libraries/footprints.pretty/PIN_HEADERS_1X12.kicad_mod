@@ -55,6 +55,18 @@
 			)
 		)
 	)
+	(property "FP_Status" "done"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "0165e8aa-1c15-4ad8-981f-e95812381190")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
 	(fp_line
 		(start -15.24 -0.635)
 		(end -15.24 0.635)
