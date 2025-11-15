@@ -38,7 +38,7 @@
 				(at 0 3.556 0)
 				(effects
 					(font
-						(size 1.27 1.27)
+						(size 1.5 1.5)
 					)
 				)
 			)
@@ -163,7 +163,7 @@
 				(at 0 -3.81 0)
 				(effects
 					(font
-						(size 1.27 1.27)
+						(size 1.5 1.5)
 					)
 				)
 			)
@@ -239,7 +239,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "symbols:JST ZH 2POS R/A (S2B-ZRLFSN)"
+		(symbol "symbols:JST ZH 2POS RA"
 			(pin_names
 				(offset 0.254)
 			)
@@ -247,22 +247,26 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "J"
-				(at 8.89 4.318 0)
+				(at 12.446 1.016 0)
 				(effects
 					(font
-						(size 1.524 1.524)
+						(size 1.5 1.5)
+						(thickness 0.3048)
+						(bold yes)
 					)
+					(justify right)
 				)
 			)
-			(property "Value" "JST S2B-ZR"
+			(property "Value" "CONN HEADER R/A 2POS 1.5MM"
 				(at 0 0 0)
 				(effects
 					(font
 						(size 1.524 1.524)
 					)
+					(hide yes)
 				)
 			)
-			(property "Footprint" "footprints:JST_ZH_2POS_RA_S2B-ZR"
+			(property "Footprint" "footprints:JST_ZH_2POS_RA"
 				(at 0 0 0)
 				(effects
 					(font
@@ -300,13 +304,21 @@
 					(hide yes)
 				)
 			)
-			(property "URL" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576"
+			(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576"
 				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 					(hide yes)
+				)
+			)
+			(property "MPN" "S2B-ZR"
+				(at 8.89 -6.35 0)
+				(effects
+					(font
+						(size 1 1)
+					)
 				)
 			)
 			(property "ki_keywords" "S2B-ZR(LF)(SN)"
@@ -318,7 +330,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "JST ZH 2POS R/A (S2B-ZRLFSN)_1_1"
+			(symbol "JST ZH 2POS RA_1_1"
 				(polyline
 					(pts
 						(xy 5.08 2.54) (xy 5.08 -5.08)
@@ -345,7 +357,7 @@
 				)
 				(polyline
 					(pts
-						(xy 10.16 0) (xy 5.08 0)
+						(xy 8.89 0) (xy 5.08 0)
 					)
 					(stroke
 						(width 0.127)
@@ -357,7 +369,7 @@
 				)
 				(polyline
 					(pts
-						(xy 10.16 0) (xy 8.89 0.8467)
+						(xy 8.89 0) (xy 7.62 0.8467)
 					)
 					(stroke
 						(width 0.127)
@@ -369,7 +381,7 @@
 				)
 				(polyline
 					(pts
-						(xy 10.16 0) (xy 8.89 -0.8467)
+						(xy 8.89 0) (xy 7.62 -0.8467)
 					)
 					(stroke
 						(width 0.127)
@@ -381,7 +393,7 @@
 				)
 				(polyline
 					(pts
-						(xy 10.16 -2.54) (xy 5.08 -2.54)
+						(xy 8.89 -2.54) (xy 5.08 -2.54)
 					)
 					(stroke
 						(width 0.127)
@@ -393,7 +405,7 @@
 				)
 				(polyline
 					(pts
-						(xy 10.16 -2.54) (xy 8.89 -1.6933)
+						(xy 8.89 -2.54) (xy 7.62 -1.6933)
 					)
 					(stroke
 						(width 0.127)
@@ -405,7 +417,7 @@
 				)
 				(polyline
 					(pts
-						(xy 10.16 -2.54) (xy 8.89 -3.3867)
+						(xy 8.89 -2.54) (xy 7.62 -3.3867)
 					)
 					(stroke
 						(width 0.127)
@@ -476,7 +488,7 @@
 					)
 				)
 			)
-			(symbol "JST ZH 2POS R/A (S2B-ZRLFSN)_1_2"
+			(symbol "JST ZH 2POS RA_1_2"
 				(polyline
 					(pts
 						(xy 5.08 2.54) (xy 5.08 -5.08)
@@ -636,7 +648,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "symbols:LED (MTE7063NK2-UR)"
+		(symbol "symbols:LED_MTE7063NK2-UR"
 			(pin_numbers
 				(hide yes)
 			)
@@ -648,18 +660,20 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "LED"
-				(at 0 2.54 0)
+				(at 0 2.794 0)
 				(effects
 					(font
-						(size 1.27 1.27)
+						(size 1.5 1.5)
+						(thickness 0.3)
+						(bold yes)
 					)
 				)
 			)
-			(property "Value" "MTE7063NK2-UR"
-				(at 0 -4.064 0)
+			(property "Value" "630nm 1.9V 50mA"
+				(at 0 -3.81 0)
 				(effects
 					(font
-						(size 1.27 1.27)
+						(size 1 1)
 					)
 				)
 			)
@@ -690,13 +704,12 @@
 					(hide yes)
 				)
 			)
-			(property "Sim.Pins" "1=K 2=A"
-				(at 0 0 0)
+			(property "MPN" "MTE7063NK2-UR"
+				(at 0 -5.588 0)
 				(effects
 					(font
-						(size 1.27 1.27)
+						(size 1 1)
 					)
-					(hide yes)
 				)
 			)
 			(property "DigiKey" "1125-1382-ND"
@@ -708,7 +721,7 @@
 					(hide yes)
 				)
 			)
-			(property "URL" "https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919"
+			(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919"
 				(at 0 0 0)
 				(effects
 					(font
@@ -726,7 +739,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "LED (MTE7063NK2-UR)_0_1"
+			(symbol "LED_MTE7063NK2-UR_0_1"
 				(polyline
 					(pts
 						(xy -3.048 -0.762) (xy -4.572 -2.286) (xy -3.81 -2.286) (xy -4.572 -2.286) (xy -4.572 -1.524)
@@ -788,7 +801,7 @@
 					)
 				)
 			)
-			(symbol "LED (MTE7063NK2-UR)_1_1"
+			(symbol "LED_MTE7063NK2-UR_1_1"
 				(pin passive line
 					(at -3.81 0 0)
 					(length 2.54)
@@ -828,29 +841,30 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "symbols:LED driver (BCR401UW6Q-7)"
+		(symbol "symbols:LED_driver_BCR401UW6Q-7"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "U"
-				(at 14.478 4.318 0)
+				(at 15.24 0 0)
 				(effects
 					(font
-						(size 1.778 1.5113)
+						(size 1.5 1.5)
+						(thickness 0.3)
+						(bold yes)
+					)
+				)
+			)
+			(property "Value" "1.4-40V PWM Dimmer 100mA"
+				(at 3.81 -8.89 0)
+				(effects
+					(font
+						(size 1 1)
 					)
 					(justify left)
 				)
 			)
-			(property "Value" "BCR401UW6Q-7"
-				(at 6.096 -9.652 0)
-				(effects
-					(font
-						(size 1.778 1.5113)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" "footprints:LED_driver_SOT-23-6_SOT95P285X140-6N"
+			(property "Footprint" "footprints:SOT-23-6"
 				(at 0 0 0)
 				(effects
 					(font
@@ -877,6 +891,14 @@
 					(hide yes)
 				)
 			)
+			(property "MPN" "BCR401UW6Q-7"
+				(at 15.494 -10.922 0)
+				(effects
+					(font
+						(size 1 1)
+					)
+				)
+			)
 			(property "DigiKey" "BCR401UW6Q-7DICT-ND"
 				(at 0 0 0)
 				(effects
@@ -886,7 +908,7 @@
 					(hide yes)
 				)
 			)
-			(property "URL" "https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843"
+			(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843"
 				(at 0 0 0)
 				(effects
 					(font
@@ -895,7 +917,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "LED driver (BCR401UW6Q-7)_1_0"
+			(symbol "LED_driver_BCR401UW6Q-7_1_0"
 				(polyline
 					(pts
 						(xy 5.08 2.54) (xy 5.08 -7.62)
@@ -1069,19 +1091,21 @@
 				(at 0 -2.54 0)
 				(effects
 					(font
-						(size 1.27 1.27)
+						(size 1.5 1.5)
+						(thickness 0.3)
+						(bold yes)
 					)
 				)
 			)
-			(property "Value" "R_US"
+			(property "Value" "Ω"
 				(at 0 2.54 0)
 				(effects
 					(font
-						(size 1.27 1.27)
+						(size 1.5 1.5)
 					)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "footprints:R_1206"
 				(at 1.016 -0.254 90)
 				(effects
 					(font
@@ -1129,7 +1153,7 @@
 			(symbol "R_US_0_1"
 				(polyline
 					(pts
-						(xy -2.286 0) (xy -2.54 0)
+						(xy -2.286 0) (xy -3.81 0)
 					)
 					(stroke
 						(width 0)
@@ -1165,7 +1189,7 @@
 				)
 				(polyline
 					(pts
-						(xy 2.286 0) (xy 2.54 0)
+						(xy 2.286 0) (xy 3.81 0)
 					)
 					(stroke
 						(width 0)
@@ -1190,7 +1214,7 @@
 			)
 			(symbol "R_US_1_1"
 				(pin passive line
-					(at -3.81 0 0)
+					(at -5.08 0 0)
 					(length 1.27)
 					(name "~"
 						(effects
@@ -1208,7 +1232,7 @@
 					)
 				)
 				(pin passive line
-					(at 3.81 0 180)
+					(at 5.08 0 180)
 					(length 1.27)
 					(name "~"
 						(effects
@@ -2400,22 +2424,24 @@
 		(dnp no)
 		(uuid "41d8a529-b240-49c2-91bd-f3d724576131")
 		(property "Reference" "R1"
-			(at 172.72 96.52 0)
+			(at 172.72 91.44 0)
 			(effects
 				(font
-					(size 1.778 1.5113)
+					(size 1.5 1.5)
+					(thickness 0.3)
+					(bold yes)
 				)
 			)
 		)
 		(property "Value" "47Ω"
-			(at 172.974 91.186 0)
+			(at 172.72 96.52 0)
 			(effects
 				(font
-					(size 1.778 1.5113)
+					(size 1.5 1.5)
 				)
 			)
 		)
-		(property "Footprint" "footprints:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
+		(property "Footprint" "footprints:R_1206"
 			(at 171.704 93.726 90)
 			(effects
 				(font
@@ -2458,7 +2484,7 @@
 		)
 	)
 	(symbol
-		(lib_id "symbols:JST ZH 2POS R/A (S2B-ZRLFSN)")
+		(lib_id "symbols:JST ZH 2POS RA")
 		(at 172.72 116.84 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -2467,23 +2493,26 @@
 		(dnp no)
 		(uuid "579382fc-415d-4c9c-bed4-16aad2d7a621")
 		(property "Reference" "J1"
-			(at 179.4246 114.0714 0)
+			(at 185.166 115.824 0)
 			(effects
 				(font
-					(size 2.083 1.7705)
+					(size 1.5 1.5)
+					(thickness 0.3048)
+					(bold yes)
 				)
-				(justify left bottom)
+				(justify right)
 			)
 		)
-		(property "Value" "JST S2B-ZR"
-			(at 181.61 123.698 0)
+		(property "Value" "CONN HEADER R/A 2POS 1.5MM"
+			(at 172.72 116.84 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1.524 1.524)
 				)
+				(hide yes)
 			)
 		)
-		(property "Footprint" "footprints:JST_ZH_2POS_RA_S2B-ZR"
+		(property "Footprint" "footprints:JST_ZH_2POS_RA"
 			(at 172.72 116.84 0)
 			(effects
 				(font
@@ -2521,13 +2550,21 @@
 				(hide yes)
 			)
 		)
-		(property "URL" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576"
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576"
 			(at 172.72 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
+			)
+		)
+		(property "MPN" "S2B-ZR"
+			(at 181.61 123.19 0)
+			(effects
+				(font
+					(size 1 1)
+				)
 			)
 		)
 		(pin "1"
@@ -2546,7 +2583,7 @@
 		)
 	)
 	(symbol
-		(lib_id "symbols:LED (MTE7063NK2-UR)")
+		(lib_id "symbols:LED_MTE7063NK2-UR")
 		(at 127 99.06 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -2555,21 +2592,21 @@
 		(dnp no)
 		(uuid "6797496d-9254-4bdd-b72a-5330359bd44e")
 		(property "Reference" "LED1"
-			(at 124.714 103.886 0)
+			(at 127 96.266 0)
 			(effects
 				(font
-					(size 1.778 1.5113)
+					(size 1.5 1.5)
+					(thickness 0.3)
+					(bold yes)
 				)
-				(justify left bottom)
 			)
 		)
-		(property "Value" "630NM MTE7063NK2-UR"
-			(at 113.284 106.934 0)
+		(property "Value" "630nm 1.9V 50mA"
+			(at 127 102.87 0)
 			(effects
 				(font
-					(size 1.778 1.5113)
+					(size 1 1)
 				)
-				(justify left bottom)
 			)
 		)
 		(property "Footprint" "footprints:TO-46-2"
@@ -2626,6 +2663,23 @@
 				(hide yes)
 			)
 		)
+		(property "MPN" "MTE7063NK2-UR"
+			(at 127 104.648 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919"
+			(at 127 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "2"
 			(uuid "4182e27e-7521-4f1d-b6ea-0035001ac40e")
 		)
@@ -2660,10 +2714,10 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 164.846 116.84 90)
+			(at 166.37 116.84 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1.5 1.5)
 				)
 			)
 		)
@@ -2725,10 +2779,10 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 164.592 119.38 90)
+			(at 166.624 119.38 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1.5 1.5)
 				)
 			)
 		)
@@ -2772,7 +2826,7 @@
 		)
 	)
 	(symbol
-		(lib_id "symbols:LED driver (BCR401UW6Q-7)")
+		(lib_id "symbols:LED_driver_BCR401UW6Q-7")
 		(at 134.62 93.98 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -2781,24 +2835,25 @@
 		(dnp no)
 		(uuid "a8a96057-d479-4524-ac85-8efa783c771b")
 		(property "Reference" "U1"
-			(at 148.59 85.598 0)
+			(at 149.86 93.98 0)
 			(effects
 				(font
-					(size 1.778 1.5113)
+					(size 1.5 1.5)
+					(thickness 0.3)
+					(bold yes)
+				)
+			)
+		)
+		(property "Value" "1.4-40V PWM Dimmer 100mA"
+			(at 138.43 102.87 0)
+			(effects
+				(font
+					(size 1 1)
 				)
 				(justify left)
 			)
 		)
-		(property "Value" "BCR401UW6Q-7"
-			(at 140.97 88.9 0)
-			(effects
-				(font
-					(size 1.778 1.5113)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "footprints:LED_driver_SOT-23-6_SOT95P285X140-6N"
+		(property "Footprint" "footprints:SOT-23-6"
 			(at 134.62 93.98 0)
 			(effects
 				(font
@@ -2835,6 +2890,23 @@
 			)
 		)
 		(property "URL" "https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843"
+			(at 134.62 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "MPN" "BCR401UW6Q-7"
+			(at 150.114 104.902 0)
+			(effects
+				(font
+					(size 1 1)
+				)
+			)
+		)
+		(property "DigiKeyURL" "https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843"
 			(at 134.62 93.98 0)
 			(effects
 				(font
@@ -2889,10 +2961,10 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 102.362 93.98 90)
+			(at 104.14 93.98 0)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1.5 1.5)
 				)
 			)
 		)
@@ -2955,10 +3027,10 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 187.96 99.0599 90)
+			(at 187.96 99.06 90)
 			(effects
 				(font
-					(size 1.27 1.27)
+					(size 1.5 1.5)
 				)
 				(justify left)
 			)
