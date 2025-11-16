@@ -1139,7 +1139,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Polymeric PTC Resettable Fuse 33V 760 mA Ih Surface Mount 1812"
+		(property "Description" "Polymeric PTC Resettable Fuse 33V 750 mA Ih Surface Mount 1812"
 			(at 0 -12.7 0)
 			(effects
 				(font
