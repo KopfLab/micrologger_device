@@ -2714,7 +2714,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 166.37 116.84 0)
+			(at 164.084 116.84 90)
 			(effects
 				(font
 					(size 1.5 1.5)
@@ -2779,7 +2779,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 166.624 119.38 0)
+			(at 164.338 119.38 90)
 			(effects
 				(font
 					(size 1.5 1.5)
@@ -2961,7 +2961,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 104.14 93.98 0)
+			(at 102.362 93.98 90)
 			(effects
 				(font
 					(size 1.5 1.5)
