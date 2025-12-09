@@ -14,6 +14,7 @@ pcbway_production
 *.lck
 *.bak
 fp-info-cache
+_autosave*
 
 # Explicitly include
 !*.pdf
