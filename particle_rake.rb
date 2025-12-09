@@ -46,8 +46,10 @@ require 'digest'
 
 desc "compile binary in the cloud (default) or locally"
 task :compile do
+  # check for dev
+  dev = Rake.application.top_level_tasks.first == "dev"
   # check for local compile
-  local = Rake.application.top_level_tasks.first == "local"
+  local = dev == true || Rake.application.top_level_tasks.first == "local"
   # what program are we compiling?
   if local
     if Rake.application.top_level_tasks.length < 2
@@ -105,7 +107,7 @@ task :compile do
     lib_paths = lib_path.strip.split(/\s+/).map do |path|
       if Dir.exist?(File.join(path, @src_folder)) 
         File.join(path, @src_folder)
-      elsif Dir.exists?(File.join(@lib_folder, path, @src_folder)) 
+      elsif Dir.exist?(File.join(@lib_folder, path, @src_folder)) 
         File.join(@lib_folder, path, @src_folder)
       else
         raise "Could not find '#{path}' library in root or #{@lib_folder} - make sure it exists"
@@ -162,7 +164,7 @@ task :compile do
         end
       else
         puts " - adding: #{target_path}"
-        unless Dir.exists?(File.dirname(target_path))
+        unless Dir.exist?(File.dirname(target_path))
           FileUtils.mkdir_p(File.dirname(target_path))
         end
         FileUtils.cp(source_path, target_path)
@@ -177,6 +179,11 @@ task :compile do
     puts "\nINFO: '#{@local_folder}' folder is ready"
     ENV['MAKE_LOCAL_PROGRAM'] = program
     Rake::Task[:compileLocal].invoke
+
+    # dev mode --> flash and start autocompile
+    if dev == true
+      sh "rake flash autoCompile autoFlash"
+    end
   else
     # compile in cloud
     sh "particle compile #{@platform} #{all_files.join(' ')} --target #{@version} --saveTo #{@bin_folder}/#{program}-#{@platform}-#{@version}-cloud.bin", verbose: false
@@ -186,7 +193,14 @@ end
 desc "flag compile to be done locally (rake local MYPROG)"
 task :local do
    if Rake.application.top_level_tasks.length < 2
-      raise "Error: compiling locally but no second task provided"
+      raise "Error: compiling locally but no program (second task) provided"
+    end
+end
+
+desc "flag to start development mode (rake dev MYPROG)"
+task :dev do
+   if Rake.application.top_level_tasks.length < 2
+      raise "Error: starting dev mode but no program (second task) provided"
     end
 end
 
@@ -211,12 +225,18 @@ task :makeLocal do
   # what program are we compiling?
   target = ENV['MAKE_LOCAL_TARGET']
   program = ENV['MAKE_LOCAL_PROGRAM'] || "local"
-  # info
-  puts "\nINFO: making '#{target}' in folder '#{@local_folder}' for #{program} #{@platform} #{@version} with local toolchain"
+  
+  # info (i.e. what are we doing?)
+  compiling = (target == "compile-user")
+  if compiling == true
+    puts "\nINFO: compiling #{program} #{@platform} #{@version} with local toolchain into folder '#{@local_folder}'"
+  else
+    puts "\nINFO: running '#{target}' in folder '#{@local_folder}'"
+  end
 
   # local folder
   local_root = File.expand_path(File.dirname(__FILE__)) + "/" + @local_folder
-  unless File.exist?("#{local_root}/src")
+  unless compiling == false || File.exist?("#{local_root}/src")
     raise "src directory in local folder '#{local_root}' not found"
   end
 
@@ -257,14 +277,16 @@ task :makeLocal do
     exit_status = wait_thr.value
     if exit_status.success?
       output_path = "#{local_root}/target/#{@platform}/#{@local_folder}.bin"
-      if File.exist?(output_path)
+      if compiling == true && File.exist?(output_path)
         bin_path = "#{@bin_folder}/#{program}-#{@platform}-#{@version}-local.bin"
         puts "INFO: saving bin in #{bin_path}"
         FileUtils.cp(output_path, bin_path)
       end
-    else
+    elsif compiling == true
       puts "\n*** COMPILE FAILED ***"
       puts "If you switched programs, platforms, or versions, you may need to clean: rake cleanLocal PLATFORM=#{@platform} VERSION=#{@version}\n\n"
+    else
+      puts "\n*** MAKE FAILED (target: '#{target}') ***"
     end
   end
 end
@@ -394,15 +416,4 @@ desc "flash the tinker app"
 task :tinker do
   puts "\nINFO: flashing tinker..."
   sh "particle flash --usb tinker"
-end
-
-### DEV MODE ###
-
-desc "Development mode"
-task :dev do
-    if Rake.application.top_level_tasks.length < 2
-      raise "Error: missing program"
-    end
-    sh "rake cleanLocal"
-    sh "rake local #{Rake.application.top_level_tasks[1]} autoCompile autoFlash"
 end
