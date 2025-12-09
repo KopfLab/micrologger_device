@@ -54,7 +54,7 @@
       "diff_pair_dimensions": [],
       "drc_exclusions": [
         [
-          "silk_over_copper|112104000|106277022|e15a65e1-c460-4dc8-b9a2-6b2aa7f4caf6|00000000-0000-0000-0000-000000000000",
+          "silk_over_copper|112104000|106277022|ecf7318b-59cc-4cb1-b929-530dd2552ab8|00000000-0000-0000-0000-000000000000",
           ""
         ]
       ],
@@ -504,7 +504,7 @@
         "microvia_drill": 0.1,
         "name": "Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": -1,
+        "priority": 2147483647,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.2,
         "via_diameter": 0.6,
@@ -654,7 +654,7 @@
   ],
   "text_variables": {
     "PROJ_AUTHOR": "Sebastian Kopf",
-    "PROJ_REV": "0.73",
+    "PROJ_REV": "0.80",
     "PROJ_TITLE": "µLogger Controller Board"
   }
 }
