@@ -654,7 +654,7 @@
   ],
   "text_variables": {
     "PROJ_AUTHOR": "Sebastian Kopf",
-    "PROJ_REV": "0.80",
+    "PROJ_REV": "0.81",
     "PROJ_TITLE": "µLogger Controller Board"
   }
 }

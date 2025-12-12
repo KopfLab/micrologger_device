@@ -4608,18 +4608,6 @@
 		)
 		(uuid "6b7e2db2-7478-45f5-a053-2429430c57c4")
 	)
-	(text "not sure if 1k and 100k are\nthe best values for signal line\n--> confirm"
-		(exclude_from_sim no)
-		(at 171.958 51.562 0)
-		(effects
-			(font
-				(size 1 1)
-				(color 255 0 0 1)
-			)
-			(justify bottom)
-		)
-		(uuid "6d3c8550-36aa-445f-b256-7565dab56527")
-	)
 	(text "DC/DC Converter"
 		(exclude_from_sim no)
 		(at 91.186 22.606 0)
@@ -4833,6 +4821,10 @@
 	(no_connect
 		(at 92.71 177.8)
 		(uuid "b19b09af-2f66-4c08-bbd0-8e835728cd76")
+	)
+	(no_connect
+		(at 57.15 180.34)
+		(uuid "c00a5654-502e-4bf8-b528-121180587eb5")
 	)
 	(no_connect
 		(at 186.69 44.45)
@@ -5399,16 +5391,6 @@
 			(type default)
 		)
 		(uuid "6bda1a82-066e-4606-8639-c37372bfc826")
-	)
-	(wire
-		(pts
-			(xy 57.15 180.34) (xy 44.45 180.34)
-		)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(uuid "6de3355b-476b-4fcb-a788-fbd1e92a0e6f")
 	)
 	(wire
 		(pts
@@ -10375,72 +10357,6 @@
 			(project ""
 				(path "/ba44af6b-d897-4c95-8815-b8860eb38091"
 					(reference "#PWR017")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "symbols:+5V")
-		(at 44.45 180.34 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "7f389bd7-cb72-4606-b318-d2af39b225d2")
-		(property "Reference" "#PWR01"
-			(at 48.26 180.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 48.768 179.07 90)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 44.45 180.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 44.45 180.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 44.45 180.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "91491cbf-947a-4dd1-93e8-158bcc77da48")
-		)
-		(instances
-			(project ""
-				(path "/ba44af6b-d897-4c95-8815-b8860eb38091"
-					(reference "#PWR01")
 					(unit 1)
 				)
 			)
