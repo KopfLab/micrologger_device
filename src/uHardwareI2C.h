@@ -107,16 +107,15 @@ public:
         }
     }
 
-    // connect to I2C
+    // connect to I2C (init() needs to be called first)
     virtual bool connect()
     {
         // are we initialized?
         if (!Finitialized)
+        {
+            Log.trace("I2C device is NOT initialized yet! make sure to call init() before trying to connect.");
             return false;
-
-        // are we already connected?
-        if (isConnected())
-            return true;
+        }
 
         // lock for thread safety
         WITH_LOCK(Wire)
@@ -166,14 +165,6 @@ public:
     {
         status = Tstatus::disconnected;
         reset();
-    }
-
-    // reconnect I2C
-    bool reconnect()
-    {
-        if (status != Tstatus::disconnected)
-            disconnect();
-        return connect();
     }
 };
 
