@@ -1,0 +1,24 @@
+﻿Designator,Quantity,Value,Footprint,Package,MPN,DNP,Mount_Type,Description,JLCPCB,JLCPCBURL,DigiKey,DigiKeyURL
+C1,1,47pF,C_0603,,,,smt,Unpolarized capacitor,C1671,https://jlcpcb.com/partdetail/2023-CL10C470JB8NNNC/C1671,,
+"C2, C3",2,100nF,C_0603,,,,smt,Unpolarized capacitor,C1591,https://jlcpcb.com/partdetail/1943-CL10B104KB8NNNC/C1591,,
+D1,1,Red 631nm 2.0V,LED_1206,,LTST-C150KRKT,,smt,Red 631nm LED Indication - Discrete 2V 1206 (3216 Metric),C125086,https://jlcpcb.com/partdetail/LiteOn-LTSTC150KRKT/C125086,160-1405-1-ND,https://www.digikey.com/en/products/detail/liteon/LTST-C150KRKT/386761
+D2,1,Yellow 571nm 2.0V,LED_1206,,LTST-C150KGKT,,smt,Green 571nm LED Indication - Discrete 2V 1206 (3216 Metric),C125085,https://jlcpcb.com/partdetail/LiteOn-LTSTC150KGKT/C125085,160-1404-1-ND,https://www.digikey.com/en/products/detail/liteon/LTST-C150KGKT/365085
+D3,1,1A/40V/500mV,D_DO-214AC_SMA,,SS14,,smt,Diode 40 V 1A Surface Mount DO-214AC (SMA),C83852,https://jlcpcb.com/partdetail/onsemi-SS14/C83852,SS14CT-ND,https://www.digikey.com/en/products/detail/onsemi/SS14/965474
+J1,1,1.5mm,JST_ZH_2POS_RA,,S2B-ZR,,tht,"Connector Header Through Hole, Right Angle 2 position 0.059"" (1.50mm)",,,455-1669-ND,https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576
+"J2, J3",2,2.5mm,JST_XH_2POS_RA,,S2B-XH-A,,tht,"Connector Header Through Hole, Right Angle 2 position 0.098"" (2.50mm)",,,455-S2B-XH-A-ND,https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-XH-A/1651055
+J4,1,1.5 mm,JST_ZR_8POS_RA,,S8B-ZR,,tht,"Connector Header Through Hole, Right Angle 8 position 0.059"" (1.50mm)",,,455-S8B-ZR-ND,https://www.digikey.com/en/products/detail/jst-sales-america-inc/S8B-ZR/926582
+J5,1,RJ45,RJ45_A-2014-2-4-N-T-R,,A-2014-2-4-N-T-R,,tht,"Jack Modular Connector 8p8c (RJ45, Ethernet) Vertical Unshielded",,,AE10396-ND,https://www.digikey.com/en/products/detail/assmann-wsw-components/A-2014-2-4-N-T-R/2183647
+J6,1,Conn_01x06,PIN_HEADERS_1X06,,,,tht,"Basic 0.1"" PTH",,,,
+"JP1, JP2, JP3, JP4",4,~,Jumper_3_NC-1_Trace,,,,tht,"3-pole Solder Jumper, pins 1+2 closed/bridged",,,,
+"Q1, Q2, Q3",3,220mA / 50V,SOT-23-3,,BSS138,,tht,N-Channel 50 V 2200mA 350mW (Ta) Surface Mount SOT-23-3,C52895,https://jlcpcb.com/partdetail/onsemi-BSS138/C52895,BSS138CT-ND,https://www.digikey.com/en/products/detail/onsemi/BSS138/244210
+"R1, R3",2,1kΩ,R_0603,,,,smt,"Resistor, US symbol",C118155,https://jlcpcb.com/partdetail/PANASONIC-ERJ3EKF1001V/C118155,,
+"R10, R15, R9",3,150Ω,R_0603,,,,smt,"Resistor, US symbol",C400650,https://jlcpcb.com/partdetail/PANASONIC-ERJ3EKF1500V/C400650,,
+"R11, R12, R13, R14, R16, R2, R5, R7, R8",9,10kΩ,R_0603,,,,smt,"Resistor, US symbol",C191124,https://jlcpcb.com/partdetail/PANASONIC-ERJ3EKF1002V/C191124?_t=1765754579496,,
+R4,1,27kΩ,R_0603,,,,smt,"Resistor, US symbol",C403122,https://jlcpcb.com/partdetail/PANASONIC-ERJ3EKF2702V/C403122,,
+R6,1,5.6kΩ,R_0603,,,,smt,"Resistor, US symbol",C403276,https://jlcpcb.com/partdetail/PANASONIC-ERJ3EKF5601V/C403276,,
+S1,1,Value,OPT101,,OPT101,,tht,"Optical Sensor Ambient 650nm Voltage 8-DIP (0.300"", 7.62mm)",,,296-23090-5-ND,https://www.digikey.com/en/products/detail/texas-instruments/OPT101P/251177
+S2,1,"IR temp sensor, -40°C to +85°C",MLX90614,,MLX90614ESF-ACC-000-TU,,tht,"Temperature Sensor Digital, Infrared (IR) -40°C ~ 85°C 16 b TO-39, 5V",,,MLX90614ESF-ACC-000-TU-ND,https://www.digikey.com/en/products/detail/melexis-technologies-nv/MLX90614ESF-ACC-000-TU/1948826
+U1,1,8-28V in / 5V 5W out,DC_DC_converter_R-78E5.0-1.0,,R-78E5.0-1.0,,tht,Linear Regulator Replacement DC DC Converter 1 Output 5V 1A 8V - 28V Input,,,945-2201-ND,https://www.digikey.com/en/products/detail/recom-power/R-78E5-0-1-0/4930585
+U2,1,I2C Dual Rheostat 100kOhm 8-bit,DFN10_3x3MC,,MCP4652T-104E/MF,,smt,Digital Potentiometer 100k Ohm 2 Circuit 257 Taps I2C Interface 10-DFN (3x3),C623638,https://jlcpcb.com/partdetail/MicrochipTech-MCP4652T_104EMF/C623638,MCP4652T-104E/MFCT-ND,https://www.digikey.com/en/products/detail/microchip-technology/MCP4652T-104E-MF/2059721
+U3,1,8x GPIO,SOT-403-1_TSSOP16,,TCA9534PWR,,tht,I/O Expander 8 I2C 400 kHz 16-TSSOP,C783615,https://jlcpcb.com/partdetail/TexasInstruments-TCA9534PWR/C783615,296-40574-1-ND,https://www.digikey.com/en/products/detail/texas-instruments/TCA9534PWR/5004966
+U4,1,4x PWM,SOT-505-1_TSSOP8,,"PCA9633DP1,118",,smt,LED Driver IC 4 Output Power Switch I2C Dimming 25mA 8-TSSOP,C88381,https://jlcpcb.com/partdetail/NXPSemicon-PCA9633DP1118/C88381?_t=1765688339929,568-3236-1-ND,https://www.digikey.com/en/products/detail/nxp-usa-inc/PCA9633DP1-118/1033521

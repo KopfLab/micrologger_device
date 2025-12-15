@@ -3433,7 +3433,7 @@
 					(hide yes)
 				)
 			)
-			(property "JLCPCB" "C125085"
+			(property "JLCPCB" "C125086"
 				(at 0 0 0)
 				(effects
 					(font
@@ -3442,7 +3442,7 @@
 					(hide yes)
 				)
 			)
-			(property "JLCPCBURL" "https://jlcpcb.com/partdetail/LiteOn-LTSTC150KGKT/C125085"
+			(property "JLCPCBURL" "https://jlcpcb.com/partdetail/LiteOn-LTSTC150KRKT/C125086"
 				(at 0 0 0)
 				(effects
 					(font
@@ -6221,12 +6221,6 @@
 		(uuid "962f4eb3-0a64-445b-a1e8-ae4bc3cf979f")
 	)
 	(junction
-		(at 251.46 199.39)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "964626f5-21fc-4302-8b06-641eceef90d6")
-	)
-	(junction
 		(at 350.52 129.54)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6343,16 +6337,6 @@
 			(type default)
 		)
 		(uuid "0c95dc19-6ed2-4521-b009-a13e912e6a0d")
-	)
-	(wire
-		(pts
-			(xy 251.46 199.39) (xy 251.46 201.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0ed9b181-c90f-498c-9c23-80ed935b125e")
 	)
 	(wire
 		(pts
@@ -7670,7 +7654,7 @@
 	)
 	(wire
 		(pts
-			(xy 251.46 198.12) (xy 251.46 199.39)
+			(xy 251.46 199.39) (xy 251.46 201.93)
 		)
 		(stroke
 			(width 0)
@@ -9835,24 +9819,6 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCB" "C4410"
-			(at 312.42 171.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/4817-1206W4F1001T5E/C4410"
-			(at 312.42 171.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(pin "1"
 			(uuid "48f713dc-d1db-4654-ac06-ba323c87a67e")
 		)
@@ -11646,7 +11612,7 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCB" "C125085"
+		(property "JLCPCB" "C125086"
 			(at 58.42 63.5 0)
 			(effects
 				(font
@@ -11655,7 +11621,7 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/LiteOn-LTSTC150KGKT/C125085"
+		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/LiteOn-LTSTC150KRKT/C125086"
 			(at 58.42 63.5 0)
 			(effects
 				(font
@@ -12763,24 +12729,6 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCB" "C17902"
-			(at 219.71 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/18590-1206W4F1002T5E/C17902"
-			(at 219.71 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(pin "1"
 			(uuid "be1fc128-a984-4130-b68a-1d36e4c90db4")
 		)
@@ -12842,24 +12790,6 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
-			(at 219.71 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCB" "C17902"
-			(at 219.71 71.12 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/18590-1206W4F1002T5E/C17902"
 			(at 219.71 71.12 0)
 			(effects
 				(font
@@ -13238,24 +13168,6 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
-			(at 215.9 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCB" "C17902"
-			(at 215.9 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/18590-1206W4F1002T5E/C17902"
 			(at 215.9 50.8 0)
 			(effects
 				(font
@@ -15317,24 +15229,6 @@
 			)
 		)
 		(property "Description" "Resistor, US symbol"
-			(at 219.71 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCB" "C17902"
-			(at 219.71 78.74 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/18590-1206W4F1002T5E/C17902"
 			(at 219.71 78.74 0)
 			(effects
 				(font
