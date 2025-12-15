@@ -9993,6 +9993,24 @@
 				(hide yes)
 			)
 		)
+		(property "JLCPCB" "C1884"
+			(at 104.14 119.38 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/2236-1206CG101J500NT/C1884"
+			(at 104.14 119.38 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
 		(pin "1"
 			(uuid "c66d6d8f-a5cf-4439-82da-9bda826c889c")
 		)
