@@ -1,5 +1,5 @@
 ﻿Designator,Quantity,Value,Footprint,Package,MPN,DNP,Mount_Type,Description,FP_Status,DigiKey,DigiKeyURL,JLCPCB,JLCPCBURL,UnitPrice,ParticleURL
-C1,1,100pF,C_1206,,,,smt,Unpolarized capacitor,,,,,,,
+C1,1,100pF,C_1206,,,,smt,Unpolarized capacitor,,,,C1884,,,
 D1,1,3A/60V/750mV,D_DO-214AB_SMC,,SS36,,tht,Diode 60 V 3A Surface Mount DO-214AB (SMC),done,SS36FSCT-ND,https://www.digikey.com/en/products/detail/onsemi/SS36/1053019,C391251,https://jlcpcb.com/partdetail/onsemi-SS36/C391251,,
 D2,1,1A/40V/500mV,D_DO-214AC_SMA,,SS14,,smt,Diode 40 V 1A Surface Mount DO-214AC (SMA),done,SS14CT-ND,https://www.digikey.com/en/products/detail/onsemi/SS14/965474,C83852,https://jlcpcb.com/partdetail/onsemi-SS14/C83852,,
 D3,1,40V,D_DO-214AA_SMB,,SMBJ36A,,tht,58.1V Clamp 10.4A Ipp Tvs Diode Surface Mount DO-214AA (SMBJ),done,SMBJ36ALFCT-ND,https://www.digikey.com/en/products/detail/littelfuse-inc/SMBJ36A/286010,C224020,https://jlcpcb.com/partdetail/Littelfuse-SMBJ36A/C224020,,
