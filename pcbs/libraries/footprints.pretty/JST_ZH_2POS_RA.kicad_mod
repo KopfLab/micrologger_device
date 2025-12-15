@@ -16,7 +16,7 @@
 			)
 		)
 	)
-	(property "Value" "Val**"
+	(property "Value" "VAL**"
 		(at 0.75 3.5 0)
 		(unlocked yes)
 		(layer "F.Fab")
