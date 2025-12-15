@@ -5254,7 +5254,7 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCB" "C125085"
+		(property "JLCPCB" "C125086"
 			(at 0 0 0)
 			(effects
 				(font
@@ -5263,7 +5263,7 @@
 				(hide yes)
 			)
 		)
-		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/LiteOn-LTSTC150KGKT/C125085"
+		(property "JLCPCBURL" "https://jlcpcb.com/partdetail/LiteOn-LTSTC150KRKT/C125086"
 			(at 0 0 0)
 			(effects
 				(font
