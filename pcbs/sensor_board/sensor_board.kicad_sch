@@ -6028,6 +6028,17 @@
 		)
 		(uuid "91aad885-b9b2-4235-963b-eef49b1a886c")
 	)
+	(text "make the LEDs brighter! more wattage running through!"
+		(exclude_from_sim no)
+		(at 64.516 74.676 0)
+		(effects
+			(font
+				(size 2 2)
+				(color 255 0 0 1)
+			)
+		)
+		(uuid "9505df51-274d-484b-b809-8d1c467396fe")
+	)
 	(text "DC/DC Converter"
 		(exclude_from_sim no)
 		(at 64.516 29.972 0)
