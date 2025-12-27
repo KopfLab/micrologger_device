@@ -22,11 +22,11 @@ require 'digest'
 # recommended versions
 # see https://docs.particle.io/reference/product-lifecycle/long-term-support-lts-releases/
 @versions ||= {
-  'p2' => '6.3.2',      # not LTS but required for CloudEvent
+  'p2' => '6.3.4',      # not LTS but required for CloudEvent
   'photon' => '2.3.1',  # LTS
   'argon' => '4.2.0',   # LTS
-  'boron' => '6.3.2',   # not LTS but required for CloudEvent
-  'msom' => '6.3.2'     # not LTS but required for CloudEvent
+  'boron' => '6.3.4',   # not LTS but required for CloudEvent
+  'msom' => '6.3.4'     # not LTS but required for CloudEvent
 }
 
 # constants
@@ -109,16 +109,33 @@ task :compile do
         File.join(path, @src_folder)
       elsif Dir.exist?(File.join(@lib_folder, path, @src_folder)) 
         File.join(@lib_folder, path, @src_folder)
+      elsif Dir.exist?(File.join(@lib_folder, path)) 
+        # looks like it's a library without a src directory -> take the parent directory
+        File.join(@lib_folder, path)
       else
         raise "Could not find '#{path}' library in root or #{@lib_folder} - make sure it exists"
       end
     end.compact
     lib_files = lib_paths.map { |path|
-      Dir.glob("#{path}/**/*.{h,c,cpp}") 
+       pattern =
+        if File.basename(path) == @src_folder
+          "#{path}/**/*.{h,c,cpp}"   # in a src directory --> recurse into subdirectories
+        else
+          "#{path}/*.{h,c,cpp}"     # not in a src directory --> only files directly in this directory
+        end
+      Dir.glob(pattern)
     }.flatten
     all_files = all_files + lib_files
     dest_files = dest_files + lib_files.map {
-      |path| File.join(@local_folder, @lib_folder, path.gsub("lib/", ""))
+      |path| 
+      parts = File.expand_path(path).split(File::SEPARATOR)
+      if parts.include?(@src_folder)
+        File.join(@local_folder, @lib_folder, path.gsub("lib/", ""))
+      else
+        dir  = File.dirname(path).gsub("lib/", "")
+        base = File.basename(path)
+        File.join(@local_folder, @lib_folder, dir, @src_folder, base)
+      end
     }
   end
 
@@ -285,6 +302,7 @@ task :makeLocal do
     elsif compiling == true
       puts "\n*** COMPILE FAILED ***"
       puts "If you switched programs, platforms, or versions, you may need to clean: rake cleanLocal PLATFORM=#{@platform} VERSION=#{@version}\n\n"
+      raise "compile failed"
     else
       puts "\n*** MAKE FAILED (target: '#{target}') ***"
     end
@@ -334,9 +352,20 @@ task :flash do
     puts "\nINFO: flashing #{bin_path} to #{@device} via the cloud..."
     sh "particle flash #{@device} #{bin_path}"
   else
+    # get bin file firmware version
+    program, platform, version, local = File.basename(bin_path).split('-')
+    if version.nil? || version.empty?
+      raise "Binary file does not have a firmware version number: #{bin_path}"
+    end
+    # find serial device's firmware version
+    fw_version = `particle identify`.lines.find { |l| l.include?("firmware version") }&.split&.last
+    # check if versions match
+    if !fw_version.nil? && !fw_version.empty? && version != fw_version
+      raise "The binary file has a different firmware version (#{version}) than the connected device (#{fw_version}). Make sure to compile the binary for the device's version or update the device firmware: rake update VERSION=#{version}"
+    end
     puts "\nINFO: putting device into DFU mode"
     sh "particle usb dfu"
-    puts "INFO: flashing #{bin_path} over USB (requires device in DFU mode = yellow blinking)..."
+    puts "INFO: flashing #{bin_path} over USB to connected device which has matching firmware version #{fw_version} (requires device in DFU mode = yellow blinking)..."
     sh "particle flash --usb #{bin_path}"
   end
 end
@@ -415,5 +444,6 @@ desc "flash the tinker app"
 # commands: digitalWrite "D7,HIGH", analogWrite, digitalRead, analogRead "A0"
 task :tinker do
   puts "\nINFO: flashing tinker..."
+  sh "particle usb dfu"
   sh "particle flash --usb tinker"
 end
