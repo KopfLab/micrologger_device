@@ -10,10 +10,9 @@ class ThardwareIOExpander : public ThardwareI2C
 
 private:
     // registers
-    const static byte FpinModesRegister = 0x03;  // pin config register
-    const static byte FpinModesInitial = 0xFF;   // see spec sheet
-    const static byte FpinValuesRegister = 0x01; // pin state register
-    const static byte FpinValuesInitial = 0xFF;  // see spec sheet
+    const static byte FpinModesRegister = 0x03;     // pin config register
+    const static byte FoutputValuesRegister = 0x01; // output pin state register
+    const static byte FinputValuesRegister = 0x00;  // input pin state register
 
     // low level interactions with the chip via I2C
 
@@ -23,7 +22,7 @@ private:
      */
     byte readRegister(byte _register, byte *_value)
     {
-        byte transmitCode;
+        byte transmitCode = SYSTEM_ERROR_NONE;
         // lock for thread safety
         WITH_LOCK(Wire)
         {
@@ -47,7 +46,7 @@ private:
                 }
             }
         }
-        return SYSTEM_ERROR_NONE;
+        return transmitCode;
     }
 
     /**
@@ -68,54 +67,39 @@ private:
         return transmitCode;
     }
 
-    // WRITE PIN MODES AND VALUES
+    // next level writing/reading modes
 
     /**
-     * @brief write pin modes
+     * @brief writes pin modes (output/input) and checks if written correctly
      */
-    bool writePinModes(bool _alwaysWrite = false, bool _check = true)
+    bool writePinModes()
     {
-        if (!_alwaysWrite && pinModes == pinModesTarget)
-        {
-            // nothing to do
-            return true;
-        }
-
-        // check connection
-        if (!isConnected())
-        {
-            if (!connect())
-                return false;
-        }
-
         // configure pin inputs/outputs
-        byte transmitCode = writeRegister(FpinModesRegister, pinModesTarget);
+        byte modes = bitsToByte(
+            pin1 == Tmode::INPUT, pin2 == Tmode::INPUT, pin3 == Tmode::INPUT, pin4 == Tmode::INPUT,
+            pin5 == Tmode::INPUT, pin6 == Tmode::INPUT, pin7 == Tmode::INPUT, pin8 == Tmode::INPUT);
+        byte transmitCode = writeRegister(FpinModesRegister, modes);
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
-            modeErrors++;
-            Log.trace("could not transmit IOExpander pin modes %s", byteBits(pinModesTarget).c_str());
-            error = Terror::failedWrite;
+            Log.trace("could not transmit IOExpander pin modes %s", byteBits(modes, 'O', 'I').c_str());
             return false;
         }
-        modeWrites++;
 
-        // if we don't check we can finish
-        if (!_check)
-            return true;
-
-        // check if modes are as expected -> read first
-        if (!readPinModes())
+        // read back modes to check if they match
+        byte read;
+        transmitCode = readRegister(FpinModesRegister, &read);
+        Log.trace("read pin modes: %s", byteBits(read, 'O', 'I').c_str());
+        if (transmitCode != SYSTEM_ERROR_NONE)
         {
+            Log.trace("could not read IOExpander pin modes");
             return false;
         }
 
         // then compare
-        if (pinModes != pinModesTarget)
+        if (read != modes)
         {
-            // config doesn't match!
-            modeErrors++;
-            Log.trace("IOExpander pin modes do not match - expected: %s, received: %s", byteBits(pinModesTarget).c_str(), byteBits(pinModes).c_str());
-            error = Terror::failedCheck;
+            // config doesn't match! something must have not worked during the transmission
+            Log.trace("IOExpander pin modes do not match - expected: %s, received: %s", byteBits(modes, 'O', 'I').c_str(), byteBits(read, 'O', 'I').c_str());
             return false;
         }
 
@@ -124,205 +108,199 @@ private:
     }
 
     /**
-     * @brief update pin values
+     * @brief updates output pin values (does nothing to input pin values) and checks if written correctly
      */
-    bool writePinValues(bool _alwaysWrite = false, bool _check = true)
+    bool writePinValues()
     {
-        // only compare values for pins that are ouput (doesn't make sense to include input)
-        if (!_alwaysWrite && (pinValues & ~pinModes) == (pinValuesTarget & ~pinModes))
-        {
-            // nothing to do
-            return true;
-        }
-
-        // check connection
-        if (!isConnected())
-        {
-            if (!connect())
-                return false;
-        }
+        // configure pin values (only matters for output pins)
+        byte values = bitsToByte(
+            pin1 == Tmode::OUTPUT_ON, pin2 == Tmode::OUTPUT_ON, pin3 == Tmode::OUTPUT_ON, pin4 == Tmode::OUTPUT_ON,
+            pin5 == Tmode::OUTPUT_ON, pin6 == Tmode::OUTPUT_ON, pin7 == Tmode::OUTPUT_ON, pin8 == Tmode::OUTPUT_ON);
 
         // configure pin inputs/outputs
-        byte transmitCode = writeRegister(FpinValuesRegister, pinValuesTarget);
+        byte transmitCode = writeRegister(FoutputValuesRegister, values);
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
-            valueErrors++;
-            Log.trace("could not transmit IOExpander pin values %s", byteBits(pinValuesTarget & ~pinModes).c_str());
+            Log.trace("could not transmit IOExpander pin values %s", byteBits(values, 'H', 'L').c_str());
             error = Terror::failedWrite;
-            return false;
-        }
-        valueWrites++;
-
-        // if we don't check we can finish
-        if (!_check)
-            return true;
-
-        // check if values are as expected -> read first
-        if (!readPinValues())
-        {
             return false;
         }
 
         // check back if values are as expected
         byte read;
-        transmitCode = readRegister(FpinValuesRegister, &read);
-        pinValues = read;
+        transmitCode = readRegister(FoutputValuesRegister, &read);
+        Log.trace("read output pin values: %s", byteBits(read, 'H', 'L').c_str());
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
-            valueErrors++;
             Log.trace("could not read IOExpander pin values");
-            error = Terror::failedRead;
             return false;
         }
 
         // then compare
-        if ((pinValues & ~pinModes) != (pinValuesTarget & ~pinModes))
+        if (read != values)
         {
             // config doesn't match!
             Log.trace("IOExpander pin values do not match - expected: %s, received: %s",
-                      byteBits(pinValuesTarget & ~pinModes).c_str(), byteBits(pinValues & ~pinModes).c_str());
-            error = Terror::failedCheck;
+                      byteBits(values, 'H', 'L').c_str(), byteBits('H', 'L').c_str());
             return false;
         }
+
+        // update sdds vars
+        setOutputValue(&pin1, &value1);
+        setOutputValue(&pin2, &value2);
+        setOutputValue(&pin3, &value3);
+        setOutputValue(&pin4, &value4);
+        setOutputValue(&pin5, &value5);
+        setOutputValue(&pin6, &value6);
+        setOutputValue(&pin7, &value7);
+        setOutputValue(&pin8, &value8);
+
+        // everything in order
+        return true;
+    }
+
+    /**
+     * @brief reads input pin values (does nothing to output pin values)
+     */
+    bool readPinValues()
+    {
+        // configure pin values (only matters for output pins)
+        byte values = bitsToByte(
+            pin1 == Tmode::OUTPUT_ON, pin2 == Tmode::OUTPUT_ON, pin3 == Tmode::OUTPUT_ON, pin4 == Tmode::OUTPUT_ON,
+            pin5 == Tmode::OUTPUT_ON, pin6 == Tmode::OUTPUT_ON, pin7 == Tmode::OUTPUT_ON, pin8 == Tmode::OUTPUT_ON);
+
+        // read values
+        byte read;
+        byte transmitCode = readRegister(FinputValuesRegister, &read);
+        Log.trace("read input pin values: %s", byteBits(read, 'H', 'L').c_str());
+        if (transmitCode != SYSTEM_ERROR_NONE)
+        {
+            Log.trace("could not read IOExpander pin values");
+            return false;
+        }
+
+        // update sdds vars
+        setInputValue(&pin1, &value1, isBitSet(read, 0));
+        setInputValue(&pin2, &value2, isBitSet(read, 1));
+        setInputValue(&pin3, &value3, isBitSet(read, 2));
+        setInputValue(&pin4, &value4, isBitSet(read, 3));
+        setInputValue(&pin5, &value5, isBitSet(read, 4));
+        setInputValue(&pin6, &value6, isBitSet(read, 5));
+        setInputValue(&pin7, &value7, isBitSet(read, 6));
+        setInputValue(&pin8, &value8, isBitSet(read, 7));
 
         // everything in order
         return true;
     }
 
 protected:
-    // reset registers
-    virtual void reset() override
+    // I2C read function
+    virtual bool read() override
     {
-        pinModes = FpinModesInitial;
-        pinValues = FpinValuesInitial;
+        if (status != Tstatus::connected && !connect())
+            return false;
+        if (!readPinValues())
+            return false;
+        return true;
+    }
+
+    // I2C write function
+    virtual bool write() override
+    {
+        if (status != Tstatus::connected && !connect())
+            return false;
+        if (!writePinModes())
+            return false;
+        if (!writePinValues())
+            return false;
+        return true;
     }
 
 public:
-    // sdds enums
-    sdds_enum(PIN1, PIN2, PIN3, PIN4, PIN5, PIN6, PIN7, PIN8) Tpin;
-    sdds_enum(UNKNOWN, INPUT, OUTPUT) Tmode;
-    sdds_enum(UNKNOWN, ON, OFF) Tvalue;
+    // pin modes
+    sdds_enum(INPUT, OUTPUT_ON, OUTPUT_OFF) Tmode; // INPUT is the default (consistent with config)
+
+    // pin values
+    sdds_enum(UNKNOWN, HIGH, LOW, UNSET, ON, OFF) Tvalue; // UNKNOWN is the default (since input is the default)
 
     // sdds vars
-    sdds_var(Tuint8, pinModes, sdds_joinOpt(sdds::opt::readonly, sdds::opt::showHex), FpinModesInitial);
-    sdds_var(Tuint8, pinModesTarget, sdds_joinOpt(sdds::opt::readonly, sdds::opt::showHex), FpinModesInitial);
-    sdds_var(Tuint32, modeReads, sdds::opt::readonly, 0);
-    sdds_var(Tuint32, modeWrites, sdds::opt::readonly, 0);
-    sdds_var(Tuint32, modeErrors, sdds::opt::readonly, 0);
-    sdds_var(Tuint8, pinValues, sdds_joinOpt(sdds::opt::readonly, sdds::opt::showHex), FpinValuesInitial);
-    sdds_var(Tuint8, pinValuesTarget, sdds_joinOpt(sdds::opt::readonly, sdds::opt::showHex), FpinValuesInitial);
-    sdds_var(Tuint32, valueReads, sdds::opt::readonly, 0);
-    sdds_var(Tuint32, valueWrites, sdds::opt::readonly, 0);
-    sdds_var(Tuint32, valueErrors, sdds::opt::readonly, 0);
-    sdds_var(Tpin, pin);
-    sdds_var(Tmode, mode);
-    sdds_var(Tvalue, value);
+    sdds_var(Tmode, pin1);
+    sdds_var(Tvalue, value1, sdds::opt::readonly);
+    sdds_var(Tmode, pin2);
+    sdds_var(Tvalue, value2, sdds::opt::readonly);
+    sdds_var(Tmode, pin3);
+    sdds_var(Tvalue, value3, sdds::opt::readonly);
+    sdds_var(Tmode, pin4);
+    sdds_var(Tvalue, value4, sdds::opt::readonly);
+    sdds_var(Tmode, pin5);
+    sdds_var(Tvalue, value5, sdds::opt::readonly);
+    sdds_var(Tmode, pin6);
+    sdds_var(Tvalue, value6, sdds::opt::readonly);
+    sdds_var(Tmode, pin7);
+    sdds_var(Tvalue, value7, sdds::opt::readonly);
+    sdds_var(Tmode, pin8);
+    sdds_var(Tvalue, value8, sdds::opt::readonly);
 
+private:
+    // set sdds value for outputs
+    void setOutputValue(Tmode *_mode, Tvalue *_value)
+    {
+        if (*_mode == Tmode::OUTPUT_ON && *_value != Tvalue::ON)
+            *_value = Tvalue::ON;
+        else if (*_mode == Tmode::OUTPUT_OFF && *_value != Tvalue::OFF)
+            *_value = Tvalue::OFF;
+    }
+
+    // set sdds value for inputs
+    void setInputValue(Tmode *_mode, Tvalue *_value, bool _read)
+    {
+        if (*_mode == Tmode::INPUT)
+        {
+            if (_read && *_value != Tvalue::HIGH)
+                *_value = Tvalue::HIGH;
+            else if (!_read && *_value != Tvalue::LOW)
+                *_value = Tvalue::LOW;
+        }
+    }
+
+    // reset sdds values after pin mode change or disconnect
+    void resetValue(Tmode *_mode, Tvalue *_value)
+    {
+        if (*_mode == Tmode::INPUT && *_value != Tvalue::UNKNOWN)
+            *_value = Tvalue::UNKNOWN; // input
+        else if (*_mode != Tmode::INPUT && *_value != Tvalue::UNSET)
+            *_value = Tvalue::UNSET; // ouput
+    }
+
+public:
     // constructor
     ThardwareIOExpander()
     {
 
-        // i2c connection
+        // change modes
+        on(pin1) { resetValue(&pin1, &value1); };
+        on(pin2) { resetValue(&pin2, &value2); };
+        on(pin3) { resetValue(&pin3, &value3); };
+        on(pin4) { resetValue(&pin4, &value4); };
+        on(pin5) { resetValue(&pin5, &value5); };
+        on(pin6) { resetValue(&pin6, &value6); };
+        on(pin7) { resetValue(&pin7, &value7); };
+        on(pin8) { resetValue(&pin8, &value8); };
+
+        // connection status
         on(status)
         {
-            if (mode != getPinMode(pin))
-                mode = getPinMode(pin);
-            if (value != getPinValue(pin))
-                value = getPinValue(pin);
-        };
-
-        // actions (read or write when connected)
-        on(action)
-        {
-            if (action == Taction::read && isConnected())
+            if (status == Tstatus::disconnected)
             {
-                readPinModes();
-                readPinValues();
-            }
-            else if (action == Taction::write && isConnected())
-            {
-                writePinModes();
-                writePinValues();
-            }
-
-            if (action != Taction::___)
-                action = Taction::___;
-        };
-
-        // update the overall pin modes
-        on(pinModes)
-        {
-            if (mode != getPinMode(pin))
-                mode = getPinMode(pin);
-        };
-
-        // update the overall pin values
-        on(pinValues)
-        {
-            if (value != getPinValue(pin))
-                value = getPinValue(pin);
-        };
-
-        // switch pins
-        on(pin)
-        {
-            if (mode != getPinMode(pin))
-                mode = getPinMode(pin);
-            if (value != getPinValue(pin))
-                value = getPinValue(pin);
-        };
-
-        // switch mode (only when connected)
-        on(mode)
-        {
-            // unknown
-            if (!isConnected() && mode == Tmode::UNKNOWN)
-                return;
-
-            // connected?
-            if (isConnected() && mode != Tmode::UNKNOWN && mode != getPinMode(pin))
-            {
-                setPinMode(pin, mode);
-            }
-
-            // not the same? (avoid callback trigger)
-            if (mode != getPinMode(pin))
-            {
-                mode = getPinMode(pin);
-            }
-
-            // read values for input
-            if (mode == Tmode::INPUT)
-            {
-                // technically we should read values here but we want to avoid circular read
-                // so skipping this, in practice for user they will call isInputOn() which
-                // will read the values
-            }
-        };
-
-        // switch value (only when connected)
-        on(value)
-        {
-            // unknown
-            if (!isConnected() && value == Tvalue::UNKNOWN)
-                return;
-
-            // connected?
-            if (isConnected() && value != Tvalue::UNKNOWN && value != getPinValue(pin))
-            {
-                setPinValue(pin, value);
-            }
-
-            // not the same? (avoid callback trigger)
-            if (mode != getPinMode(pin))
-            {
-                mode = getPinMode(pin);
-            }
-
-            // not the same? (avoid callback trigger)
-            if (value != getPinValue(pin))
-            {
-                value = getPinValue(pin);
+                // disconnected
+                resetValue(&pin1, &value1);
+                resetValue(&pin2, &value2);
+                resetValue(&pin3, &value3);
+                resetValue(&pin4, &value4);
+                resetValue(&pin5, &value5);
+                resetValue(&pin6, &value6);
+                resetValue(&pin7, &value7);
+                resetValue(&pin8, &value8);
             }
         };
     }
@@ -331,184 +309,5 @@ public:
     void init(byte _i2cAddress = 0x20)
     {
         ThardwareI2C::init(_i2cAddress);
-    }
-
-    // PIN MODES (OUTPUT vs INPUT)
-
-    /**
-     * @brief retrieve pin mode
-     */
-    Tmode::e getPinMode(Tpin::e _pin)
-    {
-        if (!isConnected())
-            return Tmode::UNKNOWN;
-        uint8_t pin = static_cast<uint8_t>(_pin);
-        if (pin < 8 && (pinModes >> pin) & 0x01)
-        {
-            return Tmode::INPUT;
-        }
-        else
-        {
-            return Tmode::OUTPUT;
-        }
-    }
-
-    /**
-     * @brief set the mode of a pin
-     */
-    bool setPinMode(Tpin::e _pin, Tmode::e _mode)
-    {
-        uint8_t pin = static_cast<uint8_t>(_pin);
-        if (pin < 8)
-        {
-            if (_mode == Tmode::OUTPUT)
-            {
-                pinModesTarget &= ~(0x01 << pin);
-            }
-            else if (_mode == Tmode::INPUT)
-            {
-                pinModesTarget |= (0x01 << pin);
-            }
-        }
-
-        // write the pin modes
-        return writePinModes();
-    }
-
-    /**
-     * @brief read pin modes via I2C - this is rarely called by the user
-     */
-    bool readPinModes()
-    {
-        // check connection
-        if (!isConnected())
-        {
-            if (!connect())
-                return false;
-        }
-
-        // read modes
-        byte read = pinModes;
-        byte transmitCode = readRegister(FpinModesRegister, &read);
-        if (transmitCode != SYSTEM_ERROR_NONE)
-        {
-            modeErrors++;
-            Log.trace("could not read IOExpander pin modes");
-            error = Terror::failedRead;
-            return false;
-        }
-        modeReads++;
-        pinModes = read;
-        return true;
-    }
-
-    // PIN VALUES (ON vs OFF)
-
-    /**
-     * @brief get pin value
-     */
-    Tvalue::e getPinValue(Tpin::e _pin)
-    {
-        if (!isConnected())
-            return Tvalue::UNKNOWN;
-        uint8_t pin = static_cast<uint8_t>(_pin);
-        if (pin < 8 && (pinValues >> pin) & 0x01)
-        {
-            return Tvalue::ON;
-        }
-        else
-        {
-            return Tvalue::OFF;
-        }
-    }
-
-    /**
-     * @brief set the value of a pin (makes sure the pin is an output pin)
-     */
-    bool setPinValue(Tpin::e _pin, Tvalue::e _value)
-    {
-        if (!setPinMode(_pin, Tmode::OUTPUT))
-        {
-            // failed to confirm/configure the pin as OUTPUT
-            return false;
-        }
-
-        uint8_t pin = static_cast<uint8_t>(_pin);
-        if (pin < 8)
-        {
-            if (_value == Tvalue::OFF)
-            {
-                pinValuesTarget &= ~(0x01 << pin);
-            }
-            else if (_value == Tvalue::ON)
-            {
-                pinValuesTarget |= (0x01 << pin);
-            }
-        }
-
-        // update values
-        return writePinValues();
-    }
-
-    /**
-     * @brief read pin values - this is useful if some pins are inputs
-     */
-    bool readPinValues()
-    {
-        // check connection
-        if (!isConnected())
-        {
-            if (!connect())
-                return false;
-        }
-
-        // read modes
-        byte read = pinValues;
-        byte transmitCode = readRegister(FpinValuesRegister, &read);
-        if (transmitCode != SYSTEM_ERROR_NONE)
-        {
-            valueErrors++;
-            Log.trace("could not read IOExpander pin values");
-            error = Terror::failedRead;
-            return false;
-        }
-        valueReads++;
-        pinValues = read;
-        return true;
-    }
-
-    // CONVENIENCE FUNCTIONS for external classes
-
-    /**
-     * @brief convenience function to turn a pin on (setPinValue makes sure the pin is an output pin)
-     */
-    bool turnOn(Tpin::e _pin)
-    {
-        return setPinValue(_pin, Tvalue::ON);
-    }
-
-    /**
-     * @brief is the pin on? (TRUE only if it's connected, it's an output, and it's ON, otherwise FALSE)
-     */
-    bool isOutputOn(Tpin::e _pin)
-    {
-        return isConnected() && getPinMode(_pin) == Tmode::OUTPUT && getPinValue(_pin) == Tvalue::ON;
-    }
-
-    /**
-     * @brief is input on? (TRUE only if it's connected, it's an input, and it's ON, otherwise FALSE)
-     */
-    bool isInputOn(Tpin::e _pin)
-    {
-        readPinValues();
-        return isConnected() && getPinMode(_pin) == Tmode::INPUT && getPinValue(_pin) == Tvalue::ON;
-    }
-
-    /**
-     * @brief convenience function to turn a pin off (setPinValue makes sure the pin is an output pin)
-     */
-    bool turnOff(Tpin::e _pin)
-    {
-        return setPinValue(_pin, Tvalue::OFF);
     }
 };
