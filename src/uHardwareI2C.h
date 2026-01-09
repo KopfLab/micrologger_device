@@ -51,7 +51,7 @@ private:
         {
             unsigned long requestStart = millis();
             Wire.beginTransmission(Fi2cAddress);
-            byte transmitCode = Wire.endTransmission();
+            uint8_t transmitCode = Wire.endTransmission();
             if (transmitCode == SYSTEM_ERROR_NONE)
             {
                 // success
@@ -81,48 +81,19 @@ private:
         return false;
     }
 
+    // read from I2C device
+    virtual bool read()
+    {
+        return false;
+    }
+
+    // write to I2C device
+    virtual bool write()
+    {
+        return false;
+    }
+
 protected:
-    // protected information (address and initialization status)
-    byte Fi2cAddress;
-    bool Finitialized = false;
-
-    // helper function to assemble register byte
-    static byte bitsToByte(
-        bool b0, bool b1, bool b2, bool b3,
-        bool b4, bool b5, bool b6, bool b7)
-    {
-        return (static_cast<byte>(b0) << 0) |
-               (static_cast<byte>(b1) << 1) |
-               (static_cast<byte>(b2) << 2) |
-               (static_cast<byte>(b3) << 3) |
-               (static_cast<byte>(b4) << 4) |
-               (static_cast<byte>(b5) << 5) |
-               (static_cast<byte>(b6) << 6) |
-               (static_cast<byte>(b7) << 7);
-    }
-
-    // helper funciton to check if a bit is set
-    static bool isBitSet(byte _byte, uint8_t _bit)
-    {
-        return _bit < 8 && (_byte >> _bit) & 0x01;
-    }
-
-    // helper function to print register byte
-    static String byteBits(byte _b, const char _0 = '0', const char _1 = '1', bool _reverse = false)
-    {
-        String s;
-        s.reserve(15);
-        int i = (_reverse) ? 7 : 0;
-        while (i >= 0 && i <= 7)
-        {
-            if ((_reverse && i < 7) || (!_reverse && i > 0))
-                s += ' ';
-            s += ((_b >> i) & 1) ? _1 : _0;
-            (_reverse) ? i-- : i++;
-        }
-        return s;
-    }
-
     // connect to I2C (init() needs to get called first)
     virtual bool connect()
     {
@@ -136,16 +107,45 @@ protected:
         return checkConnection();
     }
 
-    // read from I2C device
-    virtual bool read()
+    // protected information (address and initialization status)
+    uint8_t Fi2cAddress;
+    bool Finitialized = false;
+
+    // helper function to assemble register byte
+    static uint8_t bitsToByte(
+        bool b0, bool b1, bool b2, bool b3,
+        bool b4, bool b5, bool b6, bool b7)
     {
-        return false;
+        return (static_cast<uint8_t>(b0) << 0) |
+               (static_cast<uint8_t>(b1) << 1) |
+               (static_cast<uint8_t>(b2) << 2) |
+               (static_cast<uint8_t>(b3) << 3) |
+               (static_cast<uint8_t>(b4) << 4) |
+               (static_cast<uint8_t>(b5) << 5) |
+               (static_cast<uint8_t>(b6) << 6) |
+               (static_cast<uint8_t>(b7) << 7);
     }
 
-    // write to I2C device
-    virtual bool write()
+    // helper funciton to check if a bit is set
+    static bool isBitSet(uint8_t _byte, uint8_t _bit)
     {
-        return false;
+        return _bit < 8 && (_byte >> _bit) & 0x01;
+    }
+
+    // helper function to print register byte
+    static String byteBits(uint8_t _b, const char _0 = '0', const char _1 = '1', bool _reverse = true)
+    {
+        String s;
+        s.reserve(15);
+        int i = (_reverse) ? 7 : 0;
+        while (i >= 0 && i <= 7)
+        {
+            if ((_reverse && i < 7) || (!_reverse && i > 0))
+                s += ' ';
+            s += ((_b >> i) & 1) ? _1 : _0;
+            (_reverse) ? i-- : i++;
+        }
+        return s;
     }
 
 public:
@@ -260,7 +260,7 @@ public:
     }
 
     // initialize
-    void init(byte _i2cAddress)
+    void init(uint8_t _i2cAddress)
     {
         if (!Finitialized)
         {

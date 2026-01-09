@@ -8,21 +8,30 @@
 class ThardwareIOExpander : public ThardwareI2C
 {
 
+public:
+    // enumerations
+
+    // pin modes
+    sdds_enum(INPUT, OUTPUT_ON, OUTPUT_OFF) Tmode; // INPUT is the default (consistent with config)
+
+    // pin values
+    sdds_enum(UNKNOWN, HIGH, LOW, UNSET, ON, OFF) Tvalue; // UNKNOWN is the default (since input is the default)
+
 private:
     // registers
-    const static byte FpinModesRegister = 0x03;     // pin config register
-    const static byte FoutputValuesRegister = 0x01; // output pin state register
-    const static byte FinputValuesRegister = 0x00;  // input pin state register
+    static constexpr uint8_t FpinModesRegister = 0x03;     // pin config register
+    static constexpr uint8_t FoutputValuesRegister = 0x01; // output pin state register
+    static constexpr uint8_t FinputValuesRegister = 0x00;  // input pin state register
 
     // low level interactions with the chip via I2C
 
     /**
      * @brief read a register value
-     * @return error code from Wire.endTransmission() or custom error code 0xff if byte request failed
+     * @return error code from Wire.endTransmission() or custom error code 0xff if uint8_t request failed
      */
-    byte readRegister(byte _register, byte *_value)
+    uint8_t readRegister(uint8_t _register, uint8_t *_value)
     {
-        byte transmitCode = SYSTEM_ERROR_NONE;
+        uint8_t transmitCode = SYSTEM_ERROR_NONE;
         // lock for thread safety
         WITH_LOCK(Wire)
         {
@@ -31,17 +40,18 @@ private:
             // false = keep connection alive instead of stop
             transmitCode = Wire.endTransmission(false);
 
-            // if it worked, request the byte data
+            // if it worked, request the uint8_t data
             if (transmitCode == SYSTEM_ERROR_NONE)
             {
-                uint8_t request = Wire.requestFrom(Fi2cAddress, 1);
-                if (request == 1)
+                const uint8_t bytesRequested = 1;
+                uint8_t request = Wire.requestFrom(Fi2cAddress, bytesRequested);
+                if (request == bytesRequested && Wire.available())
                 {
                     *_value = Wire.read();
                 }
                 else
                 {
-                    // custom error: did not receive the expected 1 byte
+                    // custom error: did not receive the expected number of bytes
                     transmitCode = 0xff;
                 }
             }
@@ -53,9 +63,9 @@ private:
      * @brief write a register value
      * @return error code from Wire.endTransmission()
      */
-    byte writeRegister(byte _register, byte _value)
+    uint8_t writeRegister(uint8_t _register, uint8_t _value)
     {
-        byte transmitCode;
+        uint8_t transmitCode;
         // lock for thread safety
         WITH_LOCK(Wire)
         {
@@ -75,10 +85,10 @@ private:
     bool writePinModes()
     {
         // configure pin inputs/outputs
-        byte modes = bitsToByte(
+        uint8_t modes = bitsToByte(
             pin1 == Tmode::INPUT, pin2 == Tmode::INPUT, pin3 == Tmode::INPUT, pin4 == Tmode::INPUT,
             pin5 == Tmode::INPUT, pin6 == Tmode::INPUT, pin7 == Tmode::INPUT, pin8 == Tmode::INPUT);
-        byte transmitCode = writeRegister(FpinModesRegister, modes);
+        uint8_t transmitCode = writeRegister(FpinModesRegister, modes);
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
             Log.trace("could not transmit IOExpander pin modes %s", byteBits(modes, 'O', 'I').c_str());
@@ -86,7 +96,7 @@ private:
         }
 
         // read back modes to check if they match
-        byte read;
+        uint8_t read;
         transmitCode = readRegister(FpinModesRegister, &read);
         Log.trace("read pin modes: %s", byteBits(read, 'O', 'I').c_str());
         if (transmitCode != SYSTEM_ERROR_NONE)
@@ -113,12 +123,12 @@ private:
     bool writePinValues()
     {
         // configure pin values (only matters for output pins)
-        byte values = bitsToByte(
+        uint8_t values = bitsToByte(
             pin1 == Tmode::OUTPUT_ON, pin2 == Tmode::OUTPUT_ON, pin3 == Tmode::OUTPUT_ON, pin4 == Tmode::OUTPUT_ON,
             pin5 == Tmode::OUTPUT_ON, pin6 == Tmode::OUTPUT_ON, pin7 == Tmode::OUTPUT_ON, pin8 == Tmode::OUTPUT_ON);
 
         // configure pin inputs/outputs
-        byte transmitCode = writeRegister(FoutputValuesRegister, values);
+        uint8_t transmitCode = writeRegister(FoutputValuesRegister, values);
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
             Log.trace("could not transmit IOExpander pin values %s", byteBits(values, 'H', 'L').c_str());
@@ -127,7 +137,7 @@ private:
         }
 
         // check back if values are as expected
-        byte read;
+        uint8_t read;
         transmitCode = readRegister(FoutputValuesRegister, &read);
         Log.trace("read output pin values: %s", byteBits(read, 'H', 'L').c_str());
         if (transmitCode != SYSTEM_ERROR_NONE)
@@ -141,7 +151,7 @@ private:
         {
             // config doesn't match!
             Log.trace("IOExpander pin values do not match - expected: %s, received: %s",
-                      byteBits(values, 'H', 'L').c_str(), byteBits('H', 'L').c_str());
+                      byteBits(values, 'H', 'L').c_str(), byteBits(read, 'H', 'L').c_str());
             return false;
         }
 
@@ -165,13 +175,13 @@ private:
     bool readPinValues()
     {
         // configure pin values (only matters for output pins)
-        byte values = bitsToByte(
+        uint8_t values = bitsToByte(
             pin1 == Tmode::OUTPUT_ON, pin2 == Tmode::OUTPUT_ON, pin3 == Tmode::OUTPUT_ON, pin4 == Tmode::OUTPUT_ON,
             pin5 == Tmode::OUTPUT_ON, pin6 == Tmode::OUTPUT_ON, pin7 == Tmode::OUTPUT_ON, pin8 == Tmode::OUTPUT_ON);
 
         // read values
-        byte read;
-        byte transmitCode = readRegister(FinputValuesRegister, &read);
+        uint8_t read;
+        uint8_t transmitCode = readRegister(FinputValuesRegister, &read);
         Log.trace("read input pin values: %s", byteBits(read, 'H', 'L').c_str());
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
@@ -193,7 +203,6 @@ private:
         return true;
     }
 
-protected:
     // I2C read function
     virtual bool read() override
     {
@@ -216,32 +225,6 @@ protected:
         return true;
     }
 
-public:
-    // pin modes
-    sdds_enum(INPUT, OUTPUT_ON, OUTPUT_OFF) Tmode; // INPUT is the default (consistent with config)
-
-    // pin values
-    sdds_enum(UNKNOWN, HIGH, LOW, UNSET, ON, OFF) Tvalue; // UNKNOWN is the default (since input is the default)
-
-    // sdds vars
-    sdds_var(Tmode, pin1);
-    sdds_var(Tvalue, value1, sdds::opt::readonly);
-    sdds_var(Tmode, pin2);
-    sdds_var(Tvalue, value2, sdds::opt::readonly);
-    sdds_var(Tmode, pin3);
-    sdds_var(Tvalue, value3, sdds::opt::readonly);
-    sdds_var(Tmode, pin4);
-    sdds_var(Tvalue, value4, sdds::opt::readonly);
-    sdds_var(Tmode, pin5);
-    sdds_var(Tvalue, value5, sdds::opt::readonly);
-    sdds_var(Tmode, pin6);
-    sdds_var(Tvalue, value6, sdds::opt::readonly);
-    sdds_var(Tmode, pin7);
-    sdds_var(Tvalue, value7, sdds::opt::readonly);
-    sdds_var(Tmode, pin8);
-    sdds_var(Tvalue, value8, sdds::opt::readonly);
-
-private:
     // set sdds value for outputs
     void setOutputValue(Tmode *_mode, Tvalue *_value)
     {
@@ -273,6 +256,24 @@ private:
     }
 
 public:
+    // sdds vars
+    sdds_var(Tmode, pin1);
+    sdds_var(Tvalue, value1, sdds::opt::readonly);
+    sdds_var(Tmode, pin2);
+    sdds_var(Tvalue, value2, sdds::opt::readonly);
+    sdds_var(Tmode, pin3);
+    sdds_var(Tvalue, value3, sdds::opt::readonly);
+    sdds_var(Tmode, pin4);
+    sdds_var(Tvalue, value4, sdds::opt::readonly);
+    sdds_var(Tmode, pin5);
+    sdds_var(Tvalue, value5, sdds::opt::readonly);
+    sdds_var(Tmode, pin6);
+    sdds_var(Tvalue, value6, sdds::opt::readonly);
+    sdds_var(Tmode, pin7);
+    sdds_var(Tvalue, value7, sdds::opt::readonly);
+    sdds_var(Tmode, pin8);
+    sdds_var(Tvalue, value8, sdds::opt::readonly);
+
     // constructor
     ThardwareIOExpander()
     {
@@ -306,7 +307,7 @@ public:
     }
 
     // default i2c address in init
-    void init(byte _i2cAddress = 0x20)
+    void init(uint8_t _i2cAddress = 0x20)
     {
         ThardwareI2C::init(_i2cAddress);
     }
