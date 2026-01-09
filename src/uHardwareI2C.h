@@ -213,10 +213,13 @@ public:
         // connection
         on(status)
         {
-            if (status == Tstatus::connected && autoConnect == TonOff::ON)
+            // write and read the values if we're autoconnecting
+            if (autoConnect == TonOff::ON)
             {
-                // write the values if we're autoconnecting
-                action = Taction::write;
+                if (status == Tstatus::connected)
+                    action = Taction::write;
+                if (status == Tstatus::connected)
+                    action = Taction::read;
             }
         };
 
