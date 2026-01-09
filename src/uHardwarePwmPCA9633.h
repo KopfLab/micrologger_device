@@ -135,13 +135,6 @@ private:
     bool writeConfiguration()
     {
 
-        // // check before write
-        // Log.trace("BEFORE write:");
-        // uint8_t reads[FregistersN];
-        // readRegisters(Fmode1Register, FregistersN, reads);
-        // for (uint8_t i = 0; i < FregistersN; i++)
-        //     Log.trace("reg %d: %s", i, byteBits(reads[i]).c_str());
-
         // registers to write
         uint8_t regs[FregistersN];
         regs[Fmode1Register] = Fmode1Default;
@@ -169,66 +162,18 @@ private:
         regs[FoutputModeRegister] |= (outputModes[2] << 4); // state3 goes into bits 5:4
         regs[FoutputModeRegister] |= (outputModes[3] << 6); // state4 goes into bits 7:6
 
-        Log.trace("WHAT to write:");
-        for (uint8_t i = 0; i < FregistersN; i++)
-        {
-            Log.trace("reg %d: %s", i, byteBits(regs[i]).c_str());
-            Wire.write(regs[i]);
-        }
-
         // write the registers
         if (writeRegisters(Fmode1Register, FregistersN, regs) != SYSTEM_ERROR_NONE)
             return false;
 
-        // // lock for thread safety
-        // WITH_LOCK(Wire)
-        // {
-        //     // transmit configuration
-        //     // control: start at mode1, auto-increment from there (see Fig. 10, Table 6 & 7 in datasheet)
-        //     Wire.beginTransmission(Fi2cAddress);
-        //     Wire.write(FincrementFlagAll | Fmode1Register);
-        //     for (uint8_t i = 0; i < FregistersN; i++)
-        //     {
-        //         Log.trace("reg %d: %d = %s", i, regs[i], byteBits(regs[i]).c_str());
-        //         Wire.write(regs[i]);
-        //     }
-        //     uint8_t transmitCode = Wire.endTransmission();
-        //     if (transmitCode != SYSTEM_ERROR_NONE)
-        //     {
-        //         Log.trace("could not write PwmDimmer register values");
-        //         return false;
-        //     }
-        // }
-
-        // Wire.beginTransmission(Fi2cAddress);
-        // Wire.write(FoutputModeRegister); // control: no autoincrement, LEDOUT address
-        // Wire.write(outputMode);
-        // err = Wire.endTransmission();
-        // if (err != 0)
-        //     return false;
-
-        // // configure for external use
-        // Wire.beginTransmission(Fi2cAddress);
-        // Wire.write(Fmode1Register); // control: no autoincrement, LEDOUT address
-        // Wire.write(0x01);
-        // err = Wire.endTransmission();
-        // if (err != 0)
-        //     return false;
-
-        // Wire.beginTransmission(Fi2cAddress);
-        // Wire.write(Fmode2Register); // control: no autoincrement, LEDOUT address
-        // Wire.write(0x1D);
-        // err = Wire.endTransmission();
-        // if (err != 0)
-        //     return false;
-
-        // check after write
-        Log.trace("AFTER write:");
+        // read them back
         uint8_t reads[FregistersN];
-        readRegisters(Fmode1Register, FregistersN, reads);
+        if (readRegisters(Fmode1Register, FregistersN, reads) != SYSTEM_ERROR_NONE)
+            return false;
+
+        // compare the values
         for (uint8_t i = 0; i < FregistersN; i++)
         {
-            Log.trace("reg %d: %s", i, byteBits(reads[i]).c_str());
             if (reads[i] != regs[i])
             {
                 Log.trace("PwmDimmer register %d value does not match - expected: %s, received: %s",
