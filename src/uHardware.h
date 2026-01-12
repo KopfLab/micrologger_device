@@ -6,215 +6,224 @@
 #include "uParticleSystem.h"
 #endif
 
+// hardware parts
+#include "uHardwareMotorNidec24H.h"
+#include "uHardwareIOExpanderTCA9534.h"
+#include "uHardwareRheostatMCP4652.h"
+#include "uHardwarePwmPCA9633.h"
+
 /**
  * @brief hardware handler
  * uses a TmenuHandle for the convenience of sdds_vars but is not usually
  * included in the tree except for stand-alone testing
  */
-class Thardware : public TmenuHandle{
+class Thardware : public TmenuHandle
+{
 
-    private:
+public:
+    // enumerations
+    using TonOff = sdds::enums::OnOff;
+    using Ti2cStatus = ThardwareIOExpander::Tstatus;
+    using Ti2cAction = ThardwareI2C::Taction;
+    using TioMode = ThardwareIOExpander::Tmode;
+    using TioValue = ThardwareIOExpander::Tvalue;
+    using TdimmerValue = ThardwarePwmPCA9633::Tvalue;
 
-        bool initialized = false;
-		
-        // in case it is used in a tree
-		Tmeta meta() override { return Tmeta{TYPE_ID, 0, "hardware"}; }
+private:
+    bool Finitialized = false;
 
-         /**
-         * @brief initialize the hardware
-         */
-        void init() {
-            if (!initialized) {
-                // initialize
-                Wire.begin();
-                motor.init();
-                beam.init();
+    // in case it is used in a tree
+    Tmeta meta() override { return Tmeta{TYPE_ID, 0, "hardware"}; }
+
+    /**
+     * @brief initialize the hardware
+     */
+    void init()
+    {
+        if (!Finitialized)
+        {
+            motor.init(A2, D6); // on particle, might be different on other devices!
+            expander.init();
+            dpot.init(ThardwareRheostatMCP4652::Resolution::S256, ThardwareRheostatMCP4652::Resistance::R100k);
+            dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
+        }
+    }
+
+public:
+    // hardware components
+    sdds_var(Ti2cStatus, device, sdds::opt::readonly, Ti2cStatus::disconnected);
+    sdds_var(TonOff, beam, sdds::opt::nothing, TonOff::e::OFF);
+    sdds_var(TonOff, lights, sdds::opt::nothing, TonOff::e::OFF);
+    sdds_var(Tuint8, intensity, sdds::opt::nothing, 0);
+    sdds_var(TonOff, fan, sdds::opt::nothing, TonOff::e::OFF);
+    sdds_var(ThardwareMotor, motor);
+    sdds_var(ThardwareIOExpander, expander);
+    sdds_var(ThardwareRheostatMCP4652, dpot);
+    sdds_var(ThardwarePwmPCA9633, dimmer);
+
+    // constructor
+    Thardware()
+    {
+
+#ifdef SDDS_ON_PARTICLE
+        // if on a particle system, initialize once startup is complete
+        on(particleSystem().startup)
+        {
+            if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+            {
+                init();
             }
-        }
+        };
+#else
+        // initialize during setup
+        on(sdds::setup())
+        {
+            init();
+        };
+#endif
 
-    public:
+        // turn the gpio expander connection autocheck on to keep track of device connection
+        expander.autoConnect = TonOff::ON;
+        expander.pin1 = TioMode::OUTPUT_ON;  // indicator light
+        expander.pin2 = TioMode::OUTPUT_OFF; // beam LED
 
-        // stirrer motor
-        class Tmotor : public TmenuHandle {
-
-            private:
-
-                // speed
-                dtypes::uint16 FtargetSpeed = 0;
-                Ttimer FspeedFinetuneTimer;
-
-                // decoder for speed measurement
-                TisrEvent decoderISR; 
-                dtypes::TtickCount FdecoderStart = 0;
-                dtypes::uint32 FdecoderCounter = 0;
-                const dtypes::uint8 FdecoderPin = D6;
-
-                void decoderChangeISR(){ 
-                    decoderISR.signal(); 
-                };
-
-                void resetDecoder() {
-                    FdecoderStart = millis();
-                    FdecoderCounter = 0;
-                }
-
-            public:
-
-                sdds_var(Tuint16, speed, sdds::opt::readonly);
-                sdds_enum(none, noResponse) Terror;
-                sdds_var(Terror, error, sdds::opt::readonly);
-                
-                Tmotor() {
-                    // decoder interrupt triggered
-                    on(decoderISR){
-                        FdecoderCounter++;
-                    };
-                }
-
-                void init() {
-                    // attach the encoder interrupt
-                    attachInterrupt(FdecoderPin, &Tmotor::decoderChangeISR, this, RISING);
-                }
-
-                void setSpeed(dtypes::uint16 _speed) {
-                    FtargetSpeed = _speed;
-                    // FIXME: set the speed and finetune with the speed measurement
-                    // every time a new speed is set, the decoder resets
-                    // calculate speed each time
-                    speed = _speed; // FIXME read the actual speed
-                    resetDecoder();
-                }
-
-                dtypes::uint16 getSpeed() {
-                    // return the speed
-                        // decoder info: rpm = freq (in Hz) / 100 * 60 = counts / dt.ms * 1000 * 1/100 * 60 = count / dt.ms * 600.
-                    //float rpm = (600. * decoder_steps) / (millis() - last_speed);
-                    return 0;
-                }
-
+        // check expander I2C status
+        on(expander.status)
+        {
+            // if connected and not on yet, turn on
+            if (expander.status == Ti2cStatus::connected && expander.value1 != TioValue::ON)
+            {
+                expander.pin1 = TioMode::OUTPUT_ON;
+                expander.action = Ti2cAction::write;
+            }
         };
 
-        sdds_var(Tmotor, motor);
-
-        // beam
-        class Tbeam : public TmenuHandle {
-
-            private:
-
-                // beam runs through a TCA9534 multiplexer over 1 wire commms
-                bool initialized = false;
-                bool on = false;
-                byte FmplexAddress = 0x20; // default TCA9534 address
-                byte FmplexPinConfigRegister = 0x03; // pin config register
-                byte FmplexPinStateRegister = 0x01; // pin state register
-                uint8_t FmplexPinConfig = 0xFF; // all pins are inputs by default
-                uint8_t FmplexPinState = 0x00; // all pins are off by default
-                uint8_t FbeamPin = 0; // pin address
-
-                bool transmit(byte _register, uint8_t _config) {
-                    Wire.beginTransmission(FmplexAddress);
-                    Wire.write(_register);
-                    Wire.write(_config);
-                    return Wire.endTransmission() == 0;
-                }
-
-            public:
-
-                sdds_enum(none, failedInit, failedSet) Terror;
-                sdds_var(Terror, error, sdds::opt::readonly);
-
-                /**
-                 * @brief is beam on?
-                 */
-                bool isOn() {
-                    return on;
-                }
-
-                bool init() {
-                    initialized = true;
-                    // check if device is present
-                    Wire.beginTransmission(FmplexAddress);
-                    if(Wire.endTransmission() != 0) {
-                        error = Terror::failedInit;
-                        return false;
-                    }
-                
-                    // configure pin inputs/outputs (only beam pin as output)
-                    FmplexPinConfig = FmplexPinConfig & ~(0x01 << FbeamPin);
-                    if (!transmit(FmplexPinConfigRegister, FmplexPinConfig)) {
-                        error = Terror::failedInit;
-                        return false;
-                    }
-
-                    // set all pins to off
-                    if (!transmit(FmplexPinStateRegister, FmplexPinState)) {
-                        error = Terror::failedSet;
-                        return false;
-                    }
-            
-                    // successfully initialized, set error to none
-                    error = Terror::none;
-                    return true;
-                }
-
-                void turnOn() {
-                    // init if needed
-                    if (!initialized || error == Terror::failedInit) {
-                        if (!init()) return;
-                    }
-                    // set if off or last command failed
-                    if (!on || error == Terror::failedSet) {
-                        FmplexPinState = FmplexPinState | (0x01 << FbeamPin);
-                        on = transmit(FmplexPinStateRegister, FmplexPinState);
-                        error = !on ? 
-                            Terror::failedSet :
-                            Terror::none;
-                    }
-                }
-
-                void turnOff() {
-                    // init if needed
-                    if (!initialized || error == Terror::failedInit) {
-                        if (!init()) return;
-                    }
-                    // set if on or last command failed
-                    if (on || error == Terror::failedSet) {
-                        FmplexPinState = FmplexPinState & ~(0x01 << FbeamPin);
-                        on = !transmit(FmplexPinStateRegister, FmplexPinState);
-                        error = on ? 
-                            Terror::failedSet :
-                            Terror::none;
-                    }
-                }
-
+        // keep I2C status updated
+        on(expander.value1)
+        {
+            if (expander.value1 == TioValue::ON && device == Ti2cStatus::disconnected)
+                device = Ti2cStatus::connected;
+            else if (expander.value1 != TioValue::ON && device == Ti2cStatus::connected)
+                device = Ti2cStatus::disconnected;
         };
 
-        sdds_var(Tbeam, beam);
+        // turn beam on/off
+        on(beam)
+        {
+            if (beam == TonOff::OFF && expander.value2 == TioValue::ON)
+            {
+                expander.pin2 = TioMode::OUTPUT_OFF;
+                expander.action = Ti2cAction::write;
+            }
+            else if (beam == TonOff::ON && expander.value2 != TioValue::ON)
+            {
+                expander.pin2 = TioMode::OUTPUT_ON;
+                expander.action = Ti2cAction::write;
+            }
+        };
 
-        Thardware() {
+        // keep beam status updated
+        on(expander.value2)
+        {
+            if (expander.value2 == TioValue::ON && beam == TonOff::OFF)
+                beam = TonOff::ON;
+            else if (expander.value2 != TioValue::ON && beam == TonOff::ON)
+                beam = TonOff::OFF;
+        };
 
-            #ifdef SDDS_ON_PARTICLE
-                // if on a particle system, initialize once startup is complete
-                on(particleSystem().startup) {
-                    if (particleSystem().startup == TparticleSystem::TstartupStatus::complete) {
-                        init();
-                    }
-                };
-            #else
-                // initialize during setup
-                on(sdds::setup()) {
-                    init();
-                };
-            #endif
+        // dimmer I2C connection
+        on(device)
+        {
+            if (device == Ti2cStatus::connected)
+            {
+                // make sure to write configuration whenever I2C connects
+                dimmer.action = Ti2cAction::write;
+            }
+            else if (device == Ti2cStatus::disconnected && dimmer.status == Ti2cStatus::connected)
+            {
+                // flag dimmer as disconnected when I2C disconnects
+                dimmer.action = Ti2cAction::disconnect;
+            }
+        };
 
-        }
+        // turn lights on/off / dim lights
+        on(lights)
+        {
+            dtypes::uint8 setpoint = static_cast<dtypes::uint8>(round(static_cast<dtypes::float32>(intensity.value()) * ThardwarePwmPCA9633::MAX / 100.));
+            if ((lights == TonOff::OFF || intensity == 0) && dimmer.value1 != TdimmerValue::OFF)
+            {
+                dimmer.state1 = TonOff::OFF;
+                dimmer.action = Ti2cAction::write;
+            }
+            else if (lights == TonOff::ON && intensity == 100 && dimmer.value1 != TdimmerValue::ON)
+            {
+                dimmer.setpoint1 = ThardwarePwmPCA9633::MAX;
+                dimmer.state1 = TonOff::ON;
+                dimmer.action = Ti2cAction::write;
+            }
+            else if (lights == TonOff::ON && intensity < 100 && (dimmer.value1 != TdimmerValue::DIMMED || dimmer.setpoint1 != setpoint))
+            {
+                dimmer.setpoint1 = setpoint;
+                dimmer.state1 = TonOff::ON;
+                dimmer.action = Ti2cAction::write;
+            }
+        };
 
+        // keep lights status updated
+        on(dimmer.value1)
+        {
+            if ((dimmer.value1 == TdimmerValue::ON || dimmer.value1 == TdimmerValue::DIMMED) && lights == TonOff::OFF)
+                lights = TonOff::ON;
+            else if ((dimmer.value1 != TdimmerValue::ON && dimmer.value1 != TdimmerValue::DIMMED) && lights == TonOff::ON)
+                lights = TonOff::OFF;
+        };
+
+        // change light intensity
+        on(intensity)
+        {
+            if (intensity == 0)
+                intensity = 1;
+            else if (intensity > 100)
+                intensity = 100;
+            else
+                lights.signalEvents();
+        };
+        intensity = 100;
+
+        // turn fan on/off
+        // FIXME: double check this works with disconnects/reconnects
+        on(fan)
+        {
+            if (fan == TonOff::OFF && dimmer.value2 != TdimmerValue::OFF)
+            {
+                dimmer.state2 = TonOff::OFF;
+                dimmer.action = Ti2cAction::write;
+            }
+            else if (fan == TonOff::ON && dimmer.value2 != TdimmerValue::ON)
+            {
+                dimmer.setpoint2 = ThardwarePwmPCA9633::MAX;
+                dimmer.state2 = TonOff::ON;
+                dimmer.action = Ti2cAction::write;
+            }
+        };
+
+        // keep fan status updated
+        // FIXME: double check this works with disconnects/reconnects
+        on(dimmer.value2)
+        {
+            if (dimmer.value2 == TdimmerValue::ON && fan == TonOff::OFF)
+                fan = TonOff::ON;
+            else if (dimmer.value2 != TdimmerValue::ON && fan == TonOff::ON)
+                fan = TonOff::OFF;
+        };
+    }
 };
 
 /**
  * @brief get the static hadware instance
  */
-Thardware& hardware(){
+Thardware &hardware()
+{
     static Thardware hardware;
     return hardware;
 }
