@@ -1,0 +1,7 @@
+﻿Designator,Quantity,Value,Footprint,Package,MPN,DNP,Mount_Type,Description,JLCPCB,JLCPCBURL,STANDARD,DigiKey,DigiKeyURL
+C1,1,100nF,C_0603,,,,smt,Unpolarized capacitor,C1591,https://jlcpcb.com/partdetail/1943-CL10B104KB8NNNC/C1591,,,
+J1,1,SCL,PIN_HEADERS_1X01,,,,tht,,,,,,
+J2,1,SDA,PIN_HEADERS_1X01,,,,tht,,,,,,
+J3,1,+5V,PIN_HEADERS_1X01,,,,tht,,,,,,
+J4,1,GND,PIN_HEADERS_1X01,,,,tht,,,,,,
+S1,1,Temp sensor -55°C ~ 150°C,WSON-6_2x2mm_nopad,,TMP117AIDRVR,,smt,"Temperature Sensor Digital, Local -55°C ~ 150°C 16 b 6-WSON (2x2)",C699536,https://jlcpcb.com/partdetail/TexasInstruments-TMP117AIDRVR/C699536,IPC 7351B,296-51834-1-ND,https://www.digikey.com/en/products/detail/texas-instruments/TMP117AIDRVR/9685284
