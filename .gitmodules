@@ -10,3 +10,6 @@
 [submodule "lib/Adafruit_BusIO/src"]
 	path = lib/Adafruit_BusIO/src
 	url = https://github.com/adafruit/Adafruit_BusIO.git
+[submodule "lib/Adafruit_GFX/src"]
+	path = lib/Adafruit_GFX/src
+	url = https://github.com/adafruit/Adafruit-GFX-Library.git
