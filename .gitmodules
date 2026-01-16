@@ -10,3 +10,6 @@
 [submodule "lib/Adafruit_GFX/src"]
 	path = lib/Adafruit_GFX/src
 	url = https://github.com/adafruit/Adafruit-GFX-Library.git
+[submodule "lib/Adafruit_SSD1306/src"]
+	path = lib/Adafruit_SSD1306/src
+	url = https://github.com/adafruit/Adafruit_SSD1306.git
