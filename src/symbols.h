@@ -40,7 +40,7 @@ const uint8_t publishing_icon[] PROGMEM = {
     B11111111, B11000000  // ##########......
 };
 
-const uint8_t publishing_icon_width = 12;
+const uint8_t publishing_icon_width = 10;
 const uint8_t publishing_icon_height = 13;
 
 const uint8_t not_publishing_icon[] PROGMEM = {
@@ -59,7 +59,7 @@ const uint8_t not_publishing_icon[] PROGMEM = {
     B11111111, B11000000  // ##########......
 };
 
-const uint8_t not_publishing_icon_width = 12;
+const uint8_t not_publishing_icon_width = 10;
 const uint8_t not_publishing_icon_height = 13;
 
 const uint8_t wifi_icon[] = {

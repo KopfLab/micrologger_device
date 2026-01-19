@@ -40,7 +40,7 @@ public:
         // FIXME: implement keeping track of the indicator icons in order here!
         // need a reset function as well
         drawBitmap(Tdisplay::iconsY, _icon, _w, _h, Tdisplay::align::RIGHT, FiconXpadding);
-        FiconXpadding += _w + 1;
+        FiconXpadding += _w + 2;
     }
 
     // clear display
