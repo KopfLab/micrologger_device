@@ -1,3 +1,5 @@
+#pragma once
+
 #define splash1_width 120
 #define splash1_height 30
 
