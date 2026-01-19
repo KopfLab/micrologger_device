@@ -12,12 +12,19 @@
 #include "Particle.h"
 
 /**
- * @brief basic I2C class --> override write/read in derived classes and trigger all actions with action = Taction::connect/write/read/disconnect
+ * @brief basic I2C class --> override write/read in derived classes and trigger all actions with action = Taction::connect/write/read/disconnect/reset
  */
 // basic I2C class
 // @brief: override
 class ThardwareI2C : public TmenuHandle
 {
+
+public:
+    // enumerations
+    using TonOff = sdds::enums::OnOff;
+    sdds_enum(___, connect, disconnect, read, write, reset) Taction;
+    sdds_enum(disconnected, connected) Tstatus;
+    sdds_enum(none, damagedI2CBus, failedConnect, failedRed, failedWrite, failedReset) Terror;
 
 private:
     // global Wire initialization
@@ -84,13 +91,19 @@ private:
     // read from I2C device
     virtual bool read()
     {
-        return false;
+        return true;
     }
 
     // write to I2C device
     virtual bool write()
     {
-        return false;
+        return true;
+    }
+
+    // reset I2C device
+    virtual bool reset()
+    {
+        return true;
     }
 
 protected:
@@ -150,18 +163,15 @@ protected:
 
 public:
     // sdds vars
-    using TonOff = sdds::enums::OnOff;
-    sdds_enum(___, connect, disconnect, read, write) Taction;
     sdds_var(Taction, action);
-    sdds_enum(disconnected, connected) Tstatus;
     sdds_var(Tstatus, status, sdds::opt::readonly);
     sdds_var(TonOff, autoConnect, sdds::opt::nothing, TonOff::OFF);
     sdds_var(Tuint16, checkInterval_MS, sdds::opt::nothing, 1000);
-    sdds_enum(none, damagedI2CBus, failedConnect, failedRed, failedWrite) Terror;
     sdds_var(Terror, error, sdds::opt::readonly);
     sdds_var(Tuint32, connections, sdds::opt::readonly, 0);
     sdds_var(Tuint32, writes, sdds::opt::readonly, 0);
     sdds_var(Tuint32, reads, sdds::opt::readonly, 0);
+    sdds_var(Tuint32, resets, sdds::opt::readonly, 0);
     sdds_var(Tuint32, errors, sdds::opt::readonly, 0);
 
     // constructor
@@ -201,6 +211,14 @@ public:
                         writes++;
                     else if (!success && error == Terror::none)
                         error = Terror::failedWrite;
+                }
+                else if (action == Taction::reset)
+                {
+                    success = reset();
+                    if (success)
+                        resets++;
+                    else if (!success && error == Terror::none)
+                        error = Terror::failedReset;
                 }
 
                 // was the action successful?
