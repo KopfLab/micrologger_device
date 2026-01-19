@@ -20,6 +20,9 @@ public:
     using TonOff = sdds::enums::OnOff;
     sdds_enum(UNSET, ON, OFF, DIMMED) Tvalue;
 
+    // 8-bit resolution
+    const static uint8_t MAX = 255;
+
 private:
     // relevant registers (see manual Table 7)
     static constexpr uint8_t FregistersN = 9;
@@ -44,9 +47,6 @@ private:
     const static uint8_t FoutputModeOff = 0b00;
     const static uint8_t FoutputModeOn = 0b01;
     const static uint8_t FoutputModeDimmed = 0b10;
-
-    // 8-bit resolution
-    const static uint8_t FmaxValue = 255;
 
     // default
     Driver Fdriver = Driver::DIRECT;
@@ -199,7 +199,7 @@ private:
     {
         if (*_state == TonOff::OFF || _setpoint->value() == 0)
             return FoutputModeOff;
-        else if (*_state == TonOff::ON && _setpoint->value() == FmaxValue)
+        else if (*_state == TonOff::ON && _setpoint->value() == MAX)
             return FoutputModeOn;
         else
             return FoutputModeDimmed;
@@ -210,9 +210,9 @@ private:
     {
         if ((*_state == TonOff::OFF || _setpoint->value() == 0) && *_value != Tvalue::OFF)
             *_value = Tvalue::OFF;
-        else if (*_state == TonOff::ON && _setpoint->value() >= FmaxValue && *_value != Tvalue::ON)
+        else if (*_state == TonOff::ON && _setpoint->value() >= MAX && *_value != Tvalue::ON)
             *_value = Tvalue::ON;
-        else if (*_state == TonOff::ON && _setpoint->value() < FmaxValue && *_value != Tvalue::DIMMED)
+        else if (*_state == TonOff::ON && _setpoint->value() < MAX && *_value != Tvalue::DIMMED)
             *_value = Tvalue::DIMMED;
     }
 
@@ -224,15 +224,6 @@ private:
     }
 
 protected:
-    // I2C read function
-    virtual bool read() override
-    {
-        // doesn't do anything, everything happens via the write
-        if (status != Tstatus::connected && !connect())
-            return false;
-        return true;
-    }
-
     // I2C write function
     virtual bool write() override
     {
