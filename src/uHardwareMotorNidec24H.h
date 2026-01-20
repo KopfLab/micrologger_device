@@ -1,8 +1,8 @@
 #pragma once
 
 #include "uTypedef.h"
+#include "enums.h"
 #include "Particle.h"
-#include "uCoreEnums.h"
 
 // stirrer motor
 class ThardwareMotor : public TmenuHandle
@@ -102,8 +102,7 @@ public:
     sdds_var(Tuint16, measuredSpeed, sdds::opt::readonly, 0);
     sdds_var(Tuint16, targetSteps, sdds::opt::nothing, 0);
     sdds_var(Tuint16, steps, sdds::opt::readonly, 0);
-    using TonOff = sdds::enums::OnOff;
-    sdds_var(TonOff, autoAdjust, sdds::opt::nothing, TonOff::ON);
+    sdds_var(enums::ToffOn, autoAdjust, sdds::opt::nothing, enums::ToffOn::on);
     // speed tolerance: based on the calibration slopes of ~0.7 steps/rpm --> 1/0.7 = 1.4 rpm/step --> aim for targetSpeed +/- 2)
     sdds_var(Tuint8, autoAdjustSpeedTolerance, sdds::opt::nothing, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
     sdds_var(Tuint16, speedCheckInterval, sdds::opt::nothing, 1000);
@@ -226,7 +225,7 @@ public:
                         // mark motor as not having an error
                         error = Terror::none;
                     // now that we're running, do we want to auto-adjust the steps to get closer to the targetSpeed?
-                    if (autoAdjust == TonOff::ON &&
+                    if (autoAdjust == enums::ToffOn::on &&
                         abs(measuredSpeed - targetSpeed) > autoAdjustSpeedTolerance)
                     {
                         // finetune step adjustments

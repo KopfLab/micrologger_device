@@ -206,7 +206,7 @@ private:
     // I2C read function
     virtual bool read() override
     {
-        if (status != Tstatus::connected && !connect())
+        if (status != enums::TconStatus::connected && !connect())
             return false;
         if (!readPinValues())
             return false;
@@ -216,7 +216,7 @@ private:
     // I2C write function
     virtual bool write() override
     {
-        if (status != Tstatus::connected && !connect())
+        if (status != enums::TconStatus::connected && !connect())
             return false;
         if (!writePinModes())
             return false;
@@ -291,7 +291,7 @@ public:
         // connection status
         on(status)
         {
-            if (status == Tstatus::disconnected)
+            if (status == enums::TconStatus::disconnected)
             {
                 // disconnected
                 resetValue(&pin1, &value1);

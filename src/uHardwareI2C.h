@@ -8,7 +8,7 @@
 #pragma once
 
 #include "uTypedef.h"
-#include "uCoreEnums.h"
+#include "enums.h"
 #include "Particle.h"
 
 /**
@@ -21,9 +21,7 @@ class ThardwareI2C : public TmenuHandle
 
 public:
     // enumerations
-    using TonOff = sdds::enums::OnOff;
     sdds_enum(___, connect, disconnect, read, write, reset) Taction;
-    sdds_enum(disconnected, connected) Tstatus;
     sdds_enum(none, damagedI2CBus, failedConnect, failedRed, failedWrite, failedReset) Terror;
 
 private:
@@ -62,10 +60,10 @@ private:
             if (transmitCode == SYSTEM_ERROR_NONE)
             {
                 // success
-                if (status != Tstatus::connected)
+                if (status != enums::TconStatus::connected)
                 {
                     connections++;
-                    status = Tstatus::connected;
+                    status = enums::TconStatus::connected;
                 }
                 return true;
             }
@@ -164,8 +162,8 @@ protected:
 public:
     // sdds vars
     sdds_var(Taction, action);
-    sdds_var(Tstatus, status, sdds::opt::readonly);
-    sdds_var(TonOff, autoConnect, sdds::opt::nothing, TonOff::OFF);
+    sdds_var(enums::TconStatus, status, sdds::opt::readonly);
+    sdds_var(enums::ToffOn, autoConnect, sdds::opt::nothing);
     sdds_var(Tuint16, checkInterval_MS, sdds::opt::nothing, 1000);
     sdds_var(Terror, error, sdds::opt::readonly);
     sdds_var(Tuint32, connections, sdds::opt::readonly, 0);
@@ -194,7 +192,7 @@ public:
                 else if (action == Taction::disconnect)
                 {
                     success = true;
-                    status = Tstatus::disconnected;
+                    status = enums::TconStatus::disconnected;
                 }
                 else if (action == Taction::read)
                 {
@@ -232,11 +230,11 @@ public:
         on(status)
         {
             // write and read the values if we're autoconnecting
-            if (autoConnect == TonOff::ON)
+            if (autoConnect == enums::ToffOn::on)
             {
-                if (status == Tstatus::connected)
+                if (status == enums::TconStatus::connected)
                     action = Taction::write;
-                if (status == Tstatus::connected)
+                if (status == enums::TconStatus::connected)
                     action = Taction::read;
             }
         };
@@ -244,7 +242,7 @@ public:
         on(autoConnect)
         {
             // start connection checks?
-            if (Finitialized && autoConnect == TonOff::ON)
+            if (Finitialized && autoConnect == enums::ToffOn::on)
             {
                 FautoConnectTimer.start(checkInterval_MS);
             }
@@ -256,9 +254,9 @@ public:
 
         on(FautoConnectTimer)
         {
-            if (Finitialized && autoConnect == TonOff::ON)
+            if (Finitialized && autoConnect == enums::ToffOn::on)
             {
-                if (status == Tstatus::connected)
+                if (status == enums::TconStatus::connected)
                     checkConnection(); // check connection
                 else
                     action = Taction::connect; // start connection
@@ -274,8 +272,8 @@ public:
             if (error != Terror::none)
             {
                 errors++;
-                if (status != Tstatus::disconnected)
-                    status = Tstatus::disconnected;
+                if (status != enums::TconStatus::disconnected)
+                    status = enums::TconStatus::disconnected;
             }
         };
     }
@@ -290,7 +288,7 @@ public:
             Finitialized = true;
 
             // start auto connect check timer
-            if (autoConnect == TonOff::ON)
+            if (autoConnect == enums::ToffOn::on)
                 FautoConnectTimer.start(checkInterval_MS);
         }
     }

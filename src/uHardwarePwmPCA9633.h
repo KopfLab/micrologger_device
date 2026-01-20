@@ -1,7 +1,7 @@
 #pragma once
 
 #include "uTypedef.h"
-#include "uCoreEnums.h"
+#include "enums.h"
 #include "Particle.h"
 
 // PCA9633: 4-channel pwm dimmer with 1 wire (I2C) commms
@@ -17,7 +17,6 @@ public:
         EXTN,
         EXTP
     };
-    using TonOff = sdds::enums::OnOff;
     sdds_enum(UNSET, ON, OFF, DIMMED) Tvalue;
 
     // 8-bit resolution
@@ -195,24 +194,24 @@ private:
     /**
      * @brief get the output mode uint8_t code for a pin state and setpoint
      */
-    uint8_t getOutputMode(TonOff *_state, Tuint8 *_setpoint)
+    uint8_t getOutputMode(enums::ToffOn *_state, Tuint8 *_setpoint)
     {
-        if (*_state == TonOff::OFF || _setpoint->value() == 0)
+        if (*_state == enums::ToffOn::off || _setpoint->value() == 0)
             return FoutputModeOff;
-        else if (*_state == TonOff::ON && _setpoint->value() == MAX)
+        else if (*_state == enums::ToffOn::on && _setpoint->value() == MAX)
             return FoutputModeOn;
         else
             return FoutputModeDimmed;
     }
 
     // set sdds value
-    void setValue(Tuint8 *_setpoint, TonOff *_state, Tvalue *_value)
+    void setValue(Tuint8 *_setpoint, enums::ToffOn *_state, Tvalue *_value)
     {
-        if ((*_state == TonOff::OFF || _setpoint->value() == 0) && *_value != Tvalue::OFF)
+        if ((*_state == enums::ToffOn::off || _setpoint->value() == 0) && *_value != Tvalue::OFF)
             *_value = Tvalue::OFF;
-        else if (*_state == TonOff::ON && _setpoint->value() >= MAX && *_value != Tvalue::ON)
+        else if (*_state == enums::ToffOn::on && _setpoint->value() >= MAX && *_value != Tvalue::ON)
             *_value = Tvalue::ON;
-        else if (*_state == TonOff::ON && _setpoint->value() < MAX && *_value != Tvalue::DIMMED)
+        else if (*_state == enums::ToffOn::on && _setpoint->value() < MAX && *_value != Tvalue::DIMMED)
             *_value = Tvalue::DIMMED;
     }
 
@@ -227,7 +226,7 @@ protected:
     // I2C write function
     virtual bool write() override
     {
-        if (status != Tstatus::connected && !connect())
+        if (status != enums::TconStatus::connected && !connect())
             return false;
         if (!writeConfiguration())
             return false;
@@ -237,16 +236,16 @@ protected:
 public:
     // sdds variables
     sdds_var(Tuint8, setpoint1, sdds::opt::nothing, 255);
-    sdds_var(TonOff, state1);
+    sdds_var(enums::ToffOn, state1);
     sdds_var(Tvalue, value1, sdds::opt::readonly);
     sdds_var(Tuint8, setpoint2, sdds::opt::nothing, 255);
-    sdds_var(TonOff, state2);
+    sdds_var(enums::ToffOn, state2);
     sdds_var(Tvalue, value2, sdds::opt::readonly);
     sdds_var(Tuint8, setpoint3, sdds::opt::nothing, 255);
-    sdds_var(TonOff, state3);
+    sdds_var(enums::ToffOn, state3);
     sdds_var(Tvalue, value3, sdds::opt::readonly);
     sdds_var(Tuint8, setpoint4, sdds::opt::nothing, 255);
-    sdds_var(TonOff, state4);
+    sdds_var(enums::ToffOn, state4);
     sdds_var(Tvalue, value4, sdds::opt::readonly);
 
     // constructor
@@ -256,7 +255,7 @@ public:
         // connection status
         on(status)
         {
-            if (status == Tstatus::disconnected)
+            if (status == enums::TconStatus::disconnected)
             {
                 // disconnected
                 resetValue(&value1);

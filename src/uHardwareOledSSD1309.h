@@ -13,7 +13,6 @@ class ThardwareOledSSD1309 : public ThardwareI2C, public Adafruit_SSD1306
 
 public:
     // enumerations
-    using TonOff = sdds::enums::OnOff;
     sdds_enum(___, complete) Tstartup;
     enum class align
     {
@@ -34,7 +33,7 @@ protected:
     // I2C write function
     virtual bool write() override
     {
-        if (status != Tstatus::connected && !connect())
+        if (status != enums::TconStatus::connected && !connect())
             return false;
 
         // send over I2C
@@ -72,7 +71,7 @@ protected:
 
 public:
     // splashscreen
-    sdds_var(TonOff, splashscreen, sdds::opt::nothing, TonOff::ON);
+    sdds_var(enums::ToffOn, splashscreen, sdds::opt::nothing, enums::ToffOn::on);
     sdds_var(Tuint32, startup_MS, sdds::opt::nothing, 6000);
     sdds_var(Tstartup, startup, sdds::opt::readonly);
 
@@ -105,7 +104,7 @@ public:
             setTextSize(1);      // smallest text size by default
             setTextColor(WHITE); // default color
             clearDisplay();
-            if (splashscreen == TonOff::ON)
+            if (splashscreen == enums::ToffOn::on)
             {
                 splash();
                 FstartupTimer.start(startup_MS);
