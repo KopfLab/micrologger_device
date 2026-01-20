@@ -16,7 +16,7 @@ public:
     // display positions
     static const uint16_t dividerX = 63;
     static const uint16_t dividerY = 14;
-    static const uint16_t offsetX = dividerX + 2; // where the second column starts
+    static const uint16_t offsetX = dividerX + 3; // where the second column starts
     static const uint16_t iconsY = 0;
     static const uint16_t headerY = 3;
     static const uint16_t line1Y = 17;
@@ -37,8 +37,6 @@ public:
     // default height is 13 pixels
     void drawIcon(const uint8_t *_icon, uint16_t _w, uint16_t _h = 13)
     {
-        // FIXME: implement keeping track of the indicator icons in order here!
-        // need a reset function as well
         drawBitmap(Tdisplay::iconsY, _icon, _w, _h, Tdisplay::align::RIGHT, FiconXpadding);
         FiconXpadding += _w + 2;
     }
@@ -53,11 +51,13 @@ public:
 private:
     // icon x padding
     uint8_t FiconXpadding = 0;
+    dtypes::uint16 Fversion = 0;
 
     // render splash screen content
     virtual void splash() override
     {
         printBitmap(height() / 2, splash1_data, splash1_width, splash1_height, align::CENTER, valign::CENTER);
+        printLine(line5Y, "version " + String(Fversion), align::CENTER);
     }
 
 public:
@@ -68,5 +68,12 @@ public:
     // (screen does not get messed up as often at 100kHz instead of the 400kHz default)
     Tdisplay() : ThardwareOledSSD1309(128, 64, D10, 100000)
     {
+    }
+
+    // default i2c address in init
+    void init(dtypes::uint16 _version, uint8_t _i2cAddress = 0x3C)
+    {
+        Fversion = _version;
+        ThardwareOledSSD1309::init(_i2cAddress);
     }
 };
