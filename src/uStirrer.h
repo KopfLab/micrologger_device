@@ -127,7 +127,7 @@ private:
                 {
                     // we're vortexing and just reached the peak so let's start the vortex timer
                     vortexPeak = true;
-                    FvortexEndTimer.start(settings.vortexTimeS * 1000);
+                    FvortexEndTimer.start(settings.vortexTime_sec * 1000);
                 }
                 else
                 {
@@ -180,9 +180,9 @@ public:
     public:
         sdds_var(Tuint16, acceleration, sdds::opt::saveval, 500);  // rpm/second
         sdds_var(Tuint16, deceleration, sdds::opt::saveval, 3000); // rpm/second
-        sdds_var(Tuint16, maxSpeed, sdds::opt::saveval, hardware().motor.maxSpeed);
-        sdds_var(Tuint16, vortexSpeed, sdds::opt::saveval, 3000);
-        sdds_var(Tuint16, vortexTimeS, sdds::opt::saveval, 5);
+        sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::saveval, hardware().motor.maxSpeed);
+        sdds_var(Tuint16, vortexSpeed_rpm, sdds::opt::saveval, 3000);
+        sdds_var(Tuint16, vortexTime_sec, sdds::opt::saveval, 5);
     };
     sdds_var(Tsettings, settings);
 
@@ -236,7 +236,7 @@ public:
                 // no state change but running the vortex
                 event = TstirEvent::vortexing;
                 vortexPeak = false;
-                changeSpeed(settings.vortexSpeed);
+                changeSpeed(settings.vortexSpeed_rpm);
             }
             if (action != Taction::___)
                 action = Taction::___;
@@ -293,8 +293,8 @@ public:
         // change setpoint
         on(setpoint_rpm)
         {
-            if (setpoint_rpm > settings.maxSpeed)
-                setpoint_rpm = settings.maxSpeed;
+            if (setpoint_rpm > settings.maxSpeed_rpm)
+                setpoint_rpm = settings.maxSpeed_rpm;
             if (state == enums::ToffOn::on && event == TstirEvent::none)
             {
                 // don't adjust if we're off, paused or vortexing
@@ -303,31 +303,31 @@ public:
         };
 
         // change vortex speed
-        on(settings.vortexSpeed)
+        on(settings.vortexSpeed_rpm)
         {
-            if (settings.vortexSpeed > settings.maxSpeed)
-                settings.vortexSpeed = settings.maxSpeed;
+            if (settings.vortexSpeed_rpm > settings.maxSpeed_rpm)
+                settings.vortexSpeed_rpm = settings.maxSpeed_rpm;
             if (event == TstirEvent::vortexing && !vortexPeak)
             {
                 // currently vortexing and not yet at the peak -- change to the new speed
-                changeSpeed(settings.vortexSpeed);
+                changeSpeed(settings.vortexSpeed_rpm);
             }
         };
 
         // change max speed
-        on(settings.maxSpeed)
+        on(settings.maxSpeed_rpm)
         {
-            if (settings.maxSpeed > hardware().motor.maxSpeed)
+            if (settings.maxSpeed_rpm > hardware().motor.maxSpeed)
             {
                 // maxed out from hardware side
-                settings.maxSpeed = hardware().motor.maxSpeed;
+                settings.maxSpeed_rpm = hardware().motor.maxSpeed;
             }
             else
             {
-                if (setpoint_rpm > settings.maxSpeed)
-                    setpoint_rpm = settings.maxSpeed;
-                if (settings.vortexSpeed > settings.maxSpeed)
-                    settings.vortexSpeed = settings.maxSpeed;
+                if (setpoint_rpm > settings.maxSpeed_rpm)
+                    setpoint_rpm = settings.maxSpeed_rpm;
+                if (settings.vortexSpeed_rpm > settings.maxSpeed_rpm)
+                    settings.vortexSpeed_rpm = settings.maxSpeed_rpm;
             }
         };
 
