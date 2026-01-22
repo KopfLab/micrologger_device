@@ -59,7 +59,7 @@ private:
             hardware().display.printLine(Tdisplay::line1Y, "RPM:" + stirrer.speed_rpm.to_string());
 
         // stirrer event
-        if (stirrer.event != Tstirrer::TstirEvent::none)
+        if (stirrer.event != Tstirrer::Tevent::none)
             hardware().display.printLine(Tdisplay::line1Y, stirrer.event.to_string(), Tdisplay::offsetX);
         else
             hardware().display.printLine(Tdisplay::line1Y, "SP:" + stirrer.setpoint_rpm.to_string() + "rpm", Tdisplay::offsetX);
@@ -78,7 +78,9 @@ private:
             hardware().display.printLine(Tdisplay::line5Y, "Light:ERR");
 
         // light state
-        if (lights.state == Tlights::Tstate::on)
+        if (lights.event != Tlights::Tevent::none)
+            hardware().display.printLine(Tdisplay::line5Y, lights.event.to_string(), Tdisplay::offsetX);
+        else if (lights.state == Tlights::Tstate::on)
             hardware().display.printLine(Tdisplay::line5Y, "always on", Tdisplay::offsetX);
         else if (lights.state == Tlights::Tstate::off)
             hardware().display.printLine(Tdisplay::line5Y, "always off", Tdisplay::offsetX);

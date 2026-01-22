@@ -17,12 +17,14 @@ public:
     sdds_enum(___, on, off, schedule, pause, resume) Taction;
     sdds_enum(on, off, schedule) Tstate;
     sdds_enum(on, off, error) Tstatus;
+    sdds_enum(none, paused) Tevent;
 
 public:
     // sdds variables for light
     sdds_var(Taction, action);
     sdds_var(Tstate, state, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), Tstate::off);
     sdds_var(Tstatus, status, sdds::opt::readonly, Tstatus::off);
+    sdds_var(Tevent, event, sdds::opt::readonly, Tevent::none);
     sdds_var(Thardware::Ti2cError, error, sdds::opt::readonly);
     sdds_var(Tuint8, intensity, sdds::opt::saveval, 100);
     sdds_var(Tuint32, scheduleOn_sec, sdds::opt::saveval, 60 * 60 * 12);  // 12 hours on
@@ -216,6 +218,16 @@ public:
                 // no state change, resuming light with current state
                 update();
             }
+            // events
+            if (action == Taction::pause && event != Tevent::paused)
+            {
+                event = Tevent::paused;
+            }
+            else if (event != Tevent::none)
+            {
+                event = Tevent::none;
+            }
+
             if (action != Taction::___)
                 action = Taction::___;
         };
