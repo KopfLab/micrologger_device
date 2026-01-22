@@ -15,7 +15,7 @@ public:
     // enumerations
     sdds_enum(___, start, stop, pause, resume, vortex) Taction;
     sdds_enum(off, accelerating, decelerating, running, error) Tstatus;
-    sdds_enum(none, paused, vortexing) TstirEvent;
+    sdds_enum(none, paused, vortexing) Tevent;
 
 private:
     // keep track of publishing to detect when it switches from OFF to ON
@@ -121,7 +121,7 @@ private:
         {
             // reached target
             status = (FspeedNow > 0) ? Tstatus::running : Tstatus::off;
-            if (event == TstirEvent::vortexing)
+            if (event == Tevent::vortexing)
             {
                 if (!vortexPeak)
                 {
@@ -133,13 +133,13 @@ private:
                 {
                     // vortex event finished
                     vortexPeak = false;
-                    event = TstirEvent::none;
+                    event = Tevent::none;
                 }
             }
-            else if (event == TstirEvent::paused && FspeedNow > 0)
+            else if (event == Tevent::paused && FspeedNow > 0)
             {
                 // pausing is done
-                event = TstirEvent::none;
+                event = Tevent::none;
             }
         }
         else if (FspeedNow < FspeedTarget)
@@ -168,7 +168,7 @@ public:
     sdds_var(Thardware::TmotorError, error, sdds::opt::readonly);
 
     // stir events
-    sdds_var(TstirEvent, event, sdds::opt::readonly, TstirEvent::none);
+    sdds_var(Tevent, event, sdds::opt::readonly, Tevent::none);
 
     // speed details
     sdds_var(Tuint16, setpoint_rpm, sdds::opt::saveval, 500);
@@ -205,13 +205,13 @@ public:
             if (action == Taction::start)
             {
                 state = enums::ToffOn::on;
-                event = TstirEvent::none;
+                event = Tevent::none;
                 changeSpeed(setpoint_rpm);
             }
             else if (action == Taction::stop)
             {
                 state = enums::ToffOn::off;
-                event = TstirEvent::none;
+                event = Tevent::none;
                 changeSpeed(0);
             }
             else if (action == Taction::pause)
@@ -219,7 +219,7 @@ public:
                 if (state == enums::ToffOn::on)
                 {
                     // no state change but stopping the motor
-                    event = TstirEvent::paused;
+                    event = Tevent::paused;
                     changeSpeed(0);
                 }
             }
@@ -234,7 +234,7 @@ public:
             else if (action == Taction::vortex)
             {
                 // no state change but running the vortex
-                event = TstirEvent::vortexing;
+                event = Tevent::vortexing;
                 vortexPeak = false;
                 changeSpeed(settings.vortexSpeed_rpm);
             }
@@ -274,7 +274,7 @@ public:
                 // error, stop operations
                 error = hardware().motor.error;
                 status = Tstatus::error;
-                event = TstirEvent::none;
+                event = Tevent::none;
                 FvortexEndTimer.stop();
                 FspeedChangeTimer.stop();
                 // set to min speed so it keeps checking for connectivity
@@ -295,7 +295,7 @@ public:
         {
             if (setpoint_rpm > settings.maxSpeed_rpm)
                 setpoint_rpm = settings.maxSpeed_rpm;
-            if (state == enums::ToffOn::on && event == TstirEvent::none)
+            if (state == enums::ToffOn::on && event == Tevent::none)
             {
                 // don't adjust if we're off, paused or vortexing
                 changeSpeed(setpoint_rpm);
@@ -307,7 +307,7 @@ public:
         {
             if (settings.vortexSpeed_rpm > settings.maxSpeed_rpm)
                 settings.vortexSpeed_rpm = settings.maxSpeed_rpm;
-            if (event == TstirEvent::vortexing && !vortexPeak)
+            if (event == Tevent::vortexing && !vortexPeak)
             {
                 // currently vortexing and not yet at the peak -- change to the new speed
                 changeSpeed(settings.vortexSpeed_rpm);
