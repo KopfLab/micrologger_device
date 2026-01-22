@@ -164,7 +164,7 @@ public:
     sdds_var(Taction, action);
     sdds_var(enums::TconStatus, status, sdds::opt::readonly);
     sdds_var(enums::ToffOn, autoConnect, sdds::opt::nothing);
-    sdds_var(Tuint16, checkInterval_MS, sdds::opt::nothing, 1000);
+    sdds_var(Tuint16, checkInterval_ms, sdds::opt::nothing, 1000);
     sdds_var(Terror, error, sdds::opt::readonly);
     sdds_var(Tuint32, connections, sdds::opt::readonly, 0);
     sdds_var(Tuint32, writes, sdds::opt::readonly, 0);
@@ -244,7 +244,7 @@ public:
             // start connection checks?
             if (Finitialized && autoConnect == enums::ToffOn::on)
             {
-                FautoConnectTimer.start(checkInterval_MS);
+                FautoConnectTimer.start(checkInterval_ms);
             }
             else
             {
@@ -261,7 +261,7 @@ public:
                 else
                     action = Taction::connect; // start connection
                 // restart timer
-                FautoConnectTimer.start(checkInterval_MS);
+                FautoConnectTimer.start(checkInterval_ms);
             }
         };
 
@@ -289,7 +289,7 @@ public:
 
             // start auto connect check timer
             if (autoConnect == enums::ToffOn::on)
-                FautoConnectTimer.start(checkInterval_MS);
+                FautoConnectTimer.start(checkInterval_ms);
         }
     }
 };
