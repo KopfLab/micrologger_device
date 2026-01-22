@@ -162,9 +162,5 @@ public:
                     device = enums::TconStatus::disconnected;
             }
         };
-
-        // add hardware menu item?
-        // --> no just updating in the other menus instead
-        addDescr(hardware());
     }
 };
