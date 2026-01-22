@@ -15,7 +15,7 @@ public:
     // enumerations
     sdds_enum(___, start, stop, pause, resume, vortex) Taction;
     sdds_enum(off, accelerating, decelerating, running, error) Tstatus;
-    sdds_enum(none, pausing, vortexing) TstirEvent;
+    sdds_enum(none, paused, vortexing) TstirEvent;
 
 private:
     // keep track of publishing to detect when it switches from OFF to ON
@@ -91,7 +91,7 @@ private:
             setMotorSpeed(FspeedNow - change);
         }
         // check for issues
-        if (hardware().motor.error != ThardwareMotor::Terror::none)
+        if (hardware().motor.error != Thardware::TmotorError::none)
         {
             return; // there are motor errors
         }
@@ -109,7 +109,7 @@ private:
         hardware().motor.targetSpeed = _speed;
 
         // check for issues
-        if (hardware().motor.error != ThardwareMotor::Terror::none)
+        if (hardware().motor.error != Thardware::TmotorError::none)
         {
             // there are motor errors
             return;
@@ -136,7 +136,7 @@ private:
                     event = TstirEvent::none;
                 }
             }
-            else if (event == TstirEvent::pausing && FspeedNow > 0)
+            else if (event == TstirEvent::paused && FspeedNow > 0)
             {
                 // pausing is done
                 event = TstirEvent::none;
@@ -165,7 +165,7 @@ public:
     sdds_var(Tstatus, status, sdds::opt::readonly, Tstatus::off);
 
     // motor error
-    sdds_var(ThardwareMotor::Terror, error, sdds::opt::readonly);
+    sdds_var(Thardware::TmotorError, error, sdds::opt::readonly);
 
     // stir events
     sdds_var(TstirEvent, event, sdds::opt::readonly, TstirEvent::none);
@@ -219,7 +219,7 @@ public:
                 if (state == enums::ToffOn::on)
                 {
                     // no state change but stopping the motor
-                    event = TstirEvent::pausing;
+                    event = TstirEvent::paused;
                     changeSpeed(0);
                 }
             }
@@ -261,7 +261,7 @@ public:
         {
             if (!FisPublishing && particleSystem().publishing.publish == sdds::enums::OnOff::ON)
             {
-                error = ThardwareMotor::Terror::none;
+                error = Thardware::TmotorError::none;
             }
             FisPublishing = particleSystem().publishing.publish == sdds::enums::OnOff::ON;
         };
@@ -269,7 +269,7 @@ public:
         // update motor error from hardware
         on(hardware().motor.error)
         {
-            if (hardware().motor.error != ThardwareMotor::Terror::none)
+            if (hardware().motor.error != Thardware::TmotorError::none)
             {
                 // error, stop operations
                 error = hardware().motor.error;
@@ -282,10 +282,10 @@ public:
                 FspeedNow = hardware().motor.minSpeed;
                 setMotorSpeed(FspeedNow);
             }
-            else if (error != ThardwareMotor::Terror::none)
+            else if (error != Thardware::TmotorError::none)
             {
                 // no error anymore --> resume state
-                error = ThardwareMotor::Terror::none;
+                error = Thardware::TmotorError::none;
                 resumeState();
             }
         };
@@ -341,25 +341,21 @@ public:
     // resume the saved state of the motor after power cycling or reconnection
     void resumeState()
     {
-        if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+        if (state == enums::ToffOn::on)
         {
-
-            if (state == enums::ToffOn::on)
+            // should be on
+            if (status == Tstatus::off || status == Tstatus::error)
             {
-                // should be on
-                if (status == Tstatus::off || status == Tstatus::error)
-                {
-                    if (status == Tstatus::error)
-                        status = Tstatus::off;
-                    changeSpeed(setpoint_rpm);
-                }
+                if (status == Tstatus::error)
+                    status = Tstatus::off;
+                changeSpeed(setpoint_rpm);
             }
-            else if (status != Tstatus::off)
-            {
-                // should be off but is not
-                status = Tstatus::off;
-                changeSpeed(0);
-            }
+        }
+        else if (status != Tstatus::off)
+        {
+            // should be off but is not
+            status = Tstatus::off;
+            changeSpeed(0);
         }
     }
 };
