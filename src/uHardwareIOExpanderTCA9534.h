@@ -2,9 +2,12 @@
 
 #include "uTypedef.h"
 #include "Particle.h"
+#include "uHardwareI2C.h"
+
+// hardware constants
+#define IOEXPANDER_I2C_ADDRESS 0x20
 
 // IO expander: TCA9534 8-channel multiplexer with 1 wire (I2C) commms
-#include "uHardwareI2C.h"
 class ThardwareIOExpander : public ThardwareI2C
 {
 
@@ -302,7 +305,7 @@ public:
     }
 
     // default i2c address in init
-    void init(uint8_t _i2cAddress = 0x20)
+    void init(uint8_t _i2cAddress = IOEXPANDER_I2C_ADDRESS)
     {
         ThardwareI2C::init(_i2cAddress);
     }

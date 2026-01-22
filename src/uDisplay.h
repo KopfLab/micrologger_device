@@ -5,6 +5,10 @@
 #include "uHardwareOledSSD1309.h"
 #include "splash.h"
 
+// hardware constants
+#define DISPLAY_RESET_PIN D10
+#define DISPLAY_I2C_ADDRESS 0x3C
+
 class Tdisplay : public ThardwareOledSSD1309
 {
 
@@ -62,16 +66,16 @@ private:
 
 public:
     // display refresh rate
-    sdds_var(Tuint32, refresh_MS, sdds::opt::nothing, 1000);
+    sdds_var(Tuint32, refresh_ms, sdds::opt::nothing, 1000);
 
     // initialize 128x64 oled display with width, height, reset pin, and lower clock speed
     // (screen does not get messed up as often at 100kHz instead of the 400kHz default)
-    Tdisplay() : ThardwareOledSSD1309(128, 64, D10, 100000)
+    Tdisplay() : ThardwareOledSSD1309(128, 64, DISPLAY_RESET_PIN, 100000)
     {
     }
 
     // default i2c address in init
-    void init(dtypes::uint16 _version, uint8_t _i2cAddress = 0x3C)
+    void init(dtypes::uint16 _version, uint8_t _i2cAddress = DISPLAY_I2C_ADDRESS)
     {
         Fversion = _version;
         ThardwareOledSSD1309::init(_i2cAddress);

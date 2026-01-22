@@ -3,9 +3,13 @@
 #include "uTypedef.h"
 #include "enums.h"
 #include "Particle.h"
+#include "uHardwareI2C.h"
+
+// hardware constants
+// (to address all TCA9534s, can also use 0x70, for software reset can use 0x03)
+#define DIMMER_I2C_ADDRESS 0x62
 
 // PCA9633: 4-channel pwm dimmer with 1 wire (I2C) commms
-#include "uHardwareI2C.h"
 class ThardwarePwmPCA9633 : public ThardwareI2C
 {
 
@@ -266,8 +270,8 @@ public:
         };
     }
 
-    // default i2c address in init (to address all TCA9534s, can also use 0x70, for software reset can use 0x03)
-    void init(Driver _driver, uint8_t _i2cAddress = 0x62)
+    // default i2c address in init
+    void init(Driver _driver, uint8_t _i2cAddress = DIMMER_I2C_ADDRESS)
     {
         Fdriver = _driver;
         ThardwareI2C::init(_i2cAddress);
