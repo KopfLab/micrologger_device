@@ -174,11 +174,6 @@ private:
      */
     bool readPinValues()
     {
-        // configure pin values (only matters for output pins)
-        uint8_t values = bitsToByte(
-            pin1 == Tmode::OUTPUT_ON, pin2 == Tmode::OUTPUT_ON, pin3 == Tmode::OUTPUT_ON, pin4 == Tmode::OUTPUT_ON,
-            pin5 == Tmode::OUTPUT_ON, pin6 == Tmode::OUTPUT_ON, pin7 == Tmode::OUTPUT_ON, pin8 == Tmode::OUTPUT_ON);
-
         // read values
         uint8_t read;
         uint8_t transmitCode = readRegister(FinputValuesRegister, &read);
