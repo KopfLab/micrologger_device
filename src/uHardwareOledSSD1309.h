@@ -72,7 +72,7 @@ protected:
 public:
     // splashscreen
     sdds_var(enums::ToffOn, splashscreen, sdds::opt::nothing, enums::ToffOn::on);
-    sdds_var(Tuint32, startup_MS, sdds::opt::nothing, 6000);
+    sdds_var(Tuint32, startup_ms, sdds::opt::saveval, 6000);
     sdds_var(Tstartup, startup, sdds::opt::readonly);
 
     // constructor
@@ -107,7 +107,7 @@ public:
             if (splashscreen == enums::ToffOn::on)
             {
                 splash();
-                FstartupTimer.start(startup_MS);
+                FstartupTimer.start(startup_ms);
             }
             WITH_LOCK(Wire)
             {

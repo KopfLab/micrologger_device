@@ -66,7 +66,7 @@ private:
 
 public:
     // display refresh rate
-    sdds_var(Tuint32, refresh_ms, sdds::opt::nothing, 1000);
+    sdds_var(Tuint32, refresh_ms, sdds::opt::saveval, 1000);
 
     // initialize 128x64 oled display with width, height, reset pin, and lower clock speed
     // (screen does not get messed up as often at 100kHz instead of the 400kHz default)
