@@ -25,9 +25,9 @@ public:
     sdds_var(Tstatus, status, sdds::opt::readonly, Tstatus::off);
     sdds_var(Thardware::Ti2cError, error, sdds::opt::readonly);
     sdds_var(Tuint8, intensity, sdds::opt::saveval, 100);
-    sdds_var(Tuint32, scheduleOn_SEC, sdds::opt::saveval, 60 * 60 * 12);  // 12 hours on
-    sdds_var(Tuint32, scheduleOff_SEC, sdds::opt::saveval, 60 * 60 * 12); // 12 hours off
-    sdds_var(Tfloat32, scheduleOnStart_HHMM, sdds::opt::saveval, 6.00);
+    sdds_var(Tuint32, scheduleOn_sec, sdds::opt::saveval, 60 * 60 * 12);  // 12 hours on
+    sdds_var(Tuint32, scheduleOff_sec, sdds::opt::saveval, 60 * 60 * 12); // 12 hours off
+    sdds_var(Tuint16, scheduleOnStart_HHMM, sdds::opt::saveval, 1200);
     sdds_var(Tstring, scheduleInfo, sdds::opt::readonly);
 
     // sdds variables for fan
@@ -37,7 +37,7 @@ public:
         sdds_enum(___, on, off, withLight) Taction;
         sdds_enum(on, off, withLight) Tstate;
         sdds_var(Taction, action);
-        sdds_var(Tstate, state, sdds::opt::saveval, Tstate::withLight);
+        sdds_var(Tstate, state, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), Tstate::withLight);
         sdds_var(Tstatus, status, sdds::opt::readonly, Tstatus::off);
     };
     sdds_var(Tfan, fan);
@@ -64,19 +64,19 @@ private:
             return r;
 
         // figure out how much time has past since the start (today or yesterday)
-        const uint16_t start_hour = static_cast<uint16_t>(floor(scheduleOnStart_HHMM.value()));
-        const uint16_t start_min = static_cast<uint16_t>(round((scheduleOnStart_HHMM.value() - start_hour) * 100));
+        const uint16_t start_hour = scheduleOnStart_HHMM.value() / 100;
+        const uint16_t start_min = scheduleOnStart_HHMM.value() % 100;
         const uint32_t start_sec = start_hour * 60 * 60 + start_min * 60;
         const uint32_t now_sec = static_cast<uint32_t>(Time.hour()) * 3600 + Time.minute() * 60 + Time.second();
         const uint32_t delta = (start_sec > now_sec) ? 24 * 60 * 60 + now_sec - start_sec : now_sec - start_sec;
 
         // figure out which phase we are in and when the next phase starts
-        const uint32_t period = scheduleOn_SEC.value() + scheduleOff_SEC.value();
+        const uint32_t period = scheduleOn_sec.value() + scheduleOff_sec.value();
         const uint32_t phase = delta % period;
-        if (phase < scheduleOn_SEC.value())
+        if (phase < scheduleOn_sec.value())
         {
             r.isOn = true;
-            r.secondsToSwitch = scheduleOn_SEC.value() - phase; // ON -> OFF
+            r.secondsToSwitch = scheduleOn_sec.value() - phase; // ON -> OFF
         }
         else
         {
@@ -262,23 +262,23 @@ public:
         };
 
         // schedule
-        on(scheduleOn_SEC)
+        on(scheduleOn_sec)
         {
-            if (scheduleOn_SEC == 0)
-                scheduleOn_SEC = 1;
+            if (scheduleOn_sec == 0)
+                scheduleOn_sec = 1;
             else
                 update();
         };
-        on(scheduleOff_SEC)
+        on(scheduleOff_sec)
         {
-            if (scheduleOff_SEC == 0)
-                scheduleOff_SEC = 1;
+            if (scheduleOff_sec == 0)
+                scheduleOff_sec = 1;
             else
                 update();
         };
         on(scheduleOnStart_HHMM)
         {
-            if (scheduleOnStart_HHMM > 23.59)
+            if (scheduleOnStart_HHMM > 2359)
                 scheduleOnStart_HHMM = 0;
             else
                 update();
