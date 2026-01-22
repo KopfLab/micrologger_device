@@ -106,7 +106,7 @@ private:
     void setMotorSpeed(dtypes::uint16 _speed)
     {
         // tell the hardware the speed
-        hardware().motor.targetSpeed = _speed;
+        hardware().motor.targetSpeed_rpm = _speed;
 
         // check for issues
         if (hardware().motor.error != Thardware::TmotorError::none)
@@ -180,7 +180,7 @@ public:
     public:
         sdds_var(Tuint16, acceleration, sdds::opt::saveval, 500);  // rpm/second
         sdds_var(Tuint16, deceleration, sdds::opt::saveval, 3000); // rpm/second
-        sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::saveval, hardware().motor.maxSpeed);
+        sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::saveval, hardware().motor.maxSpeed_rpm);
         sdds_var(Tuint16, vortexSpeed_rpm, sdds::opt::saveval, 3000);
         sdds_var(Tuint16, vortexTime_sec, sdds::opt::saveval, 5);
     };
@@ -250,9 +250,9 @@ public:
         };
 
         // update speed from hardware
-        on(hardware().motor.measuredSpeed)
+        on(hardware().motor.measuredSpeed_rpm)
         {
-            speed_rpm = hardware().motor.measuredSpeed;
+            speed_rpm = hardware().motor.measuredSpeed_rpm;
         };
 
         // reset motor error when publish is turned on
@@ -279,7 +279,7 @@ public:
                 FspeedChangeTimer.stop();
                 // set to min speed so it keeps checking for connectivity
                 // but also does not speed up too fast when error resolves
-                FspeedNow = hardware().motor.minSpeed;
+                FspeedNow = hardware().motor.minSpeed_rpm;
                 setMotorSpeed(FspeedNow);
             }
             else if (error != Thardware::TmotorError::none)
@@ -317,10 +317,10 @@ public:
         // change max speed
         on(settings.maxSpeed_rpm)
         {
-            if (settings.maxSpeed_rpm > hardware().motor.maxSpeed)
+            if (settings.maxSpeed_rpm > hardware().motor.maxSpeed_rpm)
             {
                 // maxed out from hardware side
-                settings.maxSpeed_rpm = hardware().motor.maxSpeed;
+                settings.maxSpeed_rpm = hardware().motor.maxSpeed_rpm;
             }
             else
             {
