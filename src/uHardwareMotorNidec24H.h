@@ -60,9 +60,9 @@ private:
     dtypes::uint16 rpmToStep(dtypes::uint16 _rpm, bool _checkLimits = true)
     {
         // deal with limits
-        if (_checkLimits && _rpm <= minSpeed)
+        if (_checkLimits && _rpm <= minSpeed_rpm)
             return FminStep;
-        if (_checkLimits && _rpm >= maxSpeed)
+        if (_checkLimits && _rpm >= maxSpeed_rpm)
             return FmaxStep;
         // find calibration
         dtypes::float32 rpm = static_cast<dtypes::float32>(_rpm);
@@ -81,9 +81,9 @@ private:
     {
         // deal with limits
         if (_step <= FminStep)
-            return minSpeed;
+            return minSpeed_rpm;
         if (_step >= FmaxStep)
-            return maxSpeed;
+            return maxSpeed_rpm;
         // find calibration
         dtypes::uint8 calib_idx = 0;
         for (; calib_idx < 4; calib_idx++)
@@ -96,16 +96,16 @@ private:
     }
 
 public:
-    sdds_var(Tuint16, minSpeed, sdds::opt::readonly, 50);
-    sdds_var(Tuint16, maxSpeed, sdds::opt::readonly, 5000);
-    sdds_var(Tuint16, targetSpeed, sdds::opt::nothing, 0);
-    sdds_var(Tuint16, measuredSpeed, sdds::opt::readonly, 0);
+    sdds_var(Tuint16, minSpeed_rpm, sdds::opt::readonly, 50);
+    sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::readonly, 5000);
+    sdds_var(Tuint16, targetSpeed_rpm, sdds::opt::nothing, 0);
+    sdds_var(Tuint16, measuredSpeed_rpm, sdds::opt::readonly, 0);
     sdds_var(Tuint16, targetSteps, sdds::opt::nothing, 0);
     sdds_var(Tuint16, steps, sdds::opt::readonly, 0);
     sdds_var(enums::ToffOn, autoAdjust, sdds::opt::nothing, enums::ToffOn::on);
     // speed tolerance: based on the calibration slopes of ~0.7 steps/rpm --> 1/0.7 = 1.4 rpm/step --> aim for targetSpeed +/- 2)
-    sdds_var(Tuint8, autoAdjustSpeedTolerance, sdds::opt::nothing, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
-    sdds_var(Tuint16, speedCheckInterval, sdds::opt::nothing, 1000);
+    sdds_var(Tuint8, autoAdjustSpeedTolerance_rpm, sdds::opt::nothing, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
+    sdds_var(Tuint16, speedCheckInterval_ms, sdds::opt::nothing, 1000);
     sdds_var(Tuint32, speedCheckCounter, sdds::opt::nothing, 0);
     sdds_enum(none, noResponse) Terror;
     sdds_var(Terror, error, sdds::opt::readonly);
@@ -113,8 +113,8 @@ public:
     ThardwareMotor()
     {
 
-        FminStep = rpmToStep(minSpeed, false);
-        FmaxStep = rpmToStep(maxSpeed, false);
+        FminStep = rpmToStep(minSpeed_rpm, false);
+        FmaxStep = rpmToStep(maxSpeed_rpm, false);
 
         // set actual motor steps
         on(steps)
@@ -139,10 +139,10 @@ public:
             {
                 // turn motor off
                 steps = 0;
-                if (targetSpeed != 0)
+                if (targetSpeed_rpm != 0)
                 {
                     // check to avoid trigger loop
-                    targetSpeed = 0;
+                    targetSpeed_rpm = 0;
                 }
             }
             else if (targetSteps < FminStep)
@@ -159,37 +159,37 @@ public:
             {
                 // set steps
                 steps = targetSteps;
-                if (targetSpeed != stepToRpm(targetSteps.Fvalue))
+                if (targetSpeed_rpm != stepToRpm(targetSteps.Fvalue))
                 {
                     // check to aovid trigger loop
-                    targetSpeed = stepToRpm(targetSteps.Fvalue);
+                    targetSpeed_rpm = stepToRpm(targetSteps.Fvalue);
                 }
             }
         };
 
         // set speed
-        on(targetSpeed)
+        on(targetSpeed_rpm)
         {
-            if (targetSpeed == 0)
+            if (targetSpeed_rpm == 0)
             {
                 // loop safety check
                 if (targetSteps != 0)
                     targetSteps = 0;
             }
-            else if (targetSpeed < minSpeed)
+            else if (targetSpeed_rpm < minSpeed_rpm)
             {
                 // jump to min speed
-                targetSpeed = minSpeed;
+                targetSpeed_rpm = minSpeed_rpm;
             }
-            else if (targetSpeed > maxSpeed)
+            else if (targetSpeed_rpm > maxSpeed_rpm)
             {
                 // jump to max speed
-                targetSpeed = maxSpeed;
+                targetSpeed_rpm = maxSpeed_rpm;
             }
-            else if (targetSteps != rpmToStep(targetSpeed.Fvalue))
+            else if (targetSteps != rpmToStep(targetSpeed_rpm.Fvalue))
             {
                 // set target steps
-                targetSteps = rpmToStep(targetSpeed.Fvalue);
+                targetSteps = rpmToStep(targetSpeed_rpm.Fvalue);
             }
         };
 
@@ -204,7 +204,7 @@ public:
         {
             // decoder info: rpm = freq (in Hz) / 100 * 60 = counts / dt.ms * 1000 * 1/100 * 60 = count / dt.ms * 600.
             float rpm = (600. * FdecoderCounter) / (millis() - FdecoderStart);
-            measuredSpeed = static_cast<dtypes::uint16>(round(rpm));
+            measuredSpeed_rpm = static_cast<dtypes::uint16>(round(rpm));
             speedCheckCounter++;
             // are we up and running? (i.e. already at the 2nd speed check and set to something larger than 0)
             if (speedCheckCounter > 1 && targetSteps > 0)
@@ -226,12 +226,12 @@ public:
                         error = Terror::none;
                     // now that we're running, do we want to auto-adjust the steps to get closer to the targetSpeed?
                     if (autoAdjust == enums::ToffOn::on &&
-                        abs(measuredSpeed - targetSpeed) > autoAdjustSpeedTolerance)
+                        abs(measuredSpeed_rpm - targetSpeed_rpm) > autoAdjustSpeedTolerance_rpm)
                     {
                         // finetune step adjustments
-                        dtypes::uint8 adjustment = static_cast<dtypes::uint8>(round(static_cast<dtypes::float32>(abs(measuredSpeed - targetSpeed)) * Fmavg));
+                        dtypes::uint8 adjustment = static_cast<dtypes::uint8>(round(static_cast<dtypes::float32>(abs(measuredSpeed_rpm - targetSpeed_rpm)) * Fmavg));
                         if (adjustment > 0)
-                            steps = steps + adjustment * ((measuredSpeed < targetSpeed) ? 1 : -1);
+                            steps = steps + adjustment * ((measuredSpeed_rpm < targetSpeed_rpm) ? 1 : -1);
                     }
                 }
             }
@@ -269,6 +269,6 @@ public:
         // reset decoder
         FdecoderStart = millis();
         FdecoderCounter = 0;
-        FspeedCheckTimer.start(speedCheckInterval);
+        FspeedCheckTimer.start(speedCheckInterval_ms);
     }
 };
