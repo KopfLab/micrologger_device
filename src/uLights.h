@@ -156,6 +156,10 @@ private:
             }
         }
 
+        // deal with pause event
+        if (event == Tevent::paused)
+            light = false;
+
         // update light
         (light) ? hardware().setLight(enums::ToffOn::on, intensity.value()) : hardware().setLight(enums::ToffOn::off);
 
@@ -193,6 +197,22 @@ public:
         // light action events
         on(action)
         {
+            // stop if no action
+            if (action == Taction::___)
+                return;
+
+            // update event
+            if (action == Taction::pause && state != Tstate::off && event != Tevent::paused)
+            {
+                // pause if we're on/schedule and not paused yet
+                event = Tevent::paused;
+            }
+            else if (action != Taction::pause && event != Tevent::none)
+            {
+                event = Tevent::none;
+            }
+
+            // process action
             if (action == Taction::on)
             {
                 state = Tstate::on;
@@ -210,26 +230,17 @@ public:
             }
             else if (action == Taction::pause)
             {
-                // no state change but turning off the light (fan follows if it's "withLight")
-                update(Tstate::off, fan.state);
+                // no state change but event paused is now active
+                update();
             }
             else if (action == Taction::resume)
             {
-                // no state change, resuming light with current state
+                // no state change, just resuming
                 update();
             }
-            // events
-            if (action == Taction::pause && event != Tevent::paused)
-            {
-                event = Tevent::paused;
-            }
-            else if (event != Tevent::none)
-            {
-                event = Tevent::none;
-            }
 
-            if (action != Taction::___)
-                action = Taction::___;
+            // reset action
+            action = Taction::___;
         };
 
         // change light intensity
