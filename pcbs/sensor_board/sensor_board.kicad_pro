@@ -473,7 +473,7 @@
         "microvia_drill": 0.1,
         "name": "Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": -1,
+        "priority": 2147483647,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.2,
         "via_diameter": 0.6,
@@ -623,7 +623,7 @@
   ],
   "text_variables": {
     "PROJ_AUTHOR": "Sebastian Kopf",
-    "PROJ_REV": "1.1",
+    "PROJ_REV": "1.2",
     "PROJ_TITLE": "µLogger Sensor Board"
   }
 }
