@@ -16,5 +16,6 @@ public:
     void init(Resistance _resistance)
     {
         ThardwareRheostat::init(_resistance, RHEOSTAT_AD5246_I2C_ADDRESS);
+        action = ThardwareI2C::Taction::write;
     }
 };
