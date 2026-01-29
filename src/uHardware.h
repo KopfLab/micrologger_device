@@ -11,8 +11,13 @@
 #include "uHardwareMotorNidec24H.h"
 #include "uHardwareIOExpanderTCA9534.h"
 #include "uHardwareRheostatMCP4652.h"
+#include "uHardwareRheostatMCP4017.h"
+#include "uHardwareRheostatAD5246.h"
 #include "uHardwarePwmPCA9633.h"
 #include "uDisplay.h"
+
+// signal averageing
+#include "uRunningStats.h"
 
 // hardware constants
 #define MICROLOGGER_SIGNAL_PIN A1
@@ -35,48 +40,66 @@ public:
     using TioMode = ThardwareIOExpander::Tmode;
     using TioValue = ThardwareIOExpander::Tvalue;
 
+    using TbeamState = ThardwareIOExpander::Tmode;
+    using TbeamValue = ThardwareIOExpander::Tvalue;
     using TlightValue = ThardwarePwmPCA9633::Tvalue;
     using TfanValue = ThardwarePwmPCA9633::Tvalue;
 
     using TmotorError = ThardwareMotor::Terror;
 
+    const static dtypes::uint16 adcResolution = 4095; // 12-bit adc
+
 private:
     // is the hardware initialized?
     bool Finitialized = false;
 
-    // in case it is used in a tree
-    Tmeta meta() override { return Tmeta{TYPE_ID, 0, "hardware"}; }
+    // signal stats
+    TrunningStats FsignalStats;
 
-    /**
-     * @brief initialize the hardware
-     */
-    void init()
-    {
-        if (!Finitialized)
-        {
-            display.init(particleSystem().version.value());
-            expander.init();
-            //  dpot.init(ThardwareRheostatMCP4652::Resolution::S256, ThardwareRheostatMCP4652::Resistance::R100k);
-            dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
-            motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
-            Finitialized = true;
-        }
-    }
+    // timers
+    Ttimer FreadTimer;
+
+    // in case it is used in a tree
+    Tmeta meta() override { return Tmeta{TYPE_ID, 0, "HARDWARE"}; }
 
 public:
     // hardware components
     sdds_var(Tdisplay, display);
     sdds_var(ThardwareIOExpander, expander);
-    sdds_var(ThardwareRheostatMCP4652, dpot);
+    sdds_var(ThardwareRheostatMCP4017, dpot1);
+    sdds_var(ThardwareRheostatAD5246, dpot2);
+    class Tgain : public TmenuHandle
+    {
+    public:
+        sdds_var(Tuint32, base_Ohm, sdds::opt::saveval, 10000); // base resistance in the amplification ciruct
+        sdds_var(Tuint16, steps);                               // gain steps
+        sdds_var(Tuint32, total_Ohm, sdds::opt::readonly);      // total gain of the amplifier circuit
+        sdds_var(Ti2cError, error, sdds::opt::readonly);        // i2c error
+    };
+    sdds_var(Tgain, gain);
+    class Tsignal : public TmenuHandle
+    {
+    public:
+        sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 5);                                                     // how many ms between reads
+        sdds_var(Tuint16, reads, sdds::opt::saveval, 100);                                                         // how many reads to average across
+        sdds_var(Tuint16, maxValue, sdds::opt::saveval, static_cast<dtypes::uint16>(round(0.95 * adcResolution))); // what is considered the maximum value before it's considered saturated? (0.95 % of the adc resolution)
+        sdds_var(Tuint16, value, sdds::opt::readonly);                                                             // read signal
+        sdds_var(Tuint16, sdev, sdds::opt::readonly);                                                              // stdev
+        sdds_enum(none, saturated) Terror;
+        sdds_var(Terror, error, sdds::opt::readonly); // signal error
+    };
+    sdds_var(Tsignal, signal);
     sdds_var(ThardwarePwmPCA9633, dimmer);
     sdds_var(ThardwareMotor, motor);
 
     // aliases
-    decltype(expander.value1) &i2cValue = expander.value1;
+    decltype(expander.pin2) &i2cState = expander.pin2;
+    decltype(expander.value2) &i2cValue = expander.value2;
 
+    decltype(expander.error) &beamError = expander.error;
     decltype(expander.action) &beamAction = expander.action;
-    decltype(expander.pin2) &beamState = expander.pin2;
-    decltype(expander.value2) &beamValue = expander.value2;
+    decltype(expander.pin1) &beamState = expander.pin1;
+    decltype(expander.value1) &beamValue = expander.value1;
 
     decltype(dimmer.action) &fanLightAction = dimmer.action;
     decltype(dimmer.error) &fanLightError = dimmer.error;
@@ -89,6 +112,92 @@ public:
     decltype(dimmer.state2) &fanState = dimmer.state2;
     decltype(dimmer.value2) &fanValue = dimmer.value2;
     decltype(dimmer.setpoint2) &fanSetpoint = dimmer.setpoint2;
+
+    // reset signal
+    void resetSignal()
+    {
+        FsignalStats.reset();
+    }
+
+    // set circuit gain (by resistance)
+    void setGain(dtypes::uint32 _ohm)
+    {
+        dtypes::uint16 _steps;
+        dtypes::uint16 maxSteps = dpot1.maxSteps + dpot2.maxSteps - 1; // one step fewer as they are always both set (not independently)
+        dtypes::uint32 maxGain = gain.base_Ohm.value() + dpot1.maxResistance_Ohm + dpot2.maxResistance_Ohm;
+        // figure out steps for requested gain
+        if (gain.base_Ohm.value() > _ohm)
+            _steps = 0; // requested gain lower than minimum
+        else if (_ohm > maxGain)
+            _steps = maxSteps; // requested gain higher than maximum
+        else
+        {
+            _steps = static_cast<dtypes::uint16>(round(static_cast<double>((_ohm - gain.base_Ohm.value())) * maxSteps / (dpot1.maxResistance_Ohm + dpot2.maxResistance_Ohm)));
+        }
+        setGainSteps(_steps);
+    }
+
+    // set circuit gain (by steps)
+    void setGainSteps(dtypes::uint16 _steps)
+    {
+        // figure out individual digipots for requested gain
+        dtypes::uint16 maxSteps = dpot1.maxSteps + dpot2.maxSteps - 1; // one step fewer as they are always both set (not independently)
+        dtypes::uint16 dpot1_steps, dpot2_steps;
+        if (_steps > dpot1.maxSteps)
+        {
+            dpot1_steps = dpot1.maxSteps;
+            dpot2_steps = _steps - dpot1.maxSteps + 1; // above 0
+        }
+        else
+        {
+            dpot1_steps = _steps;
+            dpot2_steps = 0;
+        }
+        // set steps via I2C
+        dpot1.steps = dpot1_steps;
+        dpot1.action = ThardwareI2C::Taction::write;
+        dpot2.steps = dpot2_steps;
+        dpot2.action = ThardwareI2C::Taction::write;
+        // reset signal stats
+        FsignalStats.reset();
+        // update error information
+        if (dpot1.error != Ti2cError::none && gain.error != dpot1.error)
+            gain.error = dpot1.error;
+        else if (dpot2.error != Ti2cError::none && gain.error != dpot2.error)
+            gain.error = dpot2.error;
+        else if (gain.error != Ti2cError::none)
+            gain.error = Ti2cError::none;
+        // update steps and total gain
+        if (gain.error != Ti2cError::none)
+        {
+            // assign same value to trigger update
+            gain.total_Ohm = gain.total_Ohm.value();
+        }
+        else
+        {
+            // no error
+            if (gain.steps != _steps)
+                gain.steps = _steps;
+            gain.total_Ohm = gain.base_Ohm.value() + dpot1.resistance_Ohm + dpot2.resistance_Ohm;
+        }
+    }
+
+    // set beam
+    void setBeam(enums::ToffOn::e _state)
+    {
+        if (_state == enums::ToffOn::off && beamValue != TbeamValue::OFF)
+        {
+            // beam off
+            beamState = TbeamState::OUTPUT_OFF;
+            beamAction = Ti2cAction::write;
+        }
+        else if (_state == enums::ToffOn::on && beamValue != TbeamValue::ON)
+        {
+            // beam on
+            beamState = TbeamState::OUTPUT_ON;
+            beamAction = Ti2cAction::write;
+        }
+    }
 
     // set light by percentage
     void setLight(enums::ToffOn::e _state, uint8_t _percent = 100)
@@ -139,37 +248,33 @@ public:
         }
     }
 
-    // read signal
-    dtypes::int32 readSignal()
-    {
-        return analogRead(MICROLOGGER_SIGNAL_PIN);
-    }
-
     // constructor
     Thardware()
     {
 
-#ifdef SDDS_ON_PARTICLE
-        // if on a particle system, initialize once startup is complete
+        // initialize hardware components on startup
         on(particleSystem().startup)
         {
             if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
             {
-                init();
+                if (!Finitialized)
+                {
+                    display.init(particleSystem().version.value());
+                    expander.init();
+                    dpot1.init(ThardwareRheostatMCP4017::Resistance::R100k);
+                    dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
+                    dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
+                    motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
+                    FreadTimer.start(signal.interval_ms);
+                    Finitialized = true;
+                }
             }
         };
-#else
-        // initialize during setup
-        on(sdds::setup())
-        {
-            init();
-        };
-#endif
 
         // turn the gpio expander connection autocheck on to keep track of device connection
         expander.autoConnect = enums::ToffOn::on;
-        expander.pin1 = TioMode::OUTPUT_ON;  // indicator light
-        expander.pin2 = TioMode::OUTPUT_OFF; // beam LED
+        beamState = TioMode::OUTPUT_OFF; // beam LED
+        i2cState = TioMode::OUTPUT_ON;   // indicator LED
 
         // deal with i2c connection from auto-connecting expander
         on(expander.status)
@@ -178,18 +283,47 @@ public:
             if (expander.status == enums::TconStatus::connected)
             {
                 // turn on connection indicator LED
-                expander.pin1 = Thardware::TioMode::OUTPUT_ON;
+                i2cState = Thardware::TioMode::OUTPUT_ON;
                 expander.action = Thardware::Ti2cAction::write;
 
                 // make sure to write configuration for dimmer on connect
-                dimmer.action = Ti2cAction::write;
+                fanLightAction = Ti2cAction::write;
             }
             else
             {
                 // flag dimmer as disconnected when I2C disconnects
-                if (dimmer.status == enums::TconStatus::connected)
-                    dimmer.action = Ti2cAction::disconnect;
+                if (fanLightStatus == enums::TconStatus::connected)
+                    fanLightAction = Ti2cAction::disconnect;
             }
+        };
+
+        // adjust gain
+        on(gain.steps)
+        {
+            setGainSteps(gain.steps.value());
+        };
+
+        // read signal
+        on(FreadTimer)
+        {
+            FsignalStats.add(analogRead(MICROLOGGER_SIGNAL_PIN));
+            if (FsignalStats.count() >= signal.reads)
+            {
+                signal.value = static_cast<dtypes::uint16>(round(FsignalStats.mean()));
+                signal.sdev = static_cast<dtypes::uint16>(round(FsignalStats.stdDev()));
+                if (signal.value > signal.maxValue)
+                {
+                    if (signal.error != Tsignal::Terror::saturated)
+                        signal.error = Tsignal::Terror::saturated;
+                }
+                else
+                {
+                    if (signal.error != Tsignal::Terror::none)
+                        signal.error = Tsignal::Terror::none;
+                }
+                FsignalStats.reset();
+            }
+            FreadTimer.start(signal.interval_ms);
         };
     }
 };
