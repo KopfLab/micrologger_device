@@ -182,12 +182,6 @@ public:
         // make sure hardware is initalized
         hardware();
 
-        // resume state when startup is complete
-        on(particleSystem().startup)
-        {
-            resumeState();
-        };
-
         // timer
         on(FscheduleTimer)
         {
@@ -257,29 +251,20 @@ public:
         // update light status from hardware
         on(hardware().lightValue)
         {
-            if (hardware().fanLightError != Thardware::Ti2cError::none)
-            {
-                // error
-                error = hardware().fanLightError;
+            if (hardware().fanLightError != Thardware::Ti2cError::none && status != Tstatus::error)
                 status = Tstatus::error;
-            }
             else if ((hardware().lightValue == Thardware::TlightValue::ON || hardware().lightValue == Thardware::TlightValue::DIMMED) && status != Tstatus::on)
-            {
-                // on
-                error = Thardware::Ti2cError::none;
                 status = Tstatus::on;
-            }
             else if ((hardware().lightValue != Thardware::TlightValue::ON && hardware().lightValue != Thardware::TlightValue::DIMMED) && status != Tstatus::off)
-            {
-                // off
-                error = Thardware::Ti2cError::none;
                 status = Tstatus::off;
-            }
         };
 
         // update light error from hardware (same i2c error as the fan)
         on(hardware().fanLightError)
         {
+            if (error != hardware().fanLightError)
+                error = hardware().fanLightError;
+            // also update light and fan status
             hardware().lightValue.signalEvents();
             hardware().fanValue.signalEvents();
         };
@@ -332,7 +317,7 @@ public:
         // update fan status from hardware
         on(hardware().fanValue)
         {
-            if (hardware().fanLightError != Thardware::Ti2cError::none)
+            if (hardware().fanLightError != Thardware::Ti2cError::none && fan.status != Tstatus::error)
                 fan.status = Tstatus::error;
             else if ((hardware().fanValue == Thardware::TfanValue::ON || hardware().fanValue == Thardware::TfanValue::DIMMED) && fan.status != Tstatus::on)
                 fan.status = Tstatus::on;
@@ -341,7 +326,7 @@ public:
         };
     }
 
-    // resume the saved state of the motor after power cycling or reconnection
+    // resume the saved state after power cycling or reconnection
     void resumeState()
     {
         update();

@@ -193,12 +193,6 @@ public:
         // make sure hardware is initalized
         hardware();
 
-        // resume state when startup is complete
-        on(particleSystem().startup)
-        {
-            resumeState();
-        };
-
         // action events
         on(action)
         {
@@ -272,9 +266,12 @@ public:
             if (hardware().motor.error != Thardware::TmotorError::none)
             {
                 // error, stop operations
-                error = hardware().motor.error;
-                status = Tstatus::error;
-                event = Tevent::none;
+                if (error != hardware().motor.error)
+                    error = hardware().motor.error;
+                if (status != Tstatus::error)
+                    status = Tstatus::error;
+                if (event != Tevent::none)
+                    event = Tevent::none;
                 FvortexEndTimer.stop();
                 FspeedChangeTimer.stop();
                 // set to min speed so it keeps checking for connectivity
@@ -284,7 +281,7 @@ public:
             }
             else if (error != Thardware::TmotorError::none)
             {
-                // no error anymore --> resume state
+                // no error anymore --> resume state (this is in case errors not related to device connection get resolved)
                 error = Thardware::TmotorError::none;
                 resumeState();
             }
@@ -341,17 +338,14 @@ public:
     // resume the saved state of the motor after power cycling or reconnection
     void resumeState()
     {
-        if (state == enums::ToffOn::on)
+        if (state == enums::ToffOn::on && (status == Tstatus::off || status == Tstatus::error))
         {
-            // should be on
-            if (status == Tstatus::off || status == Tstatus::error)
-            {
-                if (status == Tstatus::error)
-                    status = Tstatus::off;
-                changeSpeed(setpoint_rpm);
-            }
+            // should be on but is not
+            if (status == Tstatus::error)
+                status = Tstatus::off; // reset from error
+            changeSpeed(setpoint_rpm);
         }
-        else if (status != Tstatus::off)
+        else if (state == enums::ToffOn::off && status != Tstatus::off)
         {
             // should be off but is not
             status = Tstatus::off;
