@@ -21,9 +21,6 @@ public:
     };
 
 private:
-    // maximal resistance (in Ohm)
-    dtypes::uint32 FmaxResistance = 0;
-
     // low level interactions with the chip via I2C
 
     /**
@@ -146,22 +143,26 @@ public:
     sdds_var(Tuint8, steps, sdds::opt::nothing, 0);
     sdds_var(Tuint32, resistance_Ohm, sdds::opt::readonly, 0);
 
+    // public vars (no need to be sdds vars)
+    dtypes::uint8 maxSteps = 127;
+    dtypes::uint32 maxResistance_Ohm = 0; // maximal resistance (in Ohm)
+
     // constructor
     ThardwareRheostat()
     {
         on(steps)
         {
-            if (steps > 127)
-                steps = 127;
+            if (steps > maxSteps)
+                steps = maxSteps;
             else
-                resistance_Ohm = static_cast<dtypes::uint32>(round(static_cast<float>(steps.value()) * FmaxResistance / 127.));
+                resistance_Ohm = static_cast<dtypes::uint32>(round(static_cast<float>(steps.value()) * maxResistance_Ohm / maxSteps));
         };
     }
 
     // default i2c address in init
     void init(Resistance _resistance, uint8_t _i2cAddress)
     {
-        FmaxResistance = static_cast<dtypes::uint32>(_resistance);
+        maxResistance_Ohm = static_cast<dtypes::uint32>(_resistance);
         ThardwareI2C::init(_i2cAddress);
     }
 };
