@@ -180,7 +180,6 @@ private:
         // read values
         uint8_t read;
         uint8_t transmitCode = readRegister(FinputValuesRegister, &read);
-        Log.trace("read input pin values: %s", byteBits(read, 'H', 'L').c_str());
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
             Log.trace("could not read IOExpander pin values");
