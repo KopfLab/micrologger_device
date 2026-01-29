@@ -52,19 +52,27 @@ private:
         // alert / FIXME when does this appear?
         hardware().display.drawIcon(alert_icon, alert_icon_width);
 
+        // optical density
+        hardware().display.printLine(Tdisplay::line1Y, "SAT:" + OD.signal_ppt.to_string());
+
+        if (OD.error == TopticalDensity::TsignalError::none)
+            hardware().display.printLine(Tdisplay::line1Y, "SDEV:" + hardware().signal.sdev.to_string(), Tdisplay::offsetX);
+        else
+            hardware().display.printLine(Tdisplay::line1Y, OD.error.to_string(), Tdisplay::offsetX);
+        // hardware().display.printLine(Tdisplay::line1Y, "OD:0.234", Tdisplay::offsetX);
+
         // stirrer speed
         if (stirrer.status == Tstirrer::Tstatus::off)
-            hardware().display.printLine(Tdisplay::line1Y, "RPM:off");
+            hardware().display.printLine(Tdisplay::line2Y, "RPM:off");
         else
-            hardware().display.printLine(Tdisplay::line1Y, "RPM:" + stirrer.speed_rpm.to_string());
+            hardware().display.printLine(Tdisplay::line2Y, "RPM:" + stirrer.speed_rpm.to_string());
 
         // stirrer event
         if (stirrer.event != Tstirrer::Tevent::none)
-            hardware().display.printLine(Tdisplay::line1Y, stirrer.event.to_string(), Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line2Y, stirrer.event.to_string(), Tdisplay::offsetX);
         else
-            hardware().display.printLine(Tdisplay::line1Y, "SP:" + stirrer.setpoint_rpm.to_string() + "rpm", Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line2Y, "SP:" + stirrer.setpoint_rpm.to_string() + "rpm", Tdisplay::offsetX);
 
-        hardware().display.printLine(Tdisplay::line2Y, "OD:0.234", Tdisplay::offsetX);
         hardware().display.printLine(Tdisplay::line3Y, "Temp:35.1C always on");
         // hardware().display.printLine(Tdisplay::line3Y, hardware().display.error.to_string(), Tdisplay::align::RIGHT);
         hardware().display.printLine(Tdisplay::line4Y, Time.format(TIME_FORMAT_ISO8601_FULL), Tdisplay::align::CENTER);
@@ -112,8 +120,8 @@ public:
 
     // sdds variables
     sdds_var(enums::TconStatus, device, sdds::opt::readonly);
+    sdds_var(TopticalDensity, OD);
     sdds_var(Tstirrer, stirrer);
-    // sdds_var(TopticalDensity, OD);
     sdds_var(Tlights, lights);
 
     TmicroLogger()
@@ -122,10 +130,16 @@ public:
         // make sure hardware is initalized
         hardware();
 
-/**
- * DISPLAY
- */
-#pragma region Display
+        // resume components' state on startup complete
+        on(particleSystem().startup)
+        {
+            if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+            {
+                OD.resumeState();
+                stirrer.resumeState();
+                lights.resumeState();
+            }
+        };
 
         // display startup complete
         on(hardware().display.startup)
@@ -144,19 +158,19 @@ public:
             FdisplayTimer.start(hardware().display.refresh_ms);
         };
 
-/**
- * CONNECTION
- */
-#pragma region Device
-
-        // keep connection status updated
+        // keep connection status updated and resume state whenever we reconnect
         on(hardware().i2cValue)
         {
             if (hardware().i2cValue == Thardware::TioValue::ON)
             {
                 if (device != enums::TconStatus::connected)
                     device = enums::TconStatus::connected;
-                lights.resumeState();
+                if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+                {
+                    OD.resumeState();
+                    stirrer.resumeState();
+                    lights.resumeState();
+                }
             }
             else if (hardware().i2cValue != Thardware::TioValue::ON)
             {
