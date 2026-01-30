@@ -9,7 +9,7 @@
 #define DISPLAY_RESET_PIN D10
 #define DISPLAY_I2C_ADDRESS 0x3C
 
-class Tdisplay : public ThardwareOledSSD1309
+class ThardwareDisplay : public ThardwareOledSSD1309
 {
 
 public:
@@ -41,7 +41,7 @@ public:
     // default height is 13 pixels
     void drawIcon(const uint8_t *_icon, uint16_t _w, uint16_t _h = 13)
     {
-        drawBitmap(Tdisplay::iconsY, _icon, _w, _h, Tdisplay::align::RIGHT, FiconXpadding);
+        drawBitmap(ThardwareDisplay::iconsY, _icon, _w, _h, ThardwareDisplay::align::RIGHT, FiconXpadding);
         FiconXpadding += _w + 2;
     }
 
@@ -70,7 +70,7 @@ public:
 
     // initialize 128x64 oled display with width, height, reset pin, and lower clock speed
     // (screen does not get messed up as often at 100kHz instead of the 400kHz default)
-    Tdisplay() : ThardwareOledSSD1309(128, 64, DISPLAY_RESET_PIN, 100000)
+    ThardwareDisplay() : ThardwareOledSSD1309(128, 64, DISPLAY_RESET_PIN, 100000)
     {
     }
 
