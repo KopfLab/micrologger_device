@@ -265,7 +265,7 @@ public:
     Thardware()
     {
 
-        // define pins on setup
+        // define pins on setup that don't get defined by other components
         on(sdds::setup())
         {
 
@@ -273,8 +273,6 @@ public:
             pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN2, INPUT);
             pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN3, INPUT);
             pinMode(MICROLOGGER_SIGNAL_PIN, INPUT);
-            pinMode(MICROLOGGER_SPEED_PIN, OUTPUT);
-            pinMode(MICROLOGGER_SPEED_PIN, INPUT);
         };
 
         // initialize hardware components on particle startup
