@@ -101,7 +101,6 @@ private:
         // read back modes to check if they match
         uint8_t read;
         transmitCode = readRegister(FpinModesRegister, &read);
-        Log.trace("read pin modes: %s", byteBits(read, 'O', 'I').c_str());
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
             Log.trace("could not read IOExpander pin modes");
@@ -142,7 +141,6 @@ private:
         // check back if values are as expected
         uint8_t read;
         transmitCode = readRegister(FoutputValuesRegister, &read);
-        Log.trace("read output pin values: %s", byteBits(read, 'H', 'L').c_str());
         if (transmitCode != SYSTEM_ERROR_NONE)
         {
             Log.trace("could not read IOExpander pin values");
