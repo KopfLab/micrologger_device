@@ -5,7 +5,7 @@
 #include "Particle.h"
 
 // stirrer motor
-class ThardwareMotor : public TmenuHandle
+class ThardwareMotorNidec24H : public TmenuHandle
 {
 
 private:
@@ -110,7 +110,7 @@ public:
     sdds_enum(none, noResponse) Terror;
     sdds_var(Terror, error, sdds::opt::readonly);
 
-    ThardwareMotor()
+    ThardwareMotorNidec24H()
     {
 
         FminStep = rpmToStep(minSpeed_rpm, false);
@@ -254,7 +254,7 @@ public:
         pinMode(FdecoderPin, INPUT);
         attachInterrupt(
             digitalPinToInterrupt(FdecoderPin),
-            &ThardwareMotor::decoderChangeISR,
+            &ThardwareMotorNidec24H::decoderChangeISR,
             this, RISING);
 
         // initialization is complete

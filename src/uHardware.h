@@ -46,7 +46,7 @@ public:
     using TlightValue = ThardwarePwmPCA9633::Tvalue;
     using TfanValue = ThardwarePwmPCA9633::Tvalue;
 
-    using TmotorError = ThardwareMotor::Terror;
+    using TmotorError = ThardwareMotorNidec24H::Terror;
     using TsignalError = ThardwareSensorOPT101::Terror;
 
 private:
@@ -104,7 +104,7 @@ public:
     sdds_var(ThardwareSensorOPT101, signal);
     // dimmer and motor
     sdds_var(ThardwarePwmPCA9633, dimmer);
-    sdds_var(ThardwareMotor, motor);
+    sdds_var(ThardwareMotorNidec24H, motor);
 
     // aliases
     decltype(expander.pin2) &i2cState = expander.pin2;
