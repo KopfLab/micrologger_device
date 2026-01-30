@@ -205,6 +205,8 @@ private:
     {
         if (status != enums::TconStatus::connected && !connect())
             return false;
+        if (!writePinModes())
+            return false;
         if (!readPinValues())
             return false;
         return true;
