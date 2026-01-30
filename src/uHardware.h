@@ -23,6 +23,9 @@
 #define MICROLOGGER_SIGNAL_PIN A1
 #define MICROLOGGER_SPEED_PIN A2
 #define MICROLOGGER_DECODER_PIN D6
+#define MICROLOGGER_CONTROLLER_VERSION_PIN1 D2
+#define MICROLOGGER_CONTROLLER_VERSION_PIN2 D3
+#define MICROLOGGER_CONTROLLER_VERSION_PIN3 D4
 
 /**
  * @brief hardware handler
@@ -62,12 +65,41 @@ private:
     // in case it is used in a tree
     Tmeta meta() override { return Tmeta{TYPE_ID, 0, "HARDWARE"}; }
 
+    // get the version of the sensor board
+    uint8_t getSensorBoardVersion()
+    {
+        expander.pin6 = TioMode::INPUT;
+        expander.pin7 = TioMode::INPUT;
+        expander.pin8 = TioMode::INPUT;
+        expander.action = Ti2cAction::read;
+        if (expander.error == Ti2cError::none)
+        {
+            uint8_t b0 = expander.value6 == TioValue::HIGH ? 1 : 0;
+            uint8_t b1 = expander.value7 == TioValue::HIGH ? 1 : 0;
+            uint8_t b2 = expander.value8 == TioValue::HIGH ? 1 : 0;
+            uint8_t version = (b2 << 2) | (b1 << 1) | b0;
+            return version + 1;
+        }
+        // error
+        return 0;
+    }
+
 public:
-    // hardware components
+    // pcb versions
+    class Tpcbs : public TmenuHandle
+    {
+    public:
+        sdds_var(Tuint8, controller, sdds::opt::readonly);
+        sdds_var(Tuint8, sensor, sdds::opt::readonly);
+    };
+    sdds_var(Tpcbs, pcbVersions);
+    // display and io expander
     sdds_var(Tdisplay, display);
     sdds_var(ThardwareIOExpander, expander);
+    // digital pots
     sdds_var(ThardwareRheostatMCP4017, dpot1);
     sdds_var(ThardwareRheostatAD5246, dpot2);
+    // gain
     class Tgain : public TmenuHandle
     {
     public:
@@ -77,6 +109,7 @@ public:
         sdds_var(Ti2cError, error, sdds::opt::readonly);        // i2c error
     };
     sdds_var(Tgain, gain);
+    // signal
     class Tsignal : public TmenuHandle
     {
     public:
@@ -89,6 +122,7 @@ public:
         sdds_var(Terror, error, sdds::opt::readonly); // signal error
     };
     sdds_var(Tsignal, signal);
+    // dimmer and motor
     sdds_var(ThardwarePwmPCA9633, dimmer);
     sdds_var(ThardwareMotor, motor);
 
@@ -252,22 +286,44 @@ public:
     Thardware()
     {
 
-        // initialize hardware components on startup
+        // define pins on setup
+        on(sdds::setup())
+        {
+
+            pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN1, INPUT);
+            pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN2, INPUT);
+            pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN3, INPUT);
+            pinMode(MICROLOGGER_SIGNAL_PIN, INPUT);
+            pinMode(MICROLOGGER_SPEED_PIN, OUTPUT);
+            pinMode(MICROLOGGER_SPEED_PIN, INPUT);
+        };
+
+        // initialize hardware components on particle startup
         on(particleSystem().startup)
         {
             if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
             {
-                if (!Finitialized)
-                {
-                    display.init(particleSystem().version.value());
-                    expander.init();
-                    dpot1.init(ThardwareRheostatMCP4017::Resistance::R100k);
-                    dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
-                    dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
-                    motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
-                    FreadTimer.start(signal.interval_ms);
-                    Finitialized = true;
-                }
+                if (Finitialized)
+                    return;
+
+                // hardware components
+                display.init(particleSystem().version.value());
+                expander.init();
+                dpot1.init(ThardwareRheostatMCP4017::Resistance::R100k);
+                dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
+                dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
+                motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
+
+                // controller board version
+                uint8_t b0 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
+                uint8_t b1 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN2) ? 1 : 0;
+                uint8_t b2 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
+                uint8_t version = (b2 << 2) | (b1 << 1) | b0;
+                pcbVersions.controller = version + 1;
+
+                // timers
+                FreadTimer.start(signal.interval_ms);
+                Finitialized = true;
             }
         };
 
@@ -286,14 +342,25 @@ public:
                 i2cState = Thardware::TioMode::OUTPUT_ON;
                 expander.action = Thardware::Ti2cAction::write;
 
-                // make sure to write configuration for dimmer on connect
+                // make sure to write configuration for dimmer and dpots on connect
                 fanLightAction = Ti2cAction::write;
+                dpot1.action = Ti2cAction::write;
+                dpot2.action = Ti2cAction::write;
+
+                // figure out sensor board version on connect
+                uint8_t version = getSensorBoardVersion();
+                if (pcbVersions.sensor != version)
+                    pcbVersions.sensor = version;
             }
             else
             {
-                // flag dimmer as disconnected when I2C disconnects
+                // flag other i2c devices as disconnected when I2C disconnects
                 if (fanLightStatus == enums::TconStatus::connected)
+                {
                     fanLightAction = Ti2cAction::disconnect;
+                    dpot1.action = Ti2cAction::disconnect;
+                    dpot2.action = Ti2cAction::disconnect;
+                }
             }
         };
 
