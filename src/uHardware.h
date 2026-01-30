@@ -14,10 +14,8 @@
 #include "uHardwareRheostatMCP4017.h"
 #include "uHardwareRheostatAD5246.h"
 #include "uHardwarePwmPCA9633.h"
+#include "uHardwareSensorOPT101.h"
 #include "uDisplay.h"
-
-// signal averageing
-#include "uRunningStats.h"
 
 // hardware constants
 #define MICROLOGGER_SIGNAL_PIN A1
@@ -49,18 +47,11 @@ public:
     using TfanValue = ThardwarePwmPCA9633::Tvalue;
 
     using TmotorError = ThardwareMotor::Terror;
-
-    const static dtypes::uint16 adcResolution = 4095; // 12-bit adc
+    using TsignalError = ThardwareSensorOPT101::Terror;
 
 private:
     // is the hardware initialized?
     bool Finitialized = false;
-
-    // signal stats
-    TrunningStats FsignalStats;
-
-    // timers
-    Ttimer FreadTimer;
 
     // in case it is used in a tree
     Tmeta meta() override { return Tmeta{TYPE_ID, 0, "HARDWARE"}; }
@@ -99,7 +90,7 @@ public:
     // digital pots
     sdds_var(ThardwareRheostatMCP4017, dpot1);
     sdds_var(ThardwareRheostatAD5246, dpot2);
-    // gain
+    // overall gain
     class Tgain : public TmenuHandle
     {
     public:
@@ -110,18 +101,7 @@ public:
     };
     sdds_var(Tgain, gain);
     // signal
-    class Tsignal : public TmenuHandle
-    {
-    public:
-        sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 5);                                                     // how many ms between reads
-        sdds_var(Tuint16, reads, sdds::opt::saveval, 100);                                                         // how many reads to average across
-        sdds_var(Tuint16, maxValue, sdds::opt::saveval, static_cast<dtypes::uint16>(round(0.95 * adcResolution))); // what is considered the maximum value before it's considered saturated? (0.95 % of the adc resolution)
-        sdds_var(Tuint16, value, sdds::opt::readonly);                                                             // read signal
-        sdds_var(Tuint16, sdev, sdds::opt::readonly);                                                              // stdev
-        sdds_enum(none, saturated) Terror;
-        sdds_var(Terror, error, sdds::opt::readonly); // signal error
-    };
-    sdds_var(Tsignal, signal);
+    sdds_var(ThardwareSensorOPT101, signal);
     // dimmer and motor
     sdds_var(ThardwarePwmPCA9633, dimmer);
     sdds_var(ThardwareMotor, motor);
@@ -146,12 +126,6 @@ public:
     decltype(dimmer.state2) &fanState = dimmer.state2;
     decltype(dimmer.value2) &fanValue = dimmer.value2;
     decltype(dimmer.setpoint2) &fanSetpoint = dimmer.setpoint2;
-
-    // reset signal
-    void resetSignal()
-    {
-        FsignalStats.reset();
-    }
 
     // set circuit gain (by resistance)
     void setGain(dtypes::uint32 _ohm)
@@ -193,7 +167,7 @@ public:
         dpot2.steps = dpot2_steps;
         dpot2.action = ThardwareI2C::Taction::write;
         // reset signal stats
-        FsignalStats.reset();
+        signal.reset();
         // update error information
         if (dpot1.error != Ti2cError::none && gain.error != dpot1.error)
             gain.error = dpot1.error;
@@ -214,6 +188,11 @@ public:
                 gain.steps = _steps;
             gain.total_Ohm = gain.base_Ohm.value() + dpot1.resistance_Ohm + dpot2.resistance_Ohm;
         }
+    }
+
+    // automatically determine gain based on target signal
+    void autoGain()
+    {
     }
 
     // set beam
@@ -313,6 +292,7 @@ public:
                 dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
                 dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
                 motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
+                signal.init(MICROLOGGER_SIGNAL_PIN);
 
                 // controller board version
                 uint8_t b0 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
@@ -321,8 +301,7 @@ public:
                 uint8_t version = (b2 << 2) | (b1 << 1) | b0;
                 pcbVersions.controller = version + 1;
 
-                // timers
-                FreadTimer.start(signal.interval_ms);
+                // fully initialized
                 Finitialized = true;
             }
         };
@@ -368,29 +347,6 @@ public:
         on(gain.steps)
         {
             setGainSteps(gain.steps.value());
-        };
-
-        // read signal
-        on(FreadTimer)
-        {
-            FsignalStats.add(analogRead(MICROLOGGER_SIGNAL_PIN));
-            if (FsignalStats.count() >= signal.reads)
-            {
-                signal.value = static_cast<dtypes::uint16>(round(FsignalStats.mean()));
-                signal.sdev = static_cast<dtypes::uint16>(round(FsignalStats.stdDev()));
-                if (signal.value > signal.maxValue)
-                {
-                    if (signal.error != Tsignal::Terror::saturated)
-                        signal.error = Tsignal::Terror::saturated;
-                }
-                else
-                {
-                    if (signal.error != Tsignal::Terror::none)
-                        signal.error = Tsignal::Terror::none;
-                }
-                FsignalStats.reset();
-            }
-            FreadTimer.start(signal.interval_ms);
         };
     }
 };

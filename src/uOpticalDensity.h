@@ -19,7 +19,7 @@ public:
     sdds_enum(___, beamOn, beamOff, zero) Taction;
     sdds_enum(off, idle, vortexing, waiting, reading) Tstatus;
 
-    using TsignalError = Thardware::Tsignal::Terror;
+    using TsignalError = Thardware::TsignalError;
 
 private:
     // keep track of publishing to detect when it switches from OFF to ON
@@ -35,14 +35,14 @@ private:
 
     dtypes::uint16 signalToPpt(dtypes::uint16 _signal)
     {
-        return static_cast<dtypes::uint16>(round(_signal * 1000. / hardware().adcResolution));
+        return static_cast<dtypes::uint16>(round(_signal * 1000. / hardware().signal.adcResolution));
     }
 
 public:
     // sdds variables
     sdds_var(Taction, action); // what to do
     sdds_var(Tuint16, signal_ppt, sdds::opt::readonly);
-    sdds_var(Thardware::Tsignal::Terror, error, sdds::opt::readonly); // signal error
+    sdds_var(TsignalError, error, sdds::opt::readonly); // signal error
 
     // FIXME: these are all the additional setings
     sdds_var(Tstatus, status, sdds::opt::readonly);
@@ -263,7 +263,7 @@ public:
         hardware().setBeam(enums::ToffOn::off);
 
         // signal reset
-        hardware().resetSignal();
+        hardware().signal.reset();
 
         // gain reset
         hardware().setGain(gain.gain_Ohm.value());
