@@ -9,7 +9,7 @@
 /**
  * @brief stirrer class
  */
-class Tlights : public TmenuHandle
+class TcomponentLights : public TmenuHandle
 {
 
 public:
@@ -176,7 +176,7 @@ private:
 
 public:
     // constructor
-    Tlights()
+    TcomponentLights()
     {
 
         // make sure hardware is initalized

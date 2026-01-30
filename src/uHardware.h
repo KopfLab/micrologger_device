@@ -15,7 +15,7 @@
 #include "uHardwareRheostatAD5246.h"
 #include "uHardwarePwmPCA9633.h"
 #include "uHardwareSensorOPT101.h"
-#include "uDisplay.h"
+#include "uHardwareDisplay.h"
 
 // hardware constants
 #define MICROLOGGER_SIGNAL_PIN A1
@@ -85,7 +85,7 @@ public:
     };
     sdds_var(Tpcbs, pcbVersions);
     // display and io expander
-    sdds_var(Tdisplay, display);
+    sdds_var(ThardwareDisplay, display);
     sdds_var(ThardwareIOExpander, expander);
     // digital pots
     sdds_var(ThardwareRheostatMCP4017, dpot1);

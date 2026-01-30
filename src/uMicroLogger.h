@@ -3,9 +3,9 @@
 #include "uTypedef.h"
 #include "uCoreEnums.h"
 #include "uHardware.h"
-#include "uStirrer.h"
-#include "uOpticalDensity.h"
-#include "uLights.h"
+#include "uComponentStirrer.h"
+#include "uComponentOpticalDensity.h"
+#include "uComponentLights.h"
 #include "symbols.h"
 
 /**
@@ -13,6 +13,16 @@
  */
 class TmicroLogger : public TmenuHandle
 {
+
+public:
+    // enumeriations
+    using TfanState = TcomponentLights::Tfan::Tstate;
+    using TlightsState = TcomponentLights::Tstate;
+    using TlightsStatus = TcomponentLights::Tstatus;
+    using TlightsEvent = TcomponentLights::Tevent;
+    using TstirrerEvent = TcomponentStirrer::Tevent;
+    using TstirrerStatus = TcomponentStirrer::Tstatus;
+    using TodError = TcomponentOpticalDensity::Terror;
 
 private:
     // timers
@@ -55,20 +65,20 @@ private:
         // optical density
         hardware().display.printLine(ThardwareDisplay::line1Y, "SAT:" + OD.signal_ppt.to_string());
 
-        if (OD.error == TopticalDensity::TsignalError::none)
+        if (OD.error == TodError::none)
             hardware().display.printLine(ThardwareDisplay::line1Y, "SDEV:" + hardware().signal.sdev.to_string(), ThardwareDisplay::offsetX);
         else
             hardware().display.printLine(ThardwareDisplay::line1Y, OD.error.to_string(), ThardwareDisplay::offsetX);
         // hardware().display.printLine(Tdisplay::line1Y, "OD:0.234", Tdisplay::offsetX);
 
         // stirrer speed
-        if (stirrer.status == Tstirrer::Tstatus::off)
+        if (stirrer.status == TstirrerStatus::off)
             hardware().display.printLine(ThardwareDisplay::line2Y, "RPM:off");
         else
             hardware().display.printLine(ThardwareDisplay::line2Y, "RPM:" + stirrer.speed_rpm.to_string());
 
         // stirrer event
-        if (stirrer.event != Tstirrer::Tevent::none)
+        if (stirrer.event != TstirrerEvent::none)
             hardware().display.printLine(ThardwareDisplay::line2Y, stirrer.event.to_string(), ThardwareDisplay::offsetX);
         else
             hardware().display.printLine(ThardwareDisplay::line2Y, "SP:" + stirrer.setpoint_rpm.to_string() + "rpm", ThardwareDisplay::offsetX);
@@ -78,37 +88,37 @@ private:
         hardware().display.printLine(ThardwareDisplay::line4Y, Time.format(TIME_FORMAT_ISO8601_FULL), ThardwareDisplay::align::CENTER);
 
         // light status
-        if (lights.status == Tlights::Tstatus::on)
+        if (lights.status == TlightsStatus::on)
             hardware().display.printLine(ThardwareDisplay::line5Y, "Light:" + lights.intensity.to_string() + "%");
-        else if (lights.status == Tlights::Tstatus::off)
+        else if (lights.status == TlightsStatus::off)
             hardware().display.printLine(ThardwareDisplay::line5Y, "Light:off");
-        else if (lights.status == Tlights::Tstatus::error)
+        else if (lights.status == TlightsStatus::error)
             hardware().display.printLine(ThardwareDisplay::line5Y, "Light:ERR");
 
         // light state
-        if (lights.event != Tlights::Tevent::none)
+        if (lights.event != TlightsEvent::none)
             hardware().display.printLine(ThardwareDisplay::line5Y, lights.event.to_string(), ThardwareDisplay::offsetX);
-        else if (lights.state == Tlights::Tstate::on)
+        else if (lights.state == TlightsState::on)
             hardware().display.printLine(ThardwareDisplay::line5Y, "always on", ThardwareDisplay::offsetX);
-        else if (lights.state == Tlights::Tstate::off)
+        else if (lights.state == TlightsState::off)
             hardware().display.printLine(ThardwareDisplay::line5Y, "always off", ThardwareDisplay::offsetX);
-        else if (lights.state == Tlights::Tstate::schedule)
+        else if (lights.state == TlightsState::schedule)
             hardware().display.printLine(ThardwareDisplay::line5Y, lights.scheduleInfo.c_str(), ThardwareDisplay::offsetX);
 
         // fan status
-        if (lights.fan.status == Tlights::Tstatus::on)
+        if (lights.fan.status == TlightsStatus::on)
             hardware().display.printLine(ThardwareDisplay::line6Y, "Fan:on");
-        else if (lights.fan.status == Tlights::Tstatus::off)
+        else if (lights.fan.status == TlightsStatus::off)
             hardware().display.printLine(ThardwareDisplay::line6Y, "Fan:off");
-        else if (lights.fan.status == Tlights::Tstatus::error)
+        else if (lights.fan.status == TlightsStatus::error)
             hardware().display.printLine(ThardwareDisplay::line6Y, "Fan:ERR");
 
         // fan state
-        if (lights.fan.state == Tlights::Tfan::Tstate::on)
+        if (lights.fan.state == TfanState::on)
             hardware().display.printLine(ThardwareDisplay::line6Y, "always on", ThardwareDisplay::offsetX);
-        else if (lights.fan.state == Tlights::Tfan::Tstate::off)
+        else if (lights.fan.state == TfanState::off)
             hardware().display.printLine(ThardwareDisplay::line6Y, "always off", ThardwareDisplay::offsetX);
-        else if (lights.fan.state == Tlights::Tfan::Tstate::withLight)
+        else if (lights.fan.state == TfanState::withLight)
             hardware().display.printLine(ThardwareDisplay::line6Y, "with light", ThardwareDisplay::offsetX);
 
         hardware().display.drawLayoutLines();
@@ -120,9 +130,9 @@ public:
 
     // sdds variables
     sdds_var(enums::TconStatus, device, sdds::opt::readonly);
-    sdds_var(TopticalDensity, OD);
-    sdds_var(Tstirrer, stirrer);
-    sdds_var(Tlights, lights);
+    sdds_var(TcomponentOpticalDensity, OD);
+    sdds_var(TcomponentStirrer, stirrer);
+    sdds_var(TcomponentLights, lights);
 
     TmicroLogger()
     {

@@ -11,15 +11,14 @@
 /**
  * @brief stirrer class
  */
-class TopticalDensity : public TmenuHandle
+class TcomponentOpticalDensity : public TmenuHandle
 {
 
 public:
     // enumerations
     sdds_enum(___, beamOn, beamOff, zero) Taction;
     sdds_enum(off, idle, vortexing, waiting, reading) Tstatus;
-
-    using TsignalError = Thardware::TsignalError;
+    sdds_enum(none, saturated, failedGain, failedZero) Terror;
 
 private:
     // keep track of publishing to detect when it switches from OFF to ON
@@ -40,9 +39,9 @@ private:
 
 public:
     // sdds variables
-    sdds_var(Taction, action); // what to do
-    sdds_var(Tuint16, signal_ppt, sdds::opt::readonly);
-    sdds_var(TsignalError, error, sdds::opt::readonly); // signal error
+    sdds_var(Taction, action);                          // what to do
+    sdds_var(Tuint16, signal_ppt, sdds::opt::readonly); // signal in parts per thousand
+    sdds_var(Terror, error, sdds::opt::readonly);       // errors
 
     // FIXME: these are all the additional setings
     sdds_var(Tstatus, status, sdds::opt::readonly);
@@ -87,7 +86,7 @@ public:
     sdds_var(Tgain, gain);
 
     // constructor
-    TopticalDensity()
+    TcomponentOpticalDensity()
     {
 
         // make sure hardware is initalized
@@ -155,11 +154,13 @@ public:
             }
         };
 
-        // update signal error from hardware
+        // update error if signal is saturated (only set update if the specific one is set since OpticalDensity also adds errors for zero and gain)
         on(hardware().signal.error)
         {
-            if (error != hardware().signal.error)
-                error = hardware().signal.error;
+            if (hardware().signal.error == Thardware::TsignalError::saturated && error == Terror::none)
+                error = Terror::saturated;
+            else if (hardware().signal.error == Thardware::TsignalError::none && error == Terror::saturated)
+                error = Terror::none;
         };
 
         // update beam status from hardware

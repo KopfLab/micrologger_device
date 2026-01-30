@@ -8,7 +8,7 @@
 /**
  * @brief stirrer class
  */
-class Tstirrer : public TmenuHandle
+class TcomponentStirrer : public TmenuHandle
 {
 
 public:
@@ -187,7 +187,7 @@ public:
     sdds_var(Tsettings, settings);
 
     // constructor
-    Tstirrer()
+    TcomponentStirrer()
     {
 
         // make sure hardware is initalized
