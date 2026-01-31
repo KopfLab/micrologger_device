@@ -2,9 +2,7 @@
 #include "uTypedef.h"
 #include "enums.h"
 #include "uHardware.h"
-#ifdef SDDS_ON_PARTICLE
 #include "uParticleSystem.h"
-#endif
 
 /**
  * @brief stirrer class
