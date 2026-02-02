@@ -16,9 +16,15 @@
 #include "uHardwarePwmPCA9633.h"
 #include "uHardwareSensorOPT101.h"
 #include "uHardwareSensorTMP117.h"
+#include "uHardwareSensorVoltage.h"
 #include "uHardwareDisplay.h"
 
 // hardware constants
+#define MICROLOGGER_VOLTAGE_PIN A0
+#define MICROLOGGER_VOLTAGE_DIVIDER_REF 3.3
+#define MICROLOGGER_VOLTAGE_DIVIDER_R1 150.0
+#define MICROLOGGER_VOLTAGE_DIVIDER_R2 10.0
+#define MICROLOGGER_VOLTAGE_SCHOTTKY_DROP 0.5
 #define MICROLOGGER_SIGNAL_PIN A1
 #define MICROLOGGER_SPEED_PIN A2
 #define MICROLOGGER_DECODER_PIN D6
@@ -104,6 +110,7 @@ public:
     // signals
     sdds_var(ThardwareSensorOPT101, signal);
     sdds_var(ThardwareSensorTMP117, temperature);
+    sdds_var(ThardwareSensorVoltage, voltage);
     // dimmer and motor
     sdds_var(ThardwarePwmPCA9633, dimmer);
     sdds_var(ThardwareMotorNidec24H, motor);
@@ -293,6 +300,7 @@ public:
                 dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
                 motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
                 signal.init(MICROLOGGER_SIGNAL_PIN);
+                voltage.init(MICROLOGGER_VOLTAGE_PIN, MICROLOGGER_VOLTAGE_DIVIDER_REF, MICROLOGGER_VOLTAGE_DIVIDER_R1, MICROLOGGER_VOLTAGE_DIVIDER_R2, MICROLOGGER_VOLTAGE_SCHOTTKY_DROP);
                 temperature.init();
 
                 // controller board version

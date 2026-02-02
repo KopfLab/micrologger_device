@@ -24,8 +24,9 @@ public:
     // sdds vars
     sdds_var(Tuint16, read_sec, sdds::opt::saveval, 1); // how often to read the temperature (in seconds)
     sdds_var(Tfloat32, temperature_C, sdds::opt::readonly);
+    sdds_var(Tfloat32, power_V, sdds::opt::readonly);
+    sdds_var(Tfloat32, powerReq_V, sdds::opt::saveval, 20.0); // what is the minimum power requirement?
     sdds_var(Thardware::Ti2cError, error, sdds::opt::readonly);
-    sdds_var(Tstring, nextRead, sdds::opt::readonly);
 
     // constructor
     TcomponentEnvironment()
@@ -47,7 +48,12 @@ public:
                 error = hardware().temperature.error;
         };
 
-        // update timer
+        on(hardware().voltage.value)
+        {
+            power_V = hardware().voltage.value;
+        };
+
+        // update temperature read timer
         on(FreadTimer)
         {
             hardware().temperature.action = Thardware::Ti2cAction::read;
@@ -55,6 +61,7 @@ public:
         };
     }
 
+    // pause state if disconnected
     void pauseState()
     {
         if (FreadTimer.running())
