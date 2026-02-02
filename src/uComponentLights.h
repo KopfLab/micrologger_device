@@ -324,6 +324,11 @@ public:
         };
     }
 
+    // pause state if disconnected
+    void pauseState()
+    {
+    }
+
     // resume the saved state after power cycling or reconnection
     void resumeState()
     {

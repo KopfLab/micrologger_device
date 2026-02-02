@@ -335,6 +335,11 @@ public:
         };
     }
 
+    // pause state if disconnected
+    void pauseState()
+    {
+    }
+
     // resume the saved state of the motor after power cycling or reconnection
     void resumeState()
     {
