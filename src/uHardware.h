@@ -15,6 +15,7 @@
 #include "uHardwareRheostatAD5246.h"
 #include "uHardwarePwmPCA9633.h"
 #include "uHardwareSensorOPT101.h"
+#include "uHardwareSensorTMP117.h"
 #include "uHardwareDisplay.h"
 
 // hardware constants
@@ -100,8 +101,9 @@ public:
         sdds_var(Ti2cError, error, sdds::opt::readonly);        // i2c error
     };
     sdds_var(Tgain, gain);
-    // signal
+    // signals
     sdds_var(ThardwareSensorOPT101, signal);
+    sdds_var(ThardwareSensorTMP117, temperature);
     // dimmer and motor
     sdds_var(ThardwarePwmPCA9633, dimmer);
     sdds_var(ThardwareMotorNidec24H, motor);
@@ -291,6 +293,7 @@ public:
                 dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
                 motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
                 signal.init(MICROLOGGER_SIGNAL_PIN);
+                temperature.init();
 
                 // controller board version
                 uint8_t b0 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
