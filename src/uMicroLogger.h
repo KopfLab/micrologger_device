@@ -6,6 +6,7 @@
 #include "uComponentStirrer.h"
 #include "uComponentOpticalDensity.h"
 #include "uComponentLights.h"
+#include "uComponentEnvironment.h"
 #include "symbols.h"
 
 /**
@@ -25,6 +26,7 @@ public:
     using TodStatus = TcomponentOpticalDensity::Tstatus;
     using TodError = TcomponentOpticalDensity::Terror;
     using Tdisplay = ThardwareDisplay;
+    using TtempError = TcomponentEnvironment::Terror;
 
 private:
     // timers
@@ -53,6 +55,15 @@ private:
         else
             hardware().display.printLine(Tdisplay::headerY, particleSystem().name);
 
+        // enough power?
+        if (environment.powerReq_V > environment.power_V)
+        {
+            hardware().display.drawIcon(alert_icon, alert_icon_width);
+            hardware().display.printLine(Tdisplay::line2Y, "not enough power!", Tdisplay::align::CENTER);
+            hardware().display.printLine(Tdisplay::line4Y, "connect to 24V supply", Tdisplay::align::CENTER);
+            return;
+        }
+
         // device connected? --> print message if not
         if (device == enums::TconStatus::disconnected)
         {
@@ -61,8 +72,9 @@ private:
             return;
         }
 
-        // alert / FIXME when does this appear?
-        hardware().display.drawIcon(alert_icon, alert_icon_width);
+        // alert if here are any issues
+        if (device == enums::TconStatus::disconnected || OD.error != TodError::none || stirrer.status == TstirrerStatus::error || environment.error != TtempError::none || lights.status == TlightsStatus::error || lights.fan.status == TlightsStatus::error)
+            hardware().display.drawIcon(alert_icon, alert_icon_width);
 
         // optical density -left
         if (OD.zero.valid == enums::TnoYes::no)
@@ -92,8 +104,19 @@ private:
         else
             hardware().display.printLine(Tdisplay::line2Y, "SP:" + stirrer.setpoint_rpm.to_string() + "rpm", Tdisplay::offsetX);
 
-        // FIXME: proper temperature
-        hardware().display.printLine(Tdisplay::line3Y, "Temp:35.1C always on");
+        // power
+        char buf[16];
+        snprintf(buf, sizeof(buf), "PWR:%.1fV", environment.power_V.value());
+        hardware().display.printLine(Tdisplay::line3Y, buf);
+
+        // temperature
+        if (environment.error != TtempError::none)
+            hardware().display.printLine(Tdisplay::line3Y, "Temp:error", Tdisplay::offsetX);
+        else
+        {
+            snprintf(buf, sizeof(buf), "Temp:%.1fC", environment.temperature_C.value());
+            hardware().display.printLine(Tdisplay::line3Y, buf, Tdisplay::offsetX);
+        }
 
         // FIXME: put data information in
         hardware().display.printLine(Tdisplay::line4Y, Time.format(TIME_FORMAT_ISO8601_FULL), Tdisplay::align::CENTER);
@@ -144,6 +167,7 @@ public:
     sdds_var(TcomponentOpticalDensity, OD);
     sdds_var(TcomponentStirrer, stirrer);
     sdds_var(TcomponentLights, lights);
+    sdds_var(TcomponentEnvironment, environment);
 
     TmicroLogger()
     {
@@ -156,13 +180,36 @@ public:
         OD.setLights(&lights);
 
         // resume components' state on startup complete
+        // by triggering the i2cValue events
         on(particleSystem().startup)
         {
-            if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+            hardware().i2cValue.signalEvents();
+        };
+
+        // keep connection status updated and resume state whenever we reconnect
+        on(hardware().i2cValue)
+        {
+            if (hardware().i2cValue == Thardware::TioValue::ON)
             {
-                OD.resumeState();
-                stirrer.resumeState();
-                lights.resumeState();
+                if (device != enums::TconStatus::connected)
+                    device = enums::TconStatus::connected;
+                if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+                {
+                    OD.resumeState();
+                    stirrer.resumeState();
+                    lights.resumeState();
+                    environment.resumeState();
+                }
+            }
+            else if (hardware().i2cValue != Thardware::TioValue::ON)
+            {
+                if (device != enums::TconStatus::disconnected)
+                    device = enums::TconStatus::disconnected;
+
+                OD.pauseState();
+                stirrer.pauseState();
+                lights.pauseState();
+                environment.pauseState();
             }
         };
 
@@ -181,27 +228,6 @@ public:
             refreshDisplay();
             hardware().display.action = Tdisplay::Taction::write;
             FdisplayTimer.start(hardware().display.refresh_ms);
-        };
-
-        // keep connection status updated and resume state whenever we reconnect
-        on(hardware().i2cValue)
-        {
-            if (hardware().i2cValue == Thardware::TioValue::ON)
-            {
-                if (device != enums::TconStatus::connected)
-                    device = enums::TconStatus::connected;
-                if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
-                {
-                    OD.resumeState();
-                    stirrer.resumeState();
-                    lights.resumeState();
-                }
-            }
-            else if (hardware().i2cValue != Thardware::TioValue::ON)
-            {
-                if (device != enums::TconStatus::disconnected)
-                    device = enums::TconStatus::disconnected;
-            }
         };
     }
 };
