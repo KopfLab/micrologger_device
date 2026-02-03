@@ -3,6 +3,7 @@
 #include "uTypedef.h"
 #include "Particle.h"
 #include "uRunningStats.h"
+#include "enums.h"
 
 // OPT101 light sensor
 class ThardwareSensorOPT101 : public TmenuHandle
@@ -27,8 +28,9 @@ private:
 
 public:
     // sdds vars
-    sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 5);                                                     // how many ms between reads
-    sdds_var(Tuint16, reads, sdds::opt::saveval, 100);                                                         // how many reads to average across
+    sdds_var(enums::ToffOn, state);
+    sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 10);                                                    // how many ms between reads
+    sdds_var(Tuint16, reads, sdds::opt::saveval, 50);                                                          // how many reads to average across
     sdds_var(Tuint16, maxValue, sdds::opt::saveval, static_cast<dtypes::uint16>(round(0.95 * adcResolution))); // what is considered the maximum value before it's considered saturated? (0.95 % of the adc resolution)
     sdds_var(Tuint16, value, sdds::opt::readonly);                                                             // read signal
     sdds_var(Tuint16, sdev, sdds::opt::readonly);                                                              // stdev
@@ -37,15 +39,28 @@ public:
     // constructor
     ThardwareSensorOPT101()
     {
+        // active?
+        on(state)
+        {
+            if (state == enums::ToffOn::on && !FreadTimer.running())
+            {
+                FreadTimer.start(0);
+            }
+            else if (state == enums::ToffOn::off && FreadTimer.running())
+            {
+                FreadTimer.stop();
+            }
+            FsignalStats.reset();
+        };
+
         // read signal
         on(FreadTimer)
         {
             FsignalStats.add(analogRead(FsignalPin));
             if (FsignalStats.count() >= reads)
             {
-                value = static_cast<dtypes::uint16>(round(FsignalStats.mean()));
-                sdev = static_cast<dtypes::uint16>(round(FsignalStats.stdDev()));
-                if (value > maxValue)
+                dtypes::uint16 mean = static_cast<dtypes::uint16>(round(FsignalStats.mean()));
+                if (mean > maxValue)
                 {
                     if (error != Terror::saturated)
                         error = Terror::saturated;
@@ -55,6 +70,8 @@ public:
                     if (error != Terror::none)
                         error = Terror::none;
                 }
+                value = mean;
+                sdev = static_cast<dtypes::uint16>(round(FsignalStats.stdDev()));
                 FsignalStats.reset();
             }
             FreadTimer.start(interval_ms);
@@ -66,7 +83,6 @@ public:
     {
         FsignalPin = _signalPin;
         pinMode(FsignalPin, INPUT);
-        FreadTimer.start(interval_ms);
     }
 
     // reset current running stats

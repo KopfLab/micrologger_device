@@ -3,6 +3,7 @@
 #include "uTypedef.h"
 #include "Particle.h"
 #include "uRunningStats.h"
+#include "enums.h"
 
 // voltage sensor by simple voltage divider
 class ThardwareSensorVoltage : public TmenuHandle
@@ -29,14 +30,30 @@ private:
 
 public:
     // sdds vars
-    sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 5); // how many ms between reads
-    sdds_var(Tuint16, reads, sdds::opt::saveval, 100);     // how many reads to average across
-    sdds_var(Tfloat32, value, sdds::opt::readonly);        // read signal
-    sdds_var(Tfloat32, sdev, sdds::opt::readonly);         // stdev
+    sdds_var(enums::ToffOn, state);
+    sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 200); // how many ms between reads
+    sdds_var(Tuint16, reads, sdds::opt::saveval, 5);         // how many reads to average across
+    sdds_var(Tfloat32, value, sdds::opt::readonly);          // read signal
+    sdds_var(Tfloat32, sdev, sdds::opt::readonly);           // stdev
 
     // constructor
     ThardwareSensorVoltage()
     {
+
+        // active?
+        on(state)
+        {
+            if (state == enums::ToffOn::on && !FreadTimer.running())
+            {
+                FreadTimer.start(0);
+            }
+            else if (state == enums::ToffOn::off && FreadTimer.running())
+            {
+                FreadTimer.stop();
+            }
+            FvoltageStats.reset();
+        };
+
         // read signal
         on(FreadTimer)
         {
@@ -72,7 +89,6 @@ public:
         FvoltageDrop = _voltageDrop;
         pinMode(FsignalPin, INPUT);
         Finitialized = TRUE;
-        FreadTimer.start(interval_ms);
     }
 
     // reset current running stats
