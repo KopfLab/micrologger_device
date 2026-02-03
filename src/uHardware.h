@@ -199,11 +199,6 @@ public:
         }
     }
 
-    // automatically determine gain based on target signal
-    void autoGain()
-    {
-    }
-
     // set beam
     void setBeam(enums::ToffOn::e _state)
     {
@@ -270,6 +265,18 @@ public:
         }
     }
 
+    // whether to record signal
+    void recordSignal(enums::ToffOn::e _state)
+    {
+        signal.state = _state;
+    }
+
+    // reset signal
+    void resetSignal()
+    {
+        signal.reset();
+    }
+
     // constructor
     Thardware()
     {
@@ -319,6 +326,9 @@ public:
         expander.autoConnect = enums::ToffOn::on;
         beamState = TioMode::OUTPUT_OFF; // beam LED
         i2cState = TioMode::OUTPUT_ON;   // indicator LED
+
+        // turn the voltage reader on
+        voltage.state = enums::ToffOn::on;
 
         // deal with i2c connection from auto-connecting expander
         on(expander.status)

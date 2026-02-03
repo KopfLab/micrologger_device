@@ -38,6 +38,7 @@ private:
     {
         hardware().display.clearDisplay();
         hardware().display.setCursor(0, 0);
+        char buf[16]; // snprintf buffer
 
         // wifi?
         if (particleSystem().internet == TparticleSystem::TinternetStatus::connected)
@@ -73,24 +74,33 @@ private:
         }
 
         // alert if here are any issues
-        if (device == enums::TconStatus::disconnected || OD.error != TodError::none || stirrer.status == TstirrerStatus::error || environment.error != TtempError::none || lights.status == TlightsStatus::error || lights.fan.status == TlightsStatus::error)
+        if (device == enums::TconStatus::disconnected || sensor.error != TodError::none || stirrer.status == TstirrerStatus::error || environment.error != TtempError::none || lights.status == TlightsStatus::error || lights.fan.status == TlightsStatus::error)
             hardware().display.drawIcon(alert_icon, alert_icon_width);
 
         // optical density -left
-        if (OD.zero.valid == enums::TnoYes::no)
-            hardware().display.printLine(Tdisplay::line1Y, "Signal:" + OD.signal_ppt.to_string());
+        if (sensor.zero.valid == enums::TnoYes::yes)
+        {
+            if (!sensor.reading.OD.isNan())
+                if (sensor.reading.OD.value() > -0.0005) // round to 0 or positive
+                    snprintf(buf, sizeof(buf), "OD:+%.3f", abs(sensor.reading.OD.value()));
+                else // negative
+                    snprintf(buf, sizeof(buf), "OD:%.3f", sensor.reading.OD.value());
+            else
+                snprintf(buf, sizeof(buf), "OD:all dark");
+            hardware().display.printLine(Tdisplay::line1Y, buf);
+        }
         else
-            hardware().display.printLine(Tdisplay::line1Y, "OD: 0.23", Tdisplay::offsetX); // FIXME: print proper OD
+            hardware().display.printLine(Tdisplay::line1Y, "SAT:" + sensor.reading.saturation_ppt.to_string());
 
         // optical density - right
-        if (OD.error != TodError::none)
-            hardware().display.printLine(Tdisplay::line1Y, OD.error.to_string(), Tdisplay::offsetX);
-        else if (OD.zero.valid != enums::TnoYes::yes && OD.status == TodStatus::idle)
+        if (sensor.error != TodError::none)
+            hardware().display.printLine(Tdisplay::line1Y, sensor.error.to_string(), Tdisplay::offsetX);
+        else if (sensor.zero.valid != enums::TnoYes::yes && sensor.status == TodStatus::idle)
             hardware().display.printLine(Tdisplay::line1Y, "zero me", Tdisplay::offsetX);
-        else if (OD.zero.valid == enums::TnoYes::yes && OD.status == TodStatus::idle)
-            hardware().display.printLine(Tdisplay::line1Y, "read in 5s", Tdisplay::offsetX); // FIXE: print proper countdown to next read
+        else if (sensor.zero.valid == enums::TnoYes::yes && sensor.status == TodStatus::idle)
+            hardware().display.printLine(Tdisplay::line1Y, dtypes::string("in ") + sensor.reading.nextRead.c_str(), Tdisplay::offsetX);
         else
-            hardware().display.printLine(Tdisplay::line1Y, OD.status.to_string(), Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line1Y, sensor.status.to_string(), Tdisplay::offsetX);
 
         // stirrer speed
         if (stirrer.status == TstirrerStatus::off)
@@ -105,7 +115,6 @@ private:
             hardware().display.printLine(Tdisplay::line2Y, "SP:" + stirrer.setpoint_rpm.to_string() + "rpm", Tdisplay::offsetX);
 
         // power
-        char buf[16];
         snprintf(buf, sizeof(buf), "PWR:%.1fV", environment.power_V.value());
         hardware().display.printLine(Tdisplay::line3Y, buf);
 
@@ -164,7 +173,7 @@ public:
 
     // sdds variables
     sdds_var(enums::TconStatus, device, sdds::opt::readonly);
-    sdds_var(TcomponentOpticalDensity, OD);
+    sdds_var(TcomponentOpticalDensity, sensor);
     sdds_var(TcomponentStirrer, stirrer);
     sdds_var(TcomponentLights, lights);
     sdds_var(TcomponentEnvironment, environment);
@@ -176,8 +185,8 @@ public:
         hardware();
 
         // set references for OD component to be able to pause the others
-        OD.setStirrer(&stirrer);
-        OD.setLights(&lights);
+        sensor.setStirrer(&stirrer);
+        sensor.setLights(&lights);
 
         // resume components' state on startup complete
         // by triggering the i2cValue events
@@ -195,7 +204,7 @@ public:
                     device = enums::TconStatus::connected;
                 if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
                 {
-                    OD.resumeState();
+                    sensor.resumeState();
                     stirrer.resumeState();
                     lights.resumeState();
                     environment.resumeState();
@@ -206,7 +215,7 @@ public:
                 if (device != enums::TconStatus::disconnected)
                     device = enums::TconStatus::disconnected;
 
-                OD.pauseState();
+                sensor.pauseState();
                 stirrer.pauseState();
                 lights.pauseState();
                 environment.pauseState();

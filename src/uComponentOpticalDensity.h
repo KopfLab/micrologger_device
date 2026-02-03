@@ -16,9 +16,9 @@ class TcomponentOpticalDensity : public TmenuHandle
 
 public:
     // enumerations
-    sdds_enum(___, zero, beamOn, beamOff, optimizeGain) Taction;
+    sdds_enum(___, zero, beamOn, beamOff, optimizeGain, reset) Taction;
     sdds_enum(idle, reading, optimizing, zeroing) Tstatus;
-    sdds_enum(none, saturated, failedGain, failedZero) Terror;
+    sdds_enum(none, saturated, failedGain, failedZero, failedRead) Terror;
 
 private:
     // keep track of publishing to detect when it switches from OFF to ON
@@ -30,12 +30,14 @@ private:
 
     // timers
     Ttimer FreadTimer;
+    Ttimer FinfoTimer;
     Ttimer FwaitTimer;
     Ttimer FwarmupTimer;
+    system_tick_t FnextRead = 0;
 
     // temporary values for gain adjustment
     bool FbeamWasOn = false;
-    dtypes::uint16 FnormalSignalReads;
+    dtypes::uint16 FnormalSignalReads = 0;
     dtypes::uint16 FlastSignal = 0;
     dtypes::uint16 FtargetSignal = 0;
     dtypes::uint16 FsignalDifference = 0;
@@ -64,6 +66,7 @@ private:
         READ_WAIT,
         READ_WARMUP,
         READ_SIGNAL,
+        READ_COOLDOWN,
         READ_DARK,
         ZERO_WAIT_FOR_GAIN
     } Freading;
@@ -86,6 +89,147 @@ private:
         {
             // FIXME: this needs to be implemented, has some similarities to the optimizing flow
             // FIXME: reading should be activated on read_ms schedule if the status is idle and zero.valid is yes
+            bool Ferror = beam.status == Tbeam::Tstatus::error || (status == Tstatus::reading && zero.valid == enums::TnoYes::no);
+            switch (Freading)
+            {
+            case TreadingStages::READ_START:
+                if (Ferror)
+                    break;
+                // zeroing invalidates the last zero
+                if (status == Tstatus::zeroing && zero.valid != enums::TnoYes::no)
+                    zero.valid = enums::TnoYes::no;
+
+                // reading.vortex if it's supposed to reading.vortex
+                if (Fstirrer && reading.vortex == enums::TnoYes::yes)
+                {
+                    (*Fstirrer).action = TcomponentStirrer::Taction::vortex;
+                    Freading = TreadingStages::READ_VORTEX;
+                    break;
+                }
+            case TreadingStages::READ_VORTEX:
+                // still waiting on this stage to get completed?
+                if (Ferror || (Freading != TreadingStages::READ_START && !_stageDone))
+                    break;
+
+                // turn stirrer off if it's supposed to go off and isn't currently
+                if (Fstirrer && reading.stopStirrer == enums::TnoYes::yes && (*Fstirrer).status != TcomponentStirrer::Tstatus::off)
+                {
+                    (*Fstirrer).action = TcomponentStirrer::Taction::pause;
+                    Freading = TreadingStages::READ_STIR_STOP;
+                    break;
+                }
+            case TreadingStages::READ_STIR_STOP:
+                // still waiting on this stage to get completed?
+                if (Ferror || (Freading != TreadingStages::READ_START && !_stageDone))
+                    break;
+
+                // wait to let the liquid settle after stirring/reading.vortexing
+                if (Fstirrer && (reading.vortex == enums::TnoYes::yes || reading.stopStirrer == enums::TnoYes::yes))
+                {
+                    Freading = TreadingStages::READ_WAIT;
+                    FwaitTimer.start(reading.wait_ms);
+                    break;
+                }
+            case TreadingStages::READ_WAIT:
+                // still waiting on this stage to get completed?
+                if (Ferror || (Freading != TreadingStages::READ_START && !_stageDone))
+                    break;
+
+                // pause lights
+                (*Flights).action = TcomponentLights::Taction::pause;
+
+                // turn beam on if not already on and wait for warmup period
+                hardware().setBeam(enums::ToffOn::on);
+                Freading = TreadingStages::READ_WARMUP;
+                FwarmupTimer.start(reading.warmup_ms);
+                break;
+            case TreadingStages::READ_WARMUP:
+                // still waiting on this stage to get completed?
+                if (Ferror || (Freading != TreadingStages::READ_START && !_stageDone))
+                    break;
+
+                // record signal
+                Freading = TreadingStages::READ_SIGNAL;
+                hardware().recordSignal(enums::ToffOn::on);
+                break;
+            case TreadingStages::READ_SIGNAL: // first read signal stage
+                if (Ferror)
+                    break;
+                // save as zeroing value?
+                if (status == Tstatus::zeroing)
+                    zero.signal = hardware().signal.value.value();
+                else
+                    reading.signal = hardware().signal.value.value();
+
+                // saturated?
+                if (hardware().signal.error == Thardware::TsignalError::saturated && error == Terror::none)
+                    error = Terror::saturated;
+                else if (hardware().signal.error == Thardware::TsignalError::none && error == Terror::saturated)
+                    error = Terror::none;
+
+                hardware().setBeam(enums::ToffOn::off); // beam back off
+                Freading = TreadingStages::READ_COOLDOWN;
+                FwarmupTimer.start(reading.warmup_ms);
+                break;
+            case TreadingStages::READ_COOLDOWN:
+                // still waiting on this stage to get completed?
+                if (Ferror || (Freading != TreadingStages::READ_START && !_stageDone))
+                    break;
+                // record dark
+                Freading = TreadingStages::READ_DARK;
+                hardware().recordSignal(enums::ToffOn::on);
+                break;
+            case TreadingStages::READ_DARK: // second read signal stage
+                if (Ferror)
+                    break;
+                if (status == Tstatus::zeroing)
+                {
+                    // finish zero
+                    zero.bgrd = hardware().signal.value.value();
+                    if (zero.bgrd.value() > zero.signal.value())
+                    {
+                        // bgrd is larger than signal! something is wrong
+                        Ferror = true;
+                        break;
+                    }
+                    reading.bgrd = zero.bgrd;
+                    reading.signal = zero.signal;
+                    zero.last = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL);
+                    zero.valid = enums::TnoYes::yes;
+                }
+                else
+                {
+                    // finish read
+                    reading.bgrd = hardware().signal.value.value();
+                    if (reading.bgrd > reading.signal)
+                        reading.signal = reading.bgrd; // = 0 transmittance
+                }
+                // finish calculations and return to idle
+                if (reading.signal == reading.bgrd)
+                {
+                    reading.transmittance = 0.0;  // no signal left
+                    reading.OD = Tfloat32::nan(); // not a number
+                }
+                else
+                {
+                    reading.transmittance = static_cast<dtypes::float32>((reading.signal.value() - reading.bgrd.value())) / (zero.signal.value() - zero.bgrd.value());
+                    reading.OD = -log10(reading.transmittance.value());
+                }
+                if (error != Terror::none && error != Terror::saturated)
+                    error = Terror::none;
+                status = Tstatus::idle;
+                break;
+            }
+
+            // act if there were errors
+            if (Ferror)
+            {
+                if (status == Tstatus::zeroing && error != Terror::failedZero)
+                    error = Terror::failedZero;
+                else if (status == Tstatus::reading && error != Terror::failedRead)
+                    error = Terror::failedRead;
+                status = Tstatus::idle;
+            }
         }
         else if (status == Tstatus::optimizing)
         {
@@ -98,8 +242,14 @@ private:
             switch (FgainAdjustment)
             {
             case TgainAdjustmentStages::GAIN_START:
-                // vortex if it's supposed to vortex
-                if (Fstirrer && vortex == enums::TnoYes::yes)
+                if (Ferror)
+                    break;
+                // gain adjustment invalidates the last zero
+                if (zero.valid != enums::TnoYes::no)
+                    zero.valid = enums::TnoYes::no;
+
+                // reading.vortex if it's supposed to reading.vortex
+                if (Fstirrer && reading.vortex == enums::TnoYes::yes)
                 {
                     (*Fstirrer).action = TcomponentStirrer::Taction::vortex;
                     FgainAdjustment = TgainAdjustmentStages::GAIN_VORTEX;
@@ -107,11 +257,11 @@ private:
                 }
             case TgainAdjustmentStages::GAIN_VORTEX:
                 // still waiting on this stage to get completed?
-                if (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone)
+                if (Ferror || (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone))
                     break;
 
-                // turn stirrer off if it's supposed to go off
-                if (Fstirrer && stopStirrer == enums::TnoYes::yes)
+                // turn stirrer off if it's supposed to go off and isn't currently
+                if (Fstirrer && reading.stopStirrer == enums::TnoYes::yes && (*Fstirrer).status != TcomponentStirrer::Tstatus::off)
                 {
                     (*Fstirrer).action = TcomponentStirrer::Taction::pause;
                     FgainAdjustment = TgainAdjustmentStages::GAIN_STIR_STOP;
@@ -119,19 +269,19 @@ private:
                 }
             case TgainAdjustmentStages::GAIN_STIR_STOP:
                 // still waiting on this stage to get completed?
-                if (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone)
+                if (Ferror || (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone))
                     break;
 
-                // wait to let the liquid settle after stirring/vortexing
-                if (Fstirrer && (vortex == enums::TnoYes::yes || stopStirrer == enums::TnoYes::yes))
+                // wait to let the liquid settle after stirring/reading.vortexing
+                if (Fstirrer && (reading.vortex == enums::TnoYes::yes || reading.stopStirrer == enums::TnoYes::yes))
                 {
                     FgainAdjustment = TgainAdjustmentStages::GAIN_WAIT;
-                    FwaitTimer.start(wait_ms);
+                    FwaitTimer.start(reading.wait_ms);
                     break;
                 }
             case TgainAdjustmentStages::GAIN_WAIT:
                 // still waiting on this stage to get completed?
-                if (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone)
+                if (Ferror || (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone))
                     break;
 
                 // set target for gain adjumsnet
@@ -149,21 +299,23 @@ private:
                 {
                     hardware().setBeam(enums::ToffOn::on);
                     FgainAdjustment = TgainAdjustmentStages::GAIN_WARMUP;
-                    FwarmupTimer.start(warmup_ms);
+                    FwarmupTimer.start(reading.warmup_ms);
                     break;
                 }
             case TgainAdjustmentStages::GAIN_WARMUP:
                 // still waiting on this stage to get completed?
-                if (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone)
+                if (Ferror || (FgainAdjustment != TgainAdjustmentStages::GAIN_START && !_stageDone))
                     break;
 
                 // reduce number of reads for quick gain adjustment
                 FnormalSignalReads = hardware().signal.reads;
                 hardware().signal.reads = 10;
-                hardware().signal.reset();
+                hardware().recordSignal(enums::ToffOn::on);
                 FgainAdjustment = TgainAdjustmentStages::READ_NO_GAIN;
                 break;
             case TgainAdjustmentStages::READ_NO_GAIN: // first read signal stage
+                if (Ferror)
+                    break;
                 FlastSignal = hardware().signal.value.value();
                 // is the zero signal higher than the target? --> no way we can adjust to reach the garget
                 if (FlastSignal > FtargetSignal)
@@ -173,9 +325,14 @@ private:
                 FgainAdjustment = TgainAdjustmentStages::READ_INITIAL_GAIN;
                 break;
             case TgainAdjustmentStages::READ_INITIAL_GAIN: // second read signal stage
+                if (Ferror)
+                    break;
                 // was there signal increase with the higher gain? if not --> error
                 if (FlastSignal > hardware().signal.value.value())
+                {
                     Ferror = true;
+                    break;
+                }
                 // calculate slope (gain / step)
                 slope = static_cast<dtypes::float64>(hardware().signal.value.value() - FlastSignal) / FinitialGainSteps;
                 // cadjust gain to reach target approximately
@@ -187,6 +344,8 @@ private:
                 hardware().setGainSteps(newGain);
                 break;
             case TgainAdjustmentStages::FINE_ADJUSTMENT: // last read signal stage
+                if (Ferror)
+                    break;
                 dtypes::uint16 newDiff = abs(FtargetSignal - hardware().signal.value.value());
                 if (newDiff > FsignalDifference)
                 {
@@ -225,36 +384,46 @@ private:
             // act if there were errors
             if (Ferror)
             {
-                error = Terror::failedGain;
+                if (error != Terror::failedGain)
+                    error = Terror::failedGain;
                 status = Tstatus::idle;
                 hardware().signal.reads = FnormalSignalReads;
             }
-            hardware().signal.reset();
+            hardware().resetSignal();
         }
     }
 
 public:
     // sdds variables
-    sdds_var(Taction, action);                          // what to do
-    sdds_var(Tuint16, signal_ppt, sdds::opt::readonly); // signal in parts per thousand
-    sdds_var(Terror, error, sdds::opt::readonly);       // errors
+    sdds_var(Taction, action);                      // what to do
+    sdds_var(Tstatus, status, sdds::opt::readonly); // what's happening
 
-    // FIXME: these are all the additional setings
-    sdds_var(Tstatus, status, sdds::opt::readonly);
-    sdds_var(Tuint16, read_S, sdds::opt::saveval, 200);                           // how often to read
-    sdds_var(enums::TnoYes, vortex, sdds::opt::saveval, enums::TnoYes::no);       // vortex before reading?
-    sdds_var(enums::TnoYes, stopStirrer, sdds::opt::saveval, enums::TnoYes::yes); // stop stirrer before read?
-    sdds_var(Tuint16, wait_ms, sdds::opt::saveval, 1000);                         // how long to wait after vortex/stirrer stop
-    sdds_var(Tuint16, warmup_ms, sdds::opt::saveval, 200);                        // beam warmup (how long to wait whenever the beam is turned on)
-    // FIXME: are these in the right place?
+    // sdds variable for latest values
+    class Treading : public TmenuHandle
+    {
+    public:
+        sdds_var(Tuint16, saturation_ppt, sdds::opt::readonly);                       // current signal saturation in parts per thousand
+        sdds_var(Tuint16, read_sec, sdds::opt::saveval, 60);                          // how often to read
+        sdds_var(enums::TnoYes, vortex, sdds::opt::saveval, enums::TnoYes::no);       // reading.vortex before reading?
+        sdds_var(enums::TnoYes, stopStirrer, sdds::opt::saveval, enums::TnoYes::yes); // stop stirrer before read?
+        sdds_var(Tuint16, wait_ms, sdds::opt::saveval, 1000);                         // how long to wait after reading.vortex/stirrer stop
+        sdds_var(Tuint16, warmup_ms, sdds::opt::saveval, 200);                        // beam warmup (how long to wait whenever the beam is turned on)
+        sdds_var(Tstring, nextRead, sdds::opt::readonly);
+        sdds_var(Tuint16, signal, sdds::opt::readonly, 0);
+        sdds_var(Tuint16, bgrd, sdds::opt::readonly, 0);
+        sdds_var(Tfloat32, transmittance, sdds::opt::readonly, 0);
+        sdds_var(Tfloat32, OD, sdds::opt::readonly, 0);
+    };
+    sdds_var(Treading, reading);
 
+    // sdds variable for zeroing
     class Tzero : public TmenuHandle
     {
     public:
         sdds_var(Tstring, last, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), "never");
         sdds_var(enums::TnoYes, valid, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), enums::TnoYes::no);
-        sdds_var(Tuint16, dark, sdds::opt::readonly, 0);
-        sdds_var(Tuint16, value, sdds::opt::readonly, 0);
+        sdds_var(Tuint16, signal, sdds::opt::readonly, 0);
+        sdds_var(Tuint16, bgrd, sdds::opt::readonly, 0);
     };
     sdds_var(Tzero, zero);
 
@@ -281,6 +450,8 @@ public:
         sdds_var(Thardware::Ti2cError, error, sdds::opt::readonly);
     };
     sdds_var(Tgain, gain);
+    // errors
+    sdds_var(Terror, error, sdds::opt::readonly);
 
     // constructor
     TcomponentOpticalDensity()
@@ -353,18 +524,9 @@ public:
         on(hardware().signal.value)
         {
             // update ppt value
-            signal_ppt = signalToPpt(hardware().signal.value.value());
+            reading.saturation_ppt = signalToPpt(hardware().signal.value.value());
             // process the signal
             process();
-        };
-
-        // update error if signal is saturated (only set update if the specific one is set since OpticalDensity also adds errors for zero and gain)
-        on(hardware().signal.error)
-        {
-            if (hardware().signal.error == Thardware::TsignalError::saturated && error == Terror::none)
-                error = Terror::saturated;
-            else if (hardware().signal.error == Thardware::TsignalError::none && error == Terror::saturated)
-                error = Terror::none;
         };
 
         // update beam status from hardware
@@ -387,6 +549,18 @@ public:
             hardware().beamValue.signalEvents();
         };
 
+        // update error if we don't have OD (if we have OD, i.e. are zeroed, this gets incorporated during reads)
+        on(hardware().signal.error)
+        {
+            if (zero.valid != enums::TnoYes::yes)
+            {
+                if (hardware().signal.error == Thardware::TsignalError::saturated && error == Terror::none)
+                    error = Terror::saturated;
+                else if (hardware().signal.error == Thardware::TsignalError::none && error == Terror::saturated)
+                    error = Terror::none;
+            }
+        };
+
         // actions
         on(action)
         {
@@ -399,7 +573,13 @@ public:
             error = Terror::none;
 
             // process actions
-            if (action == Taction::beamOn)
+            if (action == Taction::reset)
+            {
+                // reset the zeroing information
+                status = Tstatus::idle;
+                zero.valid = enums::TnoYes::no;
+            }
+            else if (action == Taction::beamOn)
             {
                 hardware().setBeam(enums::ToffOn::on);
             }
@@ -432,6 +612,27 @@ public:
             action = Taction::___;
         };
 
+        on(zero.valid)
+        {
+            // valid?
+            if (zero.valid == enums::TnoYes::yes)
+            {
+                // stop continuous recording
+                hardware().recordSignal(enums::ToffOn::off);
+                FnextRead = millis() + reading.read_sec.value() * 1000;
+                FreadTimer.start(reading.read_sec.value() * 1000);
+                FinfoTimer.start(0);
+            }
+            else if (zero.valid == enums::TnoYes::no)
+            {
+                // continueous signal reads if not zeroed yet
+                hardware().recordSignal(enums::ToffOn::on);
+                if (FreadTimer.running())
+                    FreadTimer.stop();
+                reading.nextRead = ""; // no next read
+            }
+        };
+
         on(status)
         {
             // are we switching back to idle?
@@ -456,6 +657,48 @@ public:
             // warump period is done
             process(true);
         };
+
+        on(FreadTimer)
+        {
+            if (zero.valid == enums::TnoYes::yes)
+            {
+                status = Tstatus::reading;
+                Freading = TreadingStages::READ_START;
+                FnextRead = millis() + reading.read_sec.value() * 1000;
+                FreadTimer.start(reading.read_sec.value() * 1000);
+            }
+        };
+
+        on(reading.read_sec)
+        {
+            if (FreadTimer.running())
+            {
+                FreadTimer.stop();
+                FnextRead = millis() + reading.read_sec.value() * 1000;
+                FreadTimer.start(reading.read_sec.value() * 1000);
+            }
+        };
+
+        on(FinfoTimer)
+        {
+            if (FnextRead > millis())
+            {
+                char buf[16]; // snprintf buffer
+                dtypes::uint32 diff = static_cast<dtypes::uint32>(round((FnextRead - millis()) / 1000.));
+                if (diff > 59)
+                    snprintf(buf, sizeof(buf), "%dm%ds", diff / 60, diff % 60);
+                else
+                    snprintf(buf, sizeof(buf), "%ds", diff);
+                reading.nextRead = buf;
+            }
+            else
+            {
+                reading.nextRead = "now";
+            }
+
+            if (zero.valid == enums::TnoYes::yes)
+                FinfoTimer.start(1000); // restart
+        };
     }
 
     // set pointer to stirrer component to control stirring
@@ -466,15 +709,15 @@ public:
         // register events
         on((*Fstirrer).event)
         {
-            // check if vortexing is done
-            if (FgainAdjustment == TgainAdjustmentStages::GAIN_VORTEX && (*Fstirrer).event == TcomponentStirrer::Tevent::none)
+            // check if reading.vortexing is done
+            if ((FgainAdjustment == TgainAdjustmentStages::GAIN_VORTEX || Freading == TreadingStages::READ_VORTEX) && (*Fstirrer).event == TcomponentStirrer::Tevent::none)
                 process(true);
         };
 
         on((*Fstirrer).status)
         {
             // check if stopping is done
-            if (FgainAdjustment == TgainAdjustmentStages::GAIN_STIR_STOP && (*Fstirrer).status == TcomponentStirrer::Tstatus::off)
+            if ((FgainAdjustment == TgainAdjustmentStages::GAIN_STIR_STOP || Freading == TreadingStages::READ_STIR_STOP) && (*Fstirrer).status == TcomponentStirrer::Tstatus::off)
                 process(true);
         };
     }
@@ -485,16 +728,21 @@ public:
         Flights = _lights;
     }
 
+    // pause state if disconnected
+    void pauseState()
+    {
+    }
+
     // resume the saved state
     void resumeState()
     {
         // beam off
         hardware().setBeam(enums::ToffOn::off);
 
-        // signal reset
-        hardware().signal.reset();
-
         // gain reset
         hardware().setGain(gain.gain_Ohm.value());
+
+        // signal reset
+        zero.valid.signalEvents();
     }
 };
