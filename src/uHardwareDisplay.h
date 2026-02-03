@@ -61,7 +61,7 @@ private:
     virtual void splash() override
     {
         printBitmap(height() / 2, splash1_data, splash1_width, splash1_height, align::CENTER, valign::CENTER);
-        printLine(line5Y, "version " + String(Fversion), align::CENTER);
+        printLine(line5Y, "version " + String(Fversion / 100) + "." + String(Fversion % 100), align::CENTER);
     }
 
 public:
