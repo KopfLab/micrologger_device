@@ -1,5 +1,5 @@
-﻿Designator,Quantity,Value,Footprint,Package,MPN,DNP,Mount_Type,Description,DigiKey,DigiKeyURL
-J1,1,CONN HEADER R/A 2POS 1.5MM,JST_ZH_2POS_RA,,S2B-ZR,,tht,"Connector Header Through Hole, Right Angle 2 position 0.059"" (1.50mm)",455-1669-ND,https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576
-LED1,1,630nm 1.9V 50mA,TO-46-2,,MTE7063NK2-UR,,tht,Visible Emitter 630nm 1.9V 50mA 5° TO-46-2 Lens Top Metal Can,1125-1382-ND,https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919
-R1,1,47Ω,R_1206,,,,smt,"Resistor, US symbol",,
-U1,1,1.4-40V PWM Dimmer 100mA,SOT-23-6,,BCR401UW6Q-7,,tht,LED Driver IC 1 Output Linear PWM Dimming 100mA SOT-26,BCR401UW6Q-7DICT-ND,https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843
+﻿Designator,Quantity,Value,Footprint,Package,MPN,DNP,Mount_Type,Description,DigiKey,DigiKeyURL,Sim.Pins,URL,JLCPCB,JLCPCBURL
+J1,1,CONN HEADER R/A 2POS 1.5MM,JST_ZH_2POS_RA,,S2B-ZR,,tht,"Connector Header Through Hole, Right Angle 2 position 0.059"" (1.50mm)",455-1669-ND,https://www.digikey.com/en/products/detail/jst-sales-america-inc/S2B-ZR/926576,,,,
+LED1,1,630nm 1.9V 50mA,TO-46-2,,MTE7063NK2-UR,,tht,Visible Emitter 630nm 1.9V 50mA 5° TO-46-2 Lens Top Metal Can,1125-1382-ND,https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919,1=K 2=A,https://www.digikey.com/en/products/detail/marktech-optoelectronics/MTE7063NK2-UR/6817919,,
+R1,1,47Ω,R_1206,,,,smt,"Resistor, US symbol",,,,,C3008836,https://jlcpcb.com/partdetail/VishayIntertech-CRCW120647R0FKEAHP/C3008836
+U1,1,1.4-40V PWM Dimmer 100mA,SOT-23-6,,BCR401UW6Q-7,,tht,LED Driver IC 1 Output Linear PWM Dimming 100mA SOT-26,BCR401UW6Q-7DICT-ND,https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843,,https://www.digikey.com/en/products/detail/diodes-incorporated/BCR401UW6Q-7/7352843,C2678813,https://jlcpcb.com/partdetail/DiodesIncorporated-BCR401UW6Q7/C2678813
