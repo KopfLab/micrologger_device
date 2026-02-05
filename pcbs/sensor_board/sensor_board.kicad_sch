@@ -7020,16 +7020,6 @@
 	)
 	(wire
 		(pts
-			(xy 255.27 181.61) (xy 264.16 181.61)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "558c4ed3-0235-4f9b-ad68-871516387f23")
-	)
-	(wire
-		(pts
 			(xy 184.15 201.93) (xy 186.69 201.93)
 		)
 		(stroke
@@ -7681,7 +7671,7 @@
 	)
 	(wire
 		(pts
-			(xy 240.03 181.61) (xy 245.11 181.61)
+			(xy 240.03 181.61) (xy 256.54 181.61)
 		)
 		(stroke
 			(width 0)
@@ -9179,7 +9169,7 @@
 		)
 		(uuid "3d7a5ac2-1a42-40cb-9fa5-ce8f00fbff7f")
 	)
-	(label "OUTPUT"
+	(label "SIGNAL"
 		(at 76.2 114.3 0)
 		(effects
 			(font
@@ -9290,7 +9280,7 @@
 		(uuid "80a2b861-fc24-47be-9a80-c4efc75d9bf0")
 	)
 	(label "SIGNAL"
-		(at 264.16 181.61 180)
+		(at 256.54 181.61 180)
 		(effects
 			(font
 				(size 1.2446 1.2446)
@@ -9388,16 +9378,6 @@
 			(justify right bottom)
 		)
 		(uuid "b2070a2a-7362-434a-993d-7123d0d49cde")
-	)
-	(label "OUTPUT"
-		(at 240.03 167.64 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "b97cdb6f-2b6c-446e-9a47-a1679e5a141e")
 	)
 	(label "SDA"
 		(at 33.02 198.12 0)
@@ -12363,75 +12343,6 @@
 			(project ""
 				(path "/2e363057-5f2b-4813-9b6e-20c9934d11ef"
 					(reference "R6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "symbols:R_US_0603")
-		(at 250.19 181.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "5616b5bf-cdaa-4171-9f2c-ab8c9e162bcf")
-		(property "Reference" "R17"
-			(at 250.19 184.15 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-					(thickness 0.3)
-					(bold yes)
-				)
-			)
-		)
-		(property "Value" "150Ω"
-			(at 250.19 179.07 0)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
-			)
-		)
-		(property "Footprint" "footprints:R_0603"
-			(at 251.206 181.864 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 250.19 181.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor, US symbol"
-			(at 250.19 181.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "347a19f4-1cec-417c-ba10-eb5b2b1894d3")
-		)
-		(pin "2"
-			(uuid "f64071c8-42a1-468a-a218-b9f45c185c47")
-		)
-		(instances
-			(project "sensor_board"
-				(path "/2e363057-5f2b-4813-9b6e-20c9934d11ef"
-					(reference "R17")
 					(unit 1)
 				)
 			)

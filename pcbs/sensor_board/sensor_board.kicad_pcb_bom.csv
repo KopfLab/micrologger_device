@@ -1,5 +1,5 @@
 ﻿Designator,Quantity,Value,Footprint,Package,MPN,DNP,Mount_Type,Description,JLCPCB,JLCPCBURL,DigiKey,DigiKeyURL
-C1,1,47pF,C_0603,,,,smt,Unpolarized capacitor,C1671,https://jlcpcb.com/partdetail/2023-CL10C470JB8NNNC/C1671,,
+C1,1,100pF,C_0603,,,,smt,Unpolarized capacitor,C14858,https://jlcpcb.com/partdetail/15530-CL10C101JB8NNNC/C14858,,
 "C2, C3, C4",3,100nF,C_0603,,,,smt,Unpolarized capacitor,C1591,https://jlcpcb.com/partdetail/1943-CL10B104KB8NNNC/C1591,,
 D1,1,Red 631nm 2.0V,LED_1206,,LTST-C150KRKT,,smt,Red 631nm LED Indication - Discrete 2V 1206 (3216 Metric),C125086,https://jlcpcb.com/partdetail/LiteOn-LTSTC150KRKT/C125086,160-1405-1-ND,https://www.digikey.com/en/products/detail/liteon/LTST-C150KRKT/386761
 D2,1,Yellow 571nm 2.0V,LED_1206,,LTST-C150KGKT,,smt,Green 571nm LED Indication - Discrete 2V 1206 (3216 Metric),C125085,https://jlcpcb.com/partdetail/LiteOn-LTSTC150KGKT/C125085,160-1404-1-ND,https://www.digikey.com/en/products/detail/liteon/LTST-C150KGKT/365085
