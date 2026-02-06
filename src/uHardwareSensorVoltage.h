@@ -31,10 +31,10 @@ private:
 public:
     // sdds vars
     sdds_var(enums::ToffOn, state);
-    sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 200); // how many ms between reads
-    sdds_var(Tuint16, reads, sdds::opt::saveval, 5);         // how many reads to average across
-    sdds_var(Tfloat32, value, sdds::opt::readonly);          // read signal
-    sdds_var(Tfloat32, sdev, sdds::opt::readonly);           // stdev
+    sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 200);         // how many ms between reads
+    sdds_var(Tuint16, reads, sdds::opt::saveval, 5);                 // how many reads to average across
+    sdds_var(Tfloat32, value, sdds::opt::readonly, Tfloat32::nan()); // read signal
+    sdds_var(Tfloat32, sdev, sdds::opt::readonly, Tfloat32::nan());  // stdev
 
     // constructor
     ThardwareSensorVoltage()

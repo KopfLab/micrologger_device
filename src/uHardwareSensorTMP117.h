@@ -75,7 +75,7 @@ private:
 
 public:
     // sdds vars
-    sdds_var(Tfloat32, temperature_C, sdds::opt::readonly);
+    sdds_var(Tfloat32, temperature_C, sdds::opt::readonly, Tfloat32::nan());
 
     // constructor
     ThardwareSensorTMP117()

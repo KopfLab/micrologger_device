@@ -32,8 +32,8 @@ public:
     sdds_var(Tuint16, interval_ms, sdds::opt::saveval, 10);                                                    // how many ms between reads
     sdds_var(Tuint16, reads, sdds::opt::saveval, 50);                                                          // how many reads to average across
     sdds_var(Tuint16, maxValue, sdds::opt::saveval, static_cast<dtypes::uint16>(round(0.95 * adcResolution))); // what is considered the maximum value before it's considered saturated? (0.95 % of the adc resolution)
-    sdds_var(Tuint16, value, sdds::opt::readonly);                                                             // read signal
-    sdds_var(Tuint16, sdev, sdds::opt::readonly);                                                              // stdev
+    sdds_var(Tuint16, value, sdds::opt::readonly, Tfloat32::nan());                                            // read signal
+    sdds_var(Tuint16, sdev, sdds::opt::readonly, Tfloat32::nan());                                             // stdev
     sdds_var(Terror, error, sdds::opt::readonly);                                                              // signal error
 
     // constructor
