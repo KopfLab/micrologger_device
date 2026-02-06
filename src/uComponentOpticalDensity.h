@@ -87,8 +87,7 @@ private:
 
         if (status == Tstatus::reading || status == Tstatus::zeroing)
         {
-            // FIXME: this needs to be implemented, has some similarities to the optimizing flow
-            // FIXME: reading should be activated on read_ms schedule if the status is idle and zero.valid is yes
+            // read signal sequence (light and dark)
             bool Ferror = beam.status == Tbeam::Tstatus::error || (status == Tstatus::reading && zero.valid == enums::TnoYes::no);
             switch (Freading)
             {
@@ -177,7 +176,6 @@ private:
                     break;
                 // record dark
                 Freading = TreadingStages::READ_DARK;
-                hardware().recordSignal(enums::ToffOn::on);
                 break;
             case TreadingStages::READ_DARK: // second read signal stage
                 if (Ferror)
@@ -203,6 +201,7 @@ private:
                     reading.bgrd = hardware().signal.value.value();
                     if (reading.bgrd > reading.signal)
                         reading.signal = reading.bgrd; // = 0 transmittance
+                    hardware().recordSignal(enums::ToffOn::off);
                 }
                 // finish calculations and return to idle
                 if (reading.signal == reading.bgrd)
@@ -411,8 +410,8 @@ public:
         sdds_var(Tstring, nextRead, sdds::opt::readonly);
         sdds_var(Tuint16, signal, sdds::opt::readonly, 0);
         sdds_var(Tuint16, bgrd, sdds::opt::readonly, 0);
-        sdds_var(Tfloat32, transmittance, sdds::opt::readonly, 0);
-        sdds_var(Tfloat32, OD, sdds::opt::readonly, 0);
+        sdds_var(Tfloat32, transmittance, sdds::opt::readonly, Tfloat32::nan());
+        sdds_var(Tfloat32, OD, sdds::opt::readonly, Tfloat32::nan());
     };
     sdds_var(Treading, reading);
 
@@ -422,8 +421,8 @@ public:
     public:
         sdds_var(Tstring, last, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), "never");
         sdds_var(enums::TnoYes, valid, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), enums::TnoYes::no);
-        sdds_var(Tuint16, signal, sdds::opt::readonly, 0);
-        sdds_var(Tuint16, bgrd, sdds::opt::readonly, 0);
+        sdds_var(Tuint16, signal, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
+        sdds_var(Tuint16, bgrd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
     };
     sdds_var(Tzero, zero);
 
@@ -441,7 +440,7 @@ public:
     class Tgain : public TmenuHandle
     {
     public:
-        sdds_var(enums::TnoYes, automatic, sdds::opt::saveval, enums::TnoYes::yes);
+        sdds_var(enums::TnoYes, automatic, sdds::opt::nothing, enums::TnoYes::yes); // not saved, always need to unlock to do manual changes
         sdds_var(Tuint16, max_ppt, sdds::opt::readonly);
         sdds_var(Tuint16, target_ppt, sdds::opt::saveval, 920);
         sdds_var(Tuint32, gain_Ohm, sdds::opt::saveval);
@@ -472,37 +471,17 @@ public:
         };
         hardware().signal.maxValue.signalEvents();
 
-        // manual gain adjustments
-        on(gain.gain_Ohm)
-        {
-            if (gain.automatic == enums::TnoYes::no)
-            {
-                // automatic gain is off --> set gain if it is not already this value
-                if (gain.gain_Ohm != hardware().gain.total_Ohm)
-                    hardware().setGain(gain.gain_Ohm.value());
-            }
-            else
-            {
-                // automatic gain --> jump back to original value
-                // gain will be automatically adjusted when the zero action is executed
-                hardware().gain.total_Ohm.signalEvents();
-            }
-        };
-
         // update gain status from hardware
         on(hardware().gain.total_Ohm)
         {
-            // don't update if we're in the middle of optimizing gain
-            if (status == Tstatus::optimizing)
+            // don't update if we're in the middle of optimizing gain or not yet full initialized
+            if (status == Tstatus::optimizing || particleSystem().startup != TparticleSystem::TstartupStatus::complete)
                 return;
 
             // update gain with actual hardware gain
             if (gain.gain_Ohm != hardware().gain.total_Ohm)
             {
                 gain.gain_Ohm = hardware().gain.total_Ohm;
-                // any changes in gain invalidate the last zeroing
-                if (zero.valid != enums::TnoYes::no)
-                    zero.valid = enums::TnoYes::no;
             }
             // update gain status
             if (hardware().gain.error != Thardware::Ti2cError::none && gain.status != Tgain::Tstatus::error)
@@ -593,6 +572,7 @@ public:
                 status = Tstatus::optimizing;
                 FgainAdjustment = TgainAdjustmentStages::GAIN_START;
                 Freading = TreadingStages::READ_IDLE;
+                process();
             }
             else if (action == Taction::zero && gain.automatic == enums::TnoYes::yes)
             {
@@ -600,12 +580,14 @@ public:
                 status = Tstatus::optimizing;
                 FgainAdjustment = TgainAdjustmentStages::GAIN_START;
                 Freading = TreadingStages::ZERO_WAIT_FOR_GAIN;
+                process();
             }
             else if (action == Taction::zero && gain.automatic == enums::TnoYes::no)
             {
                 // zero directly
                 status = Tstatus::zeroing;
                 Freading = TreadingStages::READ_START;
+                process();
             }
 
             // reset action
@@ -618,6 +600,7 @@ public:
             if (zero.valid == enums::TnoYes::yes)
             {
                 // stop continuous recording
+                Log.trace("turning record signal off");
                 hardware().recordSignal(enums::ToffOn::off);
                 FnextRead = millis() + reading.read_sec.value() * 1000;
                 FreadTimer.start(reading.read_sec.value() * 1000);
@@ -666,6 +649,7 @@ public:
                 Freading = TreadingStages::READ_START;
                 FnextRead = millis() + reading.read_sec.value() * 1000;
                 FreadTimer.start(reading.read_sec.value() * 1000);
+                process();
             }
         };
 
