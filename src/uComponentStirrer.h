@@ -182,7 +182,7 @@ public:
         sdds_var(Tuint16, deceleration, sdds::opt::saveval, 3000); // rpm/second
         sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::saveval, hardware().motor.maxSpeed_rpm);
         sdds_var(Tuint16, vortexSpeed_rpm, sdds::opt::saveval, 3000);
-        sdds_var(Tuint16, vortexTime_sec, sdds::opt::saveval, 5);
+        sdds_var(Tuint16, vortexTime_sec, sdds::opt::saveval, 2);
     };
     sdds_var(Tsettings, settings);
 

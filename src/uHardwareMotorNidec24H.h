@@ -1,6 +1,8 @@
 #pragma once
 
 #include "uTypedef.h"
+#include "uRunningStats.h"
+#include "stats.h"
 #include "enums.h"
 #include "Particle.h"
 
@@ -13,10 +15,10 @@ private:
     bool Finitalized = false;
 
     // speed
-    dtypes::TtickCount FspeedStart = 0L;      // when was the speed last set?
     dtypes::uint8 FspeedPin;                  // PWM output pin
     const dtypes::uint16 FspeedFreq = 25000L; // PWM frequency
     Ttimer FspeedCheckTimer;
+    Ttimer FspeedUpdateTimer;
 
     // decoder for speed measurement
     dtypes::uint8 FdecoderPin; // digital pin on decoder
@@ -29,6 +31,12 @@ private:
     {
         decoderISR.signal();
     };
+
+    // speed readings/stats
+    bool Fstabilized = false;
+    dtypes::float32 FcurrentMax = 0;
+    TrunningStats FspeedRunningStats;
+    TexactHistogram<0, 5000> Fhistogram;
 
     // step limits (will be refined based on the max and min RPM sdds variables later)
     dtypes::uint16 FminStep = 0;
@@ -97,7 +105,9 @@ private:
 
 public:
     sdds_var(Tuint16, minSpeed_rpm, sdds::opt::readonly, 50);
-    sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::readonly, 5000);
+    // note: frequent analog reads will delays interrupts - not entirely clear how accurate this reading is
+    // since some interrupts might be missed when doing an analog read
+    sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::readonly, 5000); // FIXME
     sdds_var(Tuint16, targetSpeed_rpm, sdds::opt::nothing, 0);
     sdds_var(Tuint16, measuredSpeed_rpm, sdds::opt::readonly, 0);
     sdds_var(Tuint16, targetSteps, sdds::opt::nothing, 0);
@@ -105,8 +115,8 @@ public:
     sdds_var(enums::ToffOn, autoAdjust, sdds::opt::nothing, enums::ToffOn::on);
     // speed tolerance: based on the calibration slopes of ~0.7 steps/rpm --> 1/0.7 = 1.4 rpm/step --> aim for targetSpeed +/- 2)
     sdds_var(Tuint8, autoAdjustSpeedTolerance_rpm, sdds::opt::nothing, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
-    sdds_var(Tuint16, speedCheckInterval_ms, sdds::opt::nothing, 1000);
-    sdds_var(Tuint32, speedCheckCounter, sdds::opt::nothing, 0);
+    sdds_var(Tuint16, speedCheckInterval_ms, sdds::opt::nothing, 50);
+    sdds_var(Tuint16, readInterval_ms, sdds::opt::nothing, 500);
     sdds_enum(none, noResponse) Terror;
     sdds_var(Terror, error, sdds::opt::readonly);
 
@@ -121,14 +131,29 @@ public:
         {
             if (Finitalized)
             {
+                if (steps > 4095)
+                {
+                    steps = 4095; // max value
+                    return;
+                }
+
                 if (steps == 0)
                 {
                     // we can't tell if there is an error if we're not running
                     error = Terror::none;
                 }
+                // write the voltage for speed
                 analogWrite(FspeedPin, steps.Fvalue, FspeedFreq);
-                FspeedStart = millis();
-                speedCheckCounter = 0;
+
+                // reset stats and stabilitizy
+                FspeedRunningStats.reset();
+                FcurrentMax = 0;
+                Fstabilized = false;
+
+                // start speed update timer
+                if (FspeedUpdateTimer.running())
+                    FspeedUpdateTimer.stop();
+                FspeedUpdateTimer.start(readInterval_ms);
             }
         };
 
@@ -199,43 +224,110 @@ public:
             FdecoderCounter++;
         };
 
-        // check speed timer
-        on(FspeedCheckTimer)
+        // check speed update
+        on(FspeedUpdateTimer)
         {
-            // decoder info: rpm = freq (in Hz) / 100 * 60 = counts / dt.ms * 1000 * 1/100 * 60 = count / dt.ms * 600.
-            float rpm = (600. * FdecoderCounter) / (millis() - FdecoderStart);
-            measuredSpeed_rpm = static_cast<dtypes::uint16>(round(rpm));
-            speedCheckCounter++;
-            // are we up and running? (i.e. already at the 2nd speed check and set to something larger than 0)
-            if (speedCheckCounter > 1 && targetSteps > 0)
+
+            // do we have enough count for good stats?
+            if (FspeedRunningStats.count() < 5)
             {
-                // are we having a connectivity issue?
-                if (FdecoderCounter < 10)
+                // not yet - restart timer
+                FspeedUpdateTimer.start(readInterval_ms);
+                return;
+            }
+
+            // are we stabilized yet?
+            if (!Fstabilized)
+            {
+                // not yet, use the mean for the current rpm
+                dtypes::uint16 rpm = static_cast<dtypes::uint16>(round(FcurrentMax));
+                if (measuredSpeed_rpm != rpm)
+                    measuredSpeed_rpm = rpm;
+
+                // check if we have a small enough relative standard deviation (<15%) to flag the signal as stabilized
+                if (FspeedRunningStats.stdDev() / FspeedRunningStats.mean() < 0.15)
                 {
-                    // even at 50pm, the FdecoderCounter should be counting at least 80 cts/sec by the 2nd speed check
-                    // (1st check can be slow to adjust)
-                    if (error != Terror::noResponse)
-                        // mark as motor not having a response
-                        error = Terror::noResponse;
+                    Fstabilized = true;
+                    Fhistogram.reset();
                 }
-                else
+            }
+            else
+            {
+                // stabilized already!
+                // use the histogram to estimate upper median from the histogram
+                TpercentileStats ps;
+                if (Fhistogram.percentileStats(ps, 0.8, 1.0))
                 {
-                    // all good, we're running for real
-                    if (error != Terror::none)
-                        // mark motor as not having an error
-                        error = Terror::none;
-                    // now that we're running, do we want to auto-adjust the steps to get closer to the targetSpeed?
-                    if (autoAdjust == enums::ToffOn::on &&
-                        abs(measuredSpeed_rpm - targetSpeed_rpm) > autoAdjustSpeedTolerance_rpm)
+                    dtypes::uint16 rpm = static_cast<dtypes::uint16>(round(ps.mean));
+                    if (measuredSpeed_rpm != rpm)
+                        measuredSpeed_rpm = rpm;
+
+                    // check if we're actually running
+                    if (targetSteps > 0)
                     {
-                        // finetune step adjustments
-                        dtypes::uint8 adjustment = static_cast<dtypes::uint8>(round(static_cast<dtypes::float32>(abs(measuredSpeed_rpm - targetSpeed_rpm)) * Fmavg));
-                        if (adjustment > 0)
-                            steps = steps + adjustment * ((measuredSpeed_rpm < targetSpeed_rpm) ? 1 : -1);
+                        // if it's really running should have at least be 20% of the min speed
+                        if (FspeedRunningStats.mean() < 0.2 * minSpeed_rpm.value())
+                        {
+                            // doesn't look like we're running --> mark as motor not having a response
+                            if (error != Terror::noResponse)
+                                error = Terror::noResponse;
+                        }
+                        else
+                        {
+                            // all good, we're running for real
+                            if (error != Terror::none)
+                                error = Terror::none;
+                            // now that we're running, do we want to auto-adjust the steps to get closer to the targetSpeed once we have some good stats (n=10)?
+                            if (autoAdjust == enums::ToffOn::on && ps.count >= 10 &&
+                                abs(measuredSpeed_rpm - targetSpeed_rpm) > (autoAdjustSpeedTolerance_rpm.value() + static_cast<dtypes::uint16>(ps.sem)))
+                            {
+                                // finetune step adjustments
+                                dtypes::uint8 adjustment = static_cast<dtypes::uint8>(round(static_cast<dtypes::float32>(abs(measuredSpeed_rpm - targetSpeed_rpm)) * Fmavg * 0.5));
+                                if (adjustment > 0)
+                                    steps = steps + adjustment * ((measuredSpeed_rpm < targetSpeed_rpm) ? 1 : -1);
+                            }
+                        }
                     }
                 }
             }
-            resetDecoder();
+
+            // reset stats if we have a high enough count
+            if (FspeedRunningStats.count() >= 5)
+            {
+                FspeedRunningStats.reset();
+                FcurrentMax = 0;
+            }
+
+            // restart timer
+            FspeedUpdateTimer.start(readInterval_ms);
+        };
+
+        // check speed timer
+        on(FspeedCheckTimer)
+        {
+            // how long was the check interval?
+            dtypes::uint32 diff_micros = micros() - FdecoderStart;
+            // make sure the time interval is within 1% of the intented window, otherwise it's likely that not all interrupts were caught correctly
+            if (diff_micros > speedCheckInterval_ms.value() * 990 && diff_micros < speedCheckInterval_ms.value() * 1110)
+            {
+                // decoder info: rpm = freq (in Hz) / 100 * 60 = counts / dt.micros * 1e6 * 1/100 * 60 = 600000. * count / dt.micros
+                dtypes::float32 speed = 600000.0 / diff_micros * FdecoderCounter;
+                FspeedRunningStats.add(speed);
+                if (speed > FcurrentMax)
+                    FcurrentMax = speed;
+                if (Fstabilized)
+                {
+                    // it's stabilized --> add to the histogram for future stats
+                    dtypes::uint16 rpm = static_cast<dtypes::uint16>(round(speed));
+                    Fhistogram.add(rpm);
+                }
+            }
+
+            // reset decoder
+            FdecoderStart = micros();
+            FdecoderCounter = 0;
+            FspeedCheckTimer.start(speedCheckInterval_ms);
+            return;
         };
     }
 
@@ -261,14 +353,6 @@ public:
         Finitalized = true;
 
         // start speed measurements
-        resetDecoder();
-    }
-
-    void resetDecoder()
-    {
-        // reset decoder
-        FdecoderStart = millis();
-        FdecoderCounter = 0;
-        FspeedCheckTimer.start(speedCheckInterval_ms);
+        FspeedCheckTimer.signal();
     }
 };
