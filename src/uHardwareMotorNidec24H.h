@@ -104,19 +104,17 @@ private:
     }
 
 public:
-    sdds_var(Tuint16, minSpeed_rpm, sdds::opt::readonly, 50);
-    // note: frequent analog reads will delays interrupts - not entirely clear how accurate this reading is
-    // since some interrupts might be missed when doing an analog read
-    sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::readonly, 5000); // FIXME
+    sdds_var(Tuint16, minSpeed_rpm, sdds::opt::saveval, 50);
+    sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::saveval, 5000);
     sdds_var(Tuint16, targetSpeed_rpm, sdds::opt::nothing, 0);
     sdds_var(Tuint16, measuredSpeed_rpm, sdds::opt::readonly, 0);
     sdds_var(Tuint16, targetSteps, sdds::opt::nothing, 0);
     sdds_var(Tuint16, steps, sdds::opt::readonly, 0);
-    sdds_var(enums::ToffOn, autoAdjust, sdds::opt::nothing, enums::ToffOn::on);
+    sdds_var(enums::ToffOn, autoAdjust, sdds::opt::saveval, enums::ToffOn::on);
     // speed tolerance: based on the calibration slopes of ~0.7 steps/rpm --> 1/0.7 = 1.4 rpm/step --> aim for targetSpeed +/- 2)
-    sdds_var(Tuint8, autoAdjustSpeedTolerance_rpm, sdds::opt::nothing, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
-    sdds_var(Tuint16, speedCheckInterval_ms, sdds::opt::nothing, 50);
-    sdds_var(Tuint16, readInterval_ms, sdds::opt::nothing, 500);
+    sdds_var(Tuint8, autoAdjustSpeedTolerance_rpm, sdds::opt::saveval, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
+    sdds_var(Tuint16, speedCheckInterval_ms, sdds::opt::saveval, 50);
+    sdds_var(Tuint16, readInterval_ms, sdds::opt::saveval, 500);
     sdds_enum(none, noResponse, notInitialized) Terror;
     sdds_var(Terror, error, sdds::opt::readonly);
 
