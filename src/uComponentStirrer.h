@@ -58,7 +58,7 @@ private:
             return;
         }
 
-        if ((FspeedNow < FspeedTarget && settings.acceleration == 0) || (FspeedNow > FspeedTarget && settings.deceleration == 0))
+        if ((FspeedNow < FspeedTarget && settings.acceleration_rpm_s == 0) || (FspeedNow > FspeedTarget && settings.deceleration_rpm_s == 0))
         {
             // no accelerationg/decellration setting, change speed immediately
             setMotorSpeed(FspeedTarget);
@@ -68,7 +68,7 @@ private:
         // change speed by the acceleration/deceleration amount
         if (FspeedNow < FspeedTarget)
         {
-            dtypes::uint16 change = static_cast<dtypes::uint16>(round(settings.acceleration * FspeedChangeInterval / 1000.));
+            dtypes::uint16 change = static_cast<dtypes::uint16>(round(settings.acceleration_rpm_s * FspeedChangeInterval / 1000.));
             if (FspeedNow + change > FspeedTarget)
             {
                 // reached target speed
@@ -80,7 +80,7 @@ private:
         }
         else if (FspeedNow > FspeedTarget)
         {
-            dtypes::uint16 change = static_cast<dtypes::uint16>(round(settings.deceleration * FspeedChangeInterval / 1000.));
+            dtypes::uint16 change = static_cast<dtypes::uint16>(round(settings.deceleration_rpm_s * FspeedChangeInterval / 1000.));
             if (FspeedNow < FspeedTarget + change)
             {
                 // reached target speed
@@ -180,8 +180,8 @@ public:
     class Tsettings : public TmenuHandle
     {
     public:
-        sdds_var(Tuint16, acceleration, sdds::opt::saveval, 500);  // rpm/second
-        sdds_var(Tuint16, deceleration, sdds::opt::saveval, 3000); // rpm/second
+        sdds_var(Tuint16, acceleration_rpm_s, sdds::opt::saveval, 500);  // rpm/second
+        sdds_var(Tuint16, deceleration_rpm_s, sdds::opt::saveval, 3000); // rpm/second
         sdds_var(Tuint16, maxSpeed_rpm, sdds::opt::saveval, hardware().motor.maxSpeed_rpm);
         sdds_var(Tuint16, vortexSpeed_rpm, sdds::opt::saveval, 3000);
         sdds_var(Tuint16, vortexTime_sec, sdds::opt::saveval, 2);
