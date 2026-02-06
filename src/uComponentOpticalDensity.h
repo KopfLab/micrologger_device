@@ -101,8 +101,8 @@ private:
                 // reading.vortex if it's supposed to reading.vortex
                 if (Fstirrer && reading.vortex == enums::TnoYes::yes)
                 {
-                    (*Fstirrer).action = TcomponentStirrer::Taction::vortex;
                     Freading = TreadingStages::READ_VORTEX;
+                    (*Fstirrer).action = TcomponentStirrer::Taction::vortex;
                     break;
                 }
             case TreadingStages::READ_VORTEX:
@@ -113,8 +113,8 @@ private:
                 // turn stirrer off if it's supposed to go off and isn't currently
                 if (Fstirrer && reading.stopStirrer == enums::TnoYes::yes && (*Fstirrer).status != TcomponentStirrer::Tstatus::off)
                 {
-                    (*Fstirrer).action = TcomponentStirrer::Taction::pause;
                     Freading = TreadingStages::READ_STIR_STOP;
+                    (*Fstirrer).action = TcomponentStirrer::Taction::pause;
                     break;
                 }
             case TreadingStages::READ_STIR_STOP:
@@ -250,8 +250,8 @@ private:
                 // reading.vortex if it's supposed to reading.vortex
                 if (Fstirrer && reading.vortex == enums::TnoYes::yes)
                 {
-                    (*Fstirrer).action = TcomponentStirrer::Taction::vortex;
                     FgainAdjustment = TgainAdjustmentStages::GAIN_VORTEX;
+                    (*Fstirrer).action = TcomponentStirrer::Taction::vortex;
                     break;
                 }
             case TgainAdjustmentStages::GAIN_VORTEX:
@@ -262,8 +262,8 @@ private:
                 // turn stirrer off if it's supposed to go off and isn't currently
                 if (Fstirrer && reading.stopStirrer == enums::TnoYes::yes && (*Fstirrer).status != TcomponentStirrer::Tstatus::off)
                 {
-                    (*Fstirrer).action = TcomponentStirrer::Taction::pause;
                     FgainAdjustment = TgainAdjustmentStages::GAIN_STIR_STOP;
+                    (*Fstirrer).action = TcomponentStirrer::Taction::pause;
                     break;
                 }
             case TgainAdjustmentStages::GAIN_STIR_STOP:
@@ -600,7 +600,6 @@ public:
             if (zero.valid == enums::TnoYes::yes)
             {
                 // stop continuous recording
-                Log.trace("turning record signal off");
                 hardware().recordSignal(enums::ToffOn::off);
                 FnextRead = millis() + reading.read_sec.value() * 1000;
                 FreadTimer.start(reading.read_sec.value() * 1000);

@@ -68,7 +68,7 @@ private:
         // change speed by the acceleration/deceleration amount
         if (FspeedNow < FspeedTarget)
         {
-            dtypes::uint16 change = settings.acceleration * FspeedChangeInterval / 1000;
+            dtypes::uint16 change = static_cast<dtypes::uint16>(round(settings.acceleration * FspeedChangeInterval / 1000.));
             if (FspeedNow + change > FspeedTarget)
             {
                 // reached target speed
@@ -80,7 +80,7 @@ private:
         }
         else if (FspeedNow > FspeedTarget)
         {
-            dtypes::uint16 change = settings.deceleration * FspeedChangeInterval / 1000;
+            dtypes::uint16 change = static_cast<dtypes::uint16>(round(settings.deceleration * FspeedChangeInterval / 1000.));
             if (FspeedNow < FspeedTarget + change)
             {
                 // reached target speed
@@ -145,12 +145,14 @@ private:
         else if (FspeedNow < FspeedTarget)
         {
             // still accelerating
-            status = Tstatus::accelerating;
+            if (status != Tstatus::accelerating)
+                status = Tstatus::accelerating;
         }
         else if (FspeedNow > FspeedTarget)
         {
             // still decelerating
-            status = Tstatus::decelerating;
+            if (status != Tstatus::decelerating)
+                status = Tstatus::decelerating;
         }
     }
 

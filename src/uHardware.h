@@ -57,9 +57,6 @@ public:
     using TsignalError = ThardwareSensorOPT101::Terror;
 
 private:
-    // is the hardware initialized?
-    bool Finitialized = false;
-
     // in case it is used in a tree
     Tmeta meta() override { return Tmeta{TYPE_ID, 0, "HARDWARE"}; }
 
@@ -281,46 +278,65 @@ public:
     Thardware()
     {
 
-        // define pins on setup that don't get defined by other components
+        // run during setp
         on(sdds::setup())
         {
 
+            // define pins
             pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN1, INPUT);
             pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN2, INPUT);
             pinMode(MICROLOGGER_CONTROLLER_VERSION_PIN3, INPUT);
             pinMode(MICROLOGGER_SIGNAL_PIN, INPUT);
+
+            // initialize hardware components (defines other pins)
+            display.init(particleSystem().version.value());
+            expander.init();
+            dpot1.init(ThardwareRheostatMCP4017::Resistance::R100k);
+            dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
+            dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
+            motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
+            signal.init(MICROLOGGER_SIGNAL_PIN);
+            voltage.init(MICROLOGGER_VOLTAGE_PIN, MICROLOGGER_VOLTAGE_DIVIDER_REF, MICROLOGGER_VOLTAGE_DIVIDER_R1, MICROLOGGER_VOLTAGE_DIVIDER_R2, MICROLOGGER_VOLTAGE_SCHOTTKY_DROP);
+            temperature.init();
+
+            // controller board version
+            uint8_t b0 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
+            uint8_t b1 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN2) ? 1 : 0;
+            uint8_t b2 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
+            uint8_t version = (b2 << 2) | (b1 << 1) | b0;
+            pcbVersions.controller = version + 1;
         };
 
-        // initialize hardware components on particle startup
-        on(particleSystem().startup)
-        {
-            if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
-            {
-                if (Finitialized)
-                    return;
+        // // initialize hardware components on particle startup
+        // on(particleSystem().startup)
+        // {
+        //     if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+        //     {
+        //         if (Finitialized)
+        //             return;
 
-                // hardware components
-                display.init(particleSystem().version.value());
-                expander.init();
-                dpot1.init(ThardwareRheostatMCP4017::Resistance::R100k);
-                dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
-                dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
-                motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
-                signal.init(MICROLOGGER_SIGNAL_PIN);
-                voltage.init(MICROLOGGER_VOLTAGE_PIN, MICROLOGGER_VOLTAGE_DIVIDER_REF, MICROLOGGER_VOLTAGE_DIVIDER_R1, MICROLOGGER_VOLTAGE_DIVIDER_R2, MICROLOGGER_VOLTAGE_SCHOTTKY_DROP);
-                temperature.init();
+        //         // hardware components
+        //         display.init(particleSystem().version.value());
+        //         expander.init();
+        //         dpot1.init(ThardwareRheostatMCP4017::Resistance::R100k);
+        //         dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
+        //         dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
+        //         motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
+        //         signal.init(MICROLOGGER_SIGNAL_PIN);
+        //         voltage.init(MICROLOGGER_VOLTAGE_PIN, MICROLOGGER_VOLTAGE_DIVIDER_REF, MICROLOGGER_VOLTAGE_DIVIDER_R1, MICROLOGGER_VOLTAGE_DIVIDER_R2, MICROLOGGER_VOLTAGE_SCHOTTKY_DROP);
+        //         temperature.init();
 
-                // controller board version
-                uint8_t b0 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
-                uint8_t b1 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN2) ? 1 : 0;
-                uint8_t b2 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
-                uint8_t version = (b2 << 2) | (b1 << 1) | b0;
-                pcbVersions.controller = version + 1;
+        //         // controller board version
+        //         uint8_t b0 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
+        //         uint8_t b1 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN2) ? 1 : 0;
+        //         uint8_t b2 = digitalRead(MICROLOGGER_CONTROLLER_VERSION_PIN1) ? 1 : 0;
+        //         uint8_t version = (b2 << 2) | (b1 << 1) | b0;
+        //         pcbVersions.controller = version + 1;
 
-                // fully initialized
-                Finitialized = true;
-            }
-        };
+        //         // fully initialized
+        //         Finitialized = true;
+        //     }
+        // };
 
         // turn the gpio expander connection autocheck on to keep track of device connection
         expander.autoConnect = enums::ToffOn::on;

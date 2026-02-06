@@ -211,21 +211,20 @@ public:
                     device = enums::TconStatus::connected;
                 if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
                 {
-                    sensor.resumeState();
+                    environment.resumeState();
                     stirrer.resumeState();
                     lights.resumeState();
-                    environment.resumeState();
+                    sensor.resumeState();
                 }
             }
             else if (hardware().i2cValue != Thardware::TioValue::ON)
             {
                 if (device != enums::TconStatus::disconnected)
                     device = enums::TconStatus::disconnected;
-
-                sensor.pauseState();
+                environment.pauseState();
                 stirrer.pauseState();
                 lights.pauseState();
-                environment.pauseState();
+                sensor.pauseState();
             }
         };
 

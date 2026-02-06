@@ -117,7 +117,7 @@ public:
     sdds_var(Tuint8, autoAdjustSpeedTolerance_rpm, sdds::opt::nothing, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
     sdds_var(Tuint16, speedCheckInterval_ms, sdds::opt::nothing, 50);
     sdds_var(Tuint16, readInterval_ms, sdds::opt::nothing, 500);
-    sdds_enum(none, noResponse) Terror;
+    sdds_enum(none, noResponse, notInitialized) Terror;
     sdds_var(Terror, error, sdds::opt::readonly);
 
     ThardwareMotorNidec24H()
@@ -129,32 +129,35 @@ public:
         // set actual motor steps
         on(steps)
         {
-            if (Finitalized)
+            if (!Finitalized)
             {
-                if (steps > 4095)
-                {
-                    steps = 4095; // max value
-                    return;
-                }
-
-                if (steps == 0)
-                {
-                    // we can't tell if there is an error if we're not running
-                    error = Terror::none;
-                }
-                // write the voltage for speed
-                analogWrite(FspeedPin, steps.Fvalue, FspeedFreq);
-
-                // reset stats and stabilitizy
-                FspeedRunningStats.reset();
-                FcurrentMax = 0;
-                Fstabilized = false;
-
-                // start speed update timer
-                if (FspeedUpdateTimer.running())
-                    FspeedUpdateTimer.stop();
-                FspeedUpdateTimer.start(readInterval_ms);
+                error = Terror::notInitialized;
+                return;
             }
+
+            if (steps > 4095)
+            {
+                steps = 4095; // max value
+                return;
+            }
+
+            if (steps == 0)
+            {
+                // we can't tell if there is an error if we're not running
+                error = Terror::none;
+            }
+            // write the voltage for speed
+            analogWrite(FspeedPin, steps.Fvalue, FspeedFreq);
+
+            // reset stats and stabilitizy
+            FspeedRunningStats.reset();
+            FcurrentMax = 0;
+            Fstabilized = false;
+
+            // start speed update timer
+            if (FspeedUpdateTimer.running())
+                FspeedUpdateTimer.stop();
+            FspeedUpdateTimer.start(readInterval_ms);
         };
 
         // set target steps

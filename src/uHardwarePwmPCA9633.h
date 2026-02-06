@@ -146,7 +146,6 @@ private:
         if (Fdriver == Driver::EXTN)
             regs[Fmode2Register] |= (1 << 4); // switch bit 4 on to invert output logic for NMOS drivers (Table 9 & 17), DIRECT and PMOS don't need this
         regs[Fpwm1Register] = setpoint1.value();
-        Log.trace("setpoint1: %d, reg value: %d", setpoint1.value(), regs[Fpwm1Register]);
         regs[Fpwm2Register] = setpoint2.value();
         regs[Fpwm3Register] = setpoint3.value();
         regs[Fpwm4Register] = setpoint4.value();
