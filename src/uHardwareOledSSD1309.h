@@ -71,7 +71,6 @@ protected:
 
 public:
     // splashscreen
-    sdds_var(enums::ToffOn, splashscreen, sdds::opt::nothing, enums::ToffOn::on);
     sdds_var(Tuint32, startup_ms, sdds::opt::saveval, 6000);
     sdds_var(Tstartup, startup, sdds::opt::readonly);
 
@@ -104,11 +103,8 @@ public:
             setTextSize(1);      // smallest text size by default
             setTextColor(WHITE); // default color
             clearDisplay();
-            if (splashscreen == enums::ToffOn::on)
-            {
-                splash();
-                FstartupTimer.start(startup_ms);
-            }
+            splash();
+            FstartupTimer.start(startup_ms);
             WITH_LOCK(Wire)
             {
                 display();
