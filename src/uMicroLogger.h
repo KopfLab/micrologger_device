@@ -81,12 +81,12 @@ private:
         if (sensor.zero.valid == enums::TnoYes::yes)
         {
             if (!sensor.reading.OD.isNan())
-                if (sensor.reading.OD.value() > -0.0005) // round to 0 or positive
-                    snprintf(buf, sizeof(buf), "OD:+%.3f", abs(sensor.reading.OD.value()));
-                else // negative
+                if (sensor.reading.OD.value() > -0.0005 && sensor.reading.OD.value() < 0.0005) // basically zero
+                    snprintf(buf, sizeof(buf), "OD:0.000");
+                else
                     snprintf(buf, sizeof(buf), "OD:%.3f", sensor.reading.OD.value());
             else
-                snprintf(buf, sizeof(buf), "OD:all dark");
+                snprintf(buf, sizeof(buf), "OD:no data");
             hardware().display.printLine(Tdisplay::line1Y, buf);
         }
         else
@@ -127,8 +127,15 @@ private:
             hardware().display.printLine(Tdisplay::line3Y, buf, Tdisplay::offsetX);
         }
 
-        // FIXME: put data information in
-        hardware().display.printLine(Tdisplay::line4Y, Time.format(TIME_FORMAT_ISO8601_FULL), Tdisplay::align::CENTER);
+        // data information
+        if (particleSystem().publishing.publish == TonOff::ON)
+        {
+            hardware().display.printLine(Tdisplay::line4Y, "data: 0%"); // FIXME
+        }
+        else
+        {
+            hardware().display.printLine(Tdisplay::line4Y, "Data: off");
+        }
 
         // light status
         if (lights.status == TlightsStatus::on)
