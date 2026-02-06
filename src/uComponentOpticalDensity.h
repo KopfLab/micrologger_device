@@ -37,7 +37,6 @@ private:
 
     // temporary values for gain adjustment
     bool FbeamWasOn = false;
-    dtypes::uint16 FnormalSignalReads = 0;
     dtypes::uint16 FlastSignal = 0;
     dtypes::uint16 FtargetSignal = 0;
     dtypes::uint16 FsignalDifference = 0;
@@ -307,8 +306,6 @@ private:
                     break;
 
                 // reduce number of reads for quick gain adjustment
-                FnormalSignalReads = hardware().signal.reads;
-                hardware().signal.reads = 10;
                 hardware().recordSignal(enums::ToffOn::on);
                 FgainAdjustment = TgainAdjustmentStages::READ_NO_GAIN;
                 break;
@@ -350,7 +347,6 @@ private:
                 {
                     // previous setting was better, keep that one and FINISH
                     error = Terror::none;
-                    hardware().signal.reads = FnormalSignalReads;
                     if (!FbeamWasOn)
                         hardware().setBeam(enums::ToffOn::off);
                     FgainAdjustment = TgainAdjustmentStages::GAIN_IDLE;
@@ -386,7 +382,6 @@ private:
                 if (error != Terror::failedGain)
                     error = Terror::failedGain;
                 status = Tstatus::idle;
-                hardware().signal.reads = FnormalSignalReads;
             }
             hardware().resetSignal();
         }
@@ -402,7 +397,7 @@ public:
     {
     public:
         sdds_var(Tuint16, saturation_ppt, sdds::opt::readonly);                       // current signal saturation in parts per thousand
-        sdds_var(Tuint16, read_sec, sdds::opt::saveval, 60);                          // how often to read
+        sdds_var(Tuint16, readInterval_ms, sdds::opt::saveval, 60000);                // how often to read
         sdds_var(enums::TnoYes, vortex, sdds::opt::saveval, enums::TnoYes::no);       // reading.vortex before reading?
         sdds_var(enums::TnoYes, stopStirrer, sdds::opt::saveval, enums::TnoYes::yes); // stop stirrer before read?
         sdds_var(Tuint16, wait_ms, sdds::opt::saveval, 1000);                         // how long to wait after reading.vortex/stirrer stop
@@ -601,8 +596,8 @@ public:
             {
                 // stop continuous recording
                 hardware().recordSignal(enums::ToffOn::off);
-                FnextRead = millis() + reading.read_sec.value() * 1000;
-                FreadTimer.start(reading.read_sec.value() * 1000);
+                FnextRead = millis() + reading.readInterval_ms.value();
+                FreadTimer.start(reading.readInterval_ms.value());
                 FinfoTimer.start(0);
             }
             else if (zero.valid == enums::TnoYes::no)
@@ -646,19 +641,19 @@ public:
             {
                 status = Tstatus::reading;
                 Freading = TreadingStages::READ_START;
-                FnextRead = millis() + reading.read_sec.value() * 1000;
-                FreadTimer.start(reading.read_sec.value() * 1000);
+                FnextRead = millis() + reading.readInterval_ms.value();
+                FreadTimer.start(reading.readInterval_ms.value());
                 process();
             }
         };
 
-        on(reading.read_sec)
+        on(reading.readInterval_ms)
         {
             if (FreadTimer.running())
             {
                 FreadTimer.stop();
-                FnextRead = millis() + reading.read_sec.value() * 1000;
-                FreadTimer.start(reading.read_sec.value() * 1000);
+                FnextRead = millis() + reading.readInterval_ms.value();
+                FreadTimer.start(reading.readInterval_ms.value());
             }
         };
 
