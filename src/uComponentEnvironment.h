@@ -22,7 +22,7 @@ private:
 
 public:
     // sdds vars
-    sdds_var(Tuint16, read_sec, sdds::opt::saveval, 1); // how often to read the temperature (in seconds)
+    sdds_var(Tuint16, readInterval_ms, sdds::opt::saveval, 1000); // how often to read the temperature
     sdds_var(Tfloat32, temperature_C, sdds::opt::readonly);
     sdds_var(Tfloat32, power_V, sdds::opt::readonly);
     sdds_var(Tfloat32, powerReq_V, sdds::opt::saveval, 20.0); // what is the minimum power requirement?
@@ -57,7 +57,7 @@ public:
         on(FreadTimer)
         {
             hardware().temperature.action = Thardware::Ti2cAction::read;
-            FreadTimer.start(read_sec.value() * 1000);
+            FreadTimer.start(readInterval_ms);
         };
     }
 
