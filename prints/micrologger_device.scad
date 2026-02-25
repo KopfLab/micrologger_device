@@ -1,4 +1,3 @@
-use <utils.scad>;
 use <screws.scad>;
 
 // constants
@@ -889,8 +888,6 @@ module with_wedge_cutout(dangle = 0, zoffset = -$e) {
 }
 
 /** bottle base **/
-
-// fixme: clean up this code! this size (16mm) is ideal for balch/culture tubes, need a different one for the larger culture tubes
 
 $bottle_base_thickness = 4.0; // thickness of bottle adapter base
 $bottle_base_expand = 1.15; // expanding for tight fit

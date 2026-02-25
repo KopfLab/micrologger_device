@@ -295,21 +295,7 @@ module module_controller_magnet_holder() {
   );
 }
 
-/*
-// decided to go without side magnets but it does work
-// although 1/8" (0_125) thickness recomended to be
-// able to use strong enough magnets
-module module_controller_manget_holder_sides() {
-  rotate([90, 0, 0])
-  module_controller_magnet_inserts(
-    width = $box_size[1] - 2 * $box_wall_thickness - 2 * $magnet_adapter_depth,
-    height = $box_size[2] - $box_front_thickness - $box_back_thickness - $magnet_adapter_height_gap,
-    magnet_thickness = $magnet_thickness_0_1, // $magnet_thickness_0_125,
-    n_magnets = 1
-  );
-}
-*/
-
+// render modules
 module_controller_front();
 translate([0, 0, $box_size[2] + 5])
 rotate([180, 0, 0])
