@@ -672,6 +672,7 @@ $adapter_serum_120ml = 51.5 - 2.0; // 120ml serium bottles (CONFIRMED)
 $adapter_serum_160ml = 54.5 - 2.5; // 160ml serum bottle (CONFIRMED)
 $adapter_culture_60ml = 25.4 - 1.0; // 60ml long culture bottle (CONFIRMED)
 $adapter_balch = 18.0 - 0.5; // balch and culture tubes (CONFIRMED)
+$adapter_hungate = 16.0 - 0.5; // hungate tubes
 
 $sensor_thickness = 6; // thickness of sensor port
 $sensor_start = 10; // height of sensor
@@ -949,11 +950,12 @@ module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter,
   }
 }
 
-/** prints **/
+/** standard prints **/
 
 //device();
 //stirrer_magnet_holder($stirrer_magnet_diameter_medium);
 //bottle_base();
+bottle_adapter($adapter_hungate);
 //bottle_adapter($adapter_balch);
 //bottle_adapter($adapter_gl45_100ml);
 //bottle_adapter($adapter_serum_160ml);
@@ -963,9 +965,9 @@ module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter,
 //light_adapter_down();
 //light_adapter_up();
 
-// speciality parts - 60mL culture tube base anchor for motor free use (i.e. tube supported only)
-union() {
-  bottle_base(inner_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, outer_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, height = $holder_base_height );
-  crush_ribs_ring(vial_diameter = $adapter_culture_60ml, height = $holder_base_height);
-}
+/** speciality parts - 60mL culture tube base anchor for motor free use (i.e. tube supported only) **/
+// union() {
+//   bottle_base(inner_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, outer_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, height = $holder_base_height );
+//   crush_ribs_ring(vial_diameter = $adapter_culture_60ml, height = $holder_base_height);
+// }
 
