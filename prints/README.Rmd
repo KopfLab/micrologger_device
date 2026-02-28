@@ -53,8 +53,7 @@ results <-
       stringr::str_replace_all(stringr::fixed("_"), " ") |>
       stringr::str_to_title(),
     type = stl |>
-      stringr::str_replace("^micrologger_([^_]+)(.*)$", "\\1") |>
-      stringr::str_to_title(),
+      stringr::str_replace("^micrologger_([^_]+)(.*)$", "\\1"),
     png = stl |>
       stringr::str_replace("\\.stl$", ".png"),
     result = purrr::map2(
@@ -74,14 +73,8 @@ results |>
   dplyr::arrange(type) |>
   dplyr::summarise(
     .by = "type",
-    imgs = sprintf(
-      "### %s\n\n[![](png/%s)](stl/%s)",
-      label,
-      png,
-      stl
-    ) |>
-      paste(collapse = "\n\n"),
-    code = sprintf("## %s\n\n%s\n\n", type[1], imgs)
+    code = sprintf("## %s\n\n[![](png/%s)](stl/%s)", label, png, stl) |>
+      paste(collapse = "\n\n")
   ) |>
   dplyr::pull(code) |>
   cat(sep = "\n\n")
