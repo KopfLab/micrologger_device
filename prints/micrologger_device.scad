@@ -1,3 +1,4 @@
+use <utils.scad>;
 use <screws.scad>;
 
 // constants
@@ -75,8 +76,8 @@ $beam_block_outer_width = 2 * $beam_block_screws_x + $spokes + 2 * $wall;
 $beam_block_inner_width = 2 * $beam_block_screws_x - $spokes - 2 * $wall;
 
 // ir temp sensor
-$ir_position_z = 17; // from top
-$ir_tunnel_diameter = 4.0; // diameter of sensor entrance
+$temp_position_z = 17; // from top
+$temp_tunnel_diameter = 4.0; // diameter of sensor entrance
 
 /** micrologger device **/
 
@@ -298,9 +299,9 @@ module device(spokes = true) {
       cube([$beam_light_tunnel_width, $beam_block_total_depth, $light_tunnel_height], center = true);
 
     // beam block ir sensor
-    translate([0, 0, $holder_total_height - $ir_position_z])
+    translate([0, 0, $holder_total_height - $temp_position_z])
       rotate([-90, 0, 0])
-        cylinder(d = $ir_tunnel_diameter, h = $sensor_block_total_depth + $e);
+        cylinder(d = $temp_tunnel_diameter, h = $sensor_block_total_depth + $e);
 
     // spokes
     if (spokes) {
@@ -348,11 +349,11 @@ module device(spokes = true) {
 
     // gap below ir tunnel
     translate([0, -$holder_gap_width/2, $holder_bottom_thickness])
-      cube([$holder_inner_radius + $wall + $e, $holder_gap_width, $holder_total_height - $ir_position_z - $ir_tunnel_diameter/2 - $holder_bottom_thickness], center = false);
+      cube([$holder_inner_radius + $wall + $e, $holder_gap_width, $holder_total_height - $temp_position_z - $temp_tunnel_diameter/2 - $holder_bottom_thickness], center = false);
 
     // gap between ir tunnel and light tunnel
-    translate([0, -$holder_gap_width/2, $holder_total_height - $ir_position_z + $ir_tunnel_diameter/2])
-      cube([$holder_inner_radius + $wall + $e, $holder_gap_width, $ir_position_z - $beam_position_z - $ir_tunnel_diameter/2 - $light_tunnel_height/2], center = false);
+    translate([0, -$holder_gap_width/2, $holder_total_height - $temp_position_z + $temp_tunnel_diameter/2])
+      cube([$holder_inner_radius + $wall + $e, $holder_gap_width, $temp_position_z - $beam_position_z - $temp_tunnel_diameter/2 - $light_tunnel_height/2], center = false);
 
     // gap from light tunnel to top
     translate([0, -$holder_gap_width/2, $holder_total_height - $beam_position_z + $light_tunnel_height/2])
@@ -630,31 +631,9 @@ module with_adapter_magnets(inside_diameter = 0, spokes = true, base_insert = tr
   }
 }
 
-/** bottle/vial adapters **/
-
-// bottle adapter sizes
-$adapter_gl45_100ml = 56.5 - 2.5; // 100mL media bottle (CONFIRMED)
-$adapter_serum_60ml = 41 - 1.25; // 60ml serum bottle (CONFIRMED)
-$adapter_serum_120ml = 51.5 - 2.0; // 120ml serium bottles (CONFIRMED)
-$adapter_serum_160ml = 54.5 - 2.5; // 160ml serum bottle (CONFIRMED)
-$adapter_culture_60ml = 25.4 - 1.0; // 60ml long culture bottle (CONFIRMED)
-$adapter_balch = 18.0 - 0.5; // balch and culture tubes (CONFIRMED)
-
-$sensor_thickness = 6; // thickness of sensor port
-$sensor_start = 10; // height of sensor
-$sensor_roof = 3; // roof/additional height above sensor location
-$sensor_setscrew_diameter = 2.25; // for M2 screw
-$sensor_cable_diameter = 3.0; // diameter of the cable
-
-$flex_ribs_n = 8; // number of ribs to use
-$flex_ribs_depth = 3; // perpendicular distance from ring wall to tip of ribs
-$flex_ribs_curvature = 0.7; // as a fraction of the vial radius
-$flex_ribs_width = $nozzle + 0.01; // thickness in mm (doesn't always slice correctly with only 0.5)
-
-// module adapter
-module bottle_adapter(vial_diameter, height = $magnet_adapter_height + $magnet_adapter_lip, spokes = true, sensors = false) {
+// crush ribs ring
+module crush_ribs_ring(vial_diameter, height) {
   r = vial_diameter/2 + $flex_ribs_depth;
-  with_adapter_magnets(inside_diameter = 2 * r, spokes = spokes, sensors = sensors)
   union() {
     difference() {
       // adapter walls
@@ -682,6 +661,34 @@ module bottle_adapter(vial_diameter, height = $magnet_adapter_height + $magnet_a
       }
     }
   }
+}
+
+/** bottle/vial adapters **/
+
+// bottle adapter sizes
+$adapter_gl45_100ml = 56.5 - 2.5; // 100mL media bottle (CONFIRMED)
+$adapter_serum_60ml = 41 - 1.25; // 60ml serum bottle (CONFIRMED)
+$adapter_serum_120ml = 51.5 - 2.0; // 120ml serium bottles (CONFIRMED)
+$adapter_serum_160ml = 54.5 - 2.5; // 160ml serum bottle (CONFIRMED)
+$adapter_culture_60ml = 25.4 - 1.0; // 60ml long culture bottle (CONFIRMED)
+$adapter_balch = 18.0 - 0.5; // balch and culture tubes (CONFIRMED)
+
+$sensor_thickness = 6; // thickness of sensor port
+$sensor_start = 10; // height of sensor
+$sensor_roof = 3; // roof/additional height above sensor location
+$sensor_setscrew_diameter = 2.25; // for M2 screw
+$sensor_cable_diameter = 3.0; // diameter of the cable
+
+$flex_ribs_n = 8; // number of ribs to use
+$flex_ribs_depth = 3; // perpendicular distance from ring wall to tip of ribs
+$flex_ribs_curvature = 0.7; // as a fraction of the vial radius
+$flex_ribs_width = $nozzle + 0.01; // thickness in mm (doesn't always slice correctly with only 0.5)
+
+// module adapter
+module bottle_adapter(vial_diameter, height = $magnet_adapter_height + $magnet_adapter_lip, spokes = true, sensors = false) {
+  r = vial_diameter/2 + $flex_ribs_depth;
+  with_adapter_magnets(inside_diameter = 2 * r, spokes = spokes, sensors = sensors)
+  crush_ribs_ring(vial_diameter, height);
 }
 
 /** stirrer magnet holder **/
@@ -899,96 +906,46 @@ $bottle_base_outer_diameter = 28; // the outside diameter
 $bottle_base_notch_gap = $nozzle;
 
 // make the botte base adapter
-module bottle_base(spokes = true) {
-  connector = $holder_notch_position + $holder_notch_length/2 - $bottle_base_outer_diameter/2 - $wall/2 - $bottle_base_notch_gap/2;
-  //rotate([180, 0, 0])
+module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter, outer_diameter = $bottle_base_outer_diameter + 2 * $wall, height = $bottle_base_thickness, notch_thickness = 2 * $holder_bottom_thickness) {
+  connector = $holder_notch_position + $holder_notch_length/2 - outer_diameter/2 + $wall/2 - $bottle_base_notch_gap/2;
   difference() {
     union() {
       // center
       difference() {
         union() {
-          cylinder(d = $bottle_base_outer_diameter + 2 * $wall, h = $bottle_base_thickness);
+          cylinder(d = outer_diameter, h = height);
           // connectors
           for (a = [0, 180])
             rotate([0, 0, a])
               translate([-($holder_notch_width - $bottle_base_notch_gap)/2, -connector + $holder_notch_position + $holder_notch_length/2 - $bottle_base_notch_gap/2, 0])
-                cube([$holder_notch_width - $bottle_base_notch_gap, connector, $bottle_base_thickness]);
+                cube([$holder_notch_width - $bottle_base_notch_gap, connector, height]);
         }
         translate([0, 0, -$e])
-          cylinder(d = $bottle_base_center_diameter, h = $bottle_base_thickness + $2e);
+          cylinder(d = inner_diameter , h = height + $2e);
         // spokes
         if (spokes) {
-          /*
-          translate([0, 0, -$e])
-            cube([$spokes, $holder_inner_diameter + $wall + $e, $bottle_base_thickness + $2e]);
-          */
           rotate([0, 0, 90])
             translate([0, 0, -$e])
-              cube([$spokes, $bottle_base_outer_diameter/2 + $wall + $e, $bottle_base_thickness + $2e]);
+              cube([$spokes, outer_diameter/2 + $e, height + $2e]);
         }
       }
       // notches
       for (a = [0, 180])
-        //for (x = [-1, 1])
-        //  translate([-$wall/4 + x * ($holder_notch_width/2 - $wall/4), -$holder_notch_length/2 + $bottle_base_notch_gap/2 + y * $holder_notch_position, -$holder_bottom_thickness])
-        //    cube([$wall/2, $holder_notch_length - $bottle_base_notch_gap, $holder_bottom_thickness]);
-        //for (x = [-1, 1])
         rotate([0, 0, a])
-          translate([-($holder_notch_width - $bottle_base_notch_gap)/2, -$holder_notch_length/2 + $bottle_base_notch_gap/2 - $holder_notch_position, -$holder_bottom_thickness])
-            cube([$holder_notch_width - $bottle_base_notch_gap, $holder_notch_length - 3 * $bottle_base_notch_gap, $holder_bottom_thickness]);
-
-
-
-
-
-      /*
-      // clip
-      linear_extrude($bottle_base_thickness) {
-        difference() {
-          // outside
-          difference() {
-            resize([$bottle_base_expand * ($holder_inner_diameter - $bottle_base_gap), $holder_inner_diameter - $bottle_base_gap])
-              circle(d = $holder_inner_diameter - $bottle_base_gap);
-            for (x = [-1, 1])
-              translate([x * $bottle_clip_position, 0])
-                resize([$holder_inner_diameter - $bottle_base_gap, $bottle_clip_stretch * ($holder_inner_diameter - $bottle_base_gap)])
-                  circle(d = $holder_inner_diameter - $bottle_base_gap);
-          }
-          // inside
-          offset(delta = - $wall/2) {
-            difference() {
-              resize([$bottle_base_expand * ($holder_inner_diameter - $bottle_base_gap), $holder_inner_diameter - $bottle_base_gap])
-                circle(d = $holder_inner_diameter - $bottle_base_gap);
-              for (x = [-1, 1])
-                translate([x * $bottle_clip_position, 0])
-                  resize([$holder_inner_diameter - $bottle_base_gap, $bottle_clip_stretch * ($holder_inner_diameter - $bottle_base_gap)])
-                    circle(d = $holder_inner_diameter - $bottle_base_gap);
-            }
-          }
-        }
-      }
-      */
+          translate([-($holder_notch_width - $bottle_base_notch_gap)/2, -$holder_notch_length/2 + $bottle_base_notch_gap/2 - $holder_notch_position, -notch_thickness])
+            cube([$holder_notch_width - $bottle_base_notch_gap, $holder_notch_length - 3 * $bottle_base_notch_gap, notch_thickness]);
     }
     // spokes
     if (spokes) {
       for (y = [-1, 1])
         translate([-$spokes/2, -(connector - $wall/2)/2 + y * ($holder_notch_position + $holder_notch_length/2 - $bottle_base_notch_gap/2 - connector/2 + $wall/4), 0])
-          cube([$spokes, connector - $wall/2, $bottle_base_thickness + $e]);
+          cube([$spokes, connector - $wall/2, height + $e]);
       for (a = [0, 180])
         rotate([0, 0, a])
-          translate([-$spokes/2, $bottle_base_outer_diameter/2 + $wall, -$holder_bottom_thickness - $e])
-            cube([$spokes, connector - $wall, $holder_bottom_thickness + $e]);
+          translate([-$spokes/2, outer_diameter/2, -notch_thickness - $e])
+            cube([$spokes, connector - $wall, notch_thickness + $e]);
     }
 
-    // spokes
-    /*
-    if (spokes)
-      translate([0, 0, -$e])
-        cube([$spokes, $holder_inner_diameter + $wall + $e, $bottle_base_thickness + $2e]);
-      rotate([0, 0, 180])
-        translate([0, ($bottle_base_outer_diameter/2 + $wall), -$e])
-          cube([$spokes, ($holder_inner_diameter + $wall - $bottle_base_outer_diameter - 2 * $wall)/2 + $e, $bottle_base_thickness + $2e]);
-    */
   }
 }
 
@@ -998,7 +955,7 @@ module bottle_base(spokes = true) {
 //stirrer_magnet_holder($stirrer_magnet_diameter_medium);
 //bottle_base();
 //bottle_adapter($adapter_balch);
-bottle_adapter($adapter_gl45_100ml);
+//bottle_adapter($adapter_gl45_100ml);
 //bottle_adapter($adapter_serum_160ml);
 //bottle_adapter($adapter_serum_120ml);
 //bottle_adapter($adapter_serum_60ml);
@@ -1006,6 +963,9 @@ bottle_adapter($adapter_gl45_100ml);
 //light_adapter_down();
 //light_adapter_up();
 
+// speciality parts - 60mL culture tube base anchor for motor free use (i.e. tube supported only)
+union() {
+  bottle_base(inner_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, outer_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, height = $holder_base_height );
+  crush_ribs_ring(vial_diameter = $adapter_culture_60ml, height = $holder_base_height);
+}
 
-// todo:
-// - clean up code
