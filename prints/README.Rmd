@@ -69,7 +69,7 @@ results <-
 #| results: asis
 # generate output
 results |>
-  dplyr::mutate(type = factor(type) |> forcats::fct_relevel("Device")) |>
+  dplyr::mutate(type = factor(type) |> forcats::fct_relevel("device")) |>
   dplyr::arrange(type) |>
   dplyr::summarise(
     .by = "type",

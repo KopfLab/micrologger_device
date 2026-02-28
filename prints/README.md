@@ -3,10 +3,9 @@
 
 # 3D printed µLogger parts
 
-    #> Warning: There was 1 warning in `dplyr::mutate()`.
-    #> ℹ In argument: `type = forcats::fct_relevel(factor(type), "Device")`.
-    #> Caused by warning:
-    #> ! 1 unknown level in `f`: Device
+## Device
+
+[![](png/micrologger_device_nozzle_0.4mm.png)](stl/micrologger_device_nozzle_0.4mm.stl)
 
 ## Adapter Balch
 
@@ -43,10 +42,6 @@
 ## Base Bottle Adapter
 
 [![](png/micrologger_base_bottle_adapter_nozzle_0.4mm.png)](stl/micrologger_base_bottle_adapter_nozzle_0.4mm.stl)
-
-## Device
-
-[![](png/micrologger_device_nozzle_0.4mm.png)](stl/micrologger_device_nozzle_0.4mm.stl)
 
 ## Light Adapter Down
 
