@@ -1,0 +1,67 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# 3D printed µLogger parts
+
+
+## Tube Adapters
+
+
+```{r}
+#| echo: false
+#| results: asis
+# define the path to the OpenSCAD executable
+openscad_path <- "openscad"
+
+# convert stl to png
+convert_stl_to_png <- function(stl, png, overwrite = FALSE) {
+  if (file.exists(png) && !overwrite) {
+    return(list("already done"))
+  }
+  # openscad rendering options
+  # --autocenter and --viewall ensure the model fits the frame
+  cmd_args <- c(
+    "-o",
+    png,
+    "--imgsize=1024,1024",
+    "--colorscheme=Nature",
+    "--autocenter",
+    "--viewall",
+    sprintf("-D 'stl=\"%s\"'", stl),
+    "png_converter.scad"
+  )
+
+  # execute the conversion
+  out <- system2(openscad_path, args = cmd_args, stdout = TRUE, stderr = TRUE)
+  return(out)
+}
+
+# generate png files for all stls
+results <-
+  tibble::tibble(
+    stl = list.files("stl", pattern = "\\.stl$"),
+    png = gsub("\\.stl$", ".png", stl),
+    result = purrr::map2(
+      file.path("stl", stl),
+      file.path("png", png),
+      convert_stl_to_png
+    )
+  )
+
+# generate output
+sprintf("### %s\n\n[![](png/%s)](%s)", results$stl, results$png, results$stl) |>
+  cat(sep = "\n\n")
+```

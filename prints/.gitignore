@@ -1,2 +1,5 @@
 # printer dependent, don’t include in git
 gcode
+README_files
+*.html
+!png/*.png
