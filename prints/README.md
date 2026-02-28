@@ -3,56 +3,64 @@
 
 # 3D printed µLogger parts
 
-## Tube Adapters
+## Device
 
-### micrologger_adapter_balch_nozzle_0.4mm.stl
+### Device
 
-[![](png/micrologger_adapter_balch_nozzle_0.4mm.png)](micrologger_adapter_balch_nozzle_0.4mm.stl)
+[![](png/micrologger_device_nozzle_0.4mm.png)](stl/micrologger_device_nozzle_0.4mm.stl)
 
-### micrologger_adapter_culture60_nozzle_0.4mm.stl
+## Adapter
 
-[![](png/micrologger_adapter_culture60_nozzle_0.4mm.png)](micrologger_adapter_culture60_nozzle_0.4mm.stl)
+### Adapter Balch
 
-### micrologger_adapter_gl45_nozzle_0.4mm.stl
+[![](png/micrologger_adapter_balch_nozzle_0.4mm.png)](stl/micrologger_adapter_balch_nozzle_0.4mm.stl)
 
-[![](png/micrologger_adapter_gl45_nozzle_0.4mm.png)](micrologger_adapter_gl45_nozzle_0.4mm.stl)
+### Adapter Culture60
 
-### micrologger_adapter_hungate_nozzle_0.4mm.stl
+[![](png/micrologger_adapter_culture60_nozzle_0.4mm.png)](stl/micrologger_adapter_culture60_nozzle_0.4mm.stl)
 
-[![](png/micrologger_adapter_hungate_nozzle_0.4mm.png)](micrologger_adapter_hungate_nozzle_0.4mm.stl)
+### Adapter Gl45
 
-### micrologger_adapter_serum120_nozzle_0.4mm.stl
+[![](png/micrologger_adapter_gl45_nozzle_0.4mm.png)](stl/micrologger_adapter_gl45_nozzle_0.4mm.stl)
 
-[![](png/micrologger_adapter_serum120_nozzle_0.4mm.png)](micrologger_adapter_serum120_nozzle_0.4mm.stl)
+### Adapter Hungate
 
-### micrologger_adapter_serum160_nozzle_0.4mm.stl
+[![](png/micrologger_adapter_hungate_nozzle_0.4mm.png)](stl/micrologger_adapter_hungate_nozzle_0.4mm.stl)
 
-[![](png/micrologger_adapter_serum160_nozzle_0.4mm.png)](micrologger_adapter_serum160_nozzle_0.4mm.stl)
+### Adapter Serum120
 
-### micrologger_adapter_serum60_nozzle_0.4mm.stl
+[![](png/micrologger_adapter_serum120_nozzle_0.4mm.png)](stl/micrologger_adapter_serum120_nozzle_0.4mm.stl)
 
-[![](png/micrologger_adapter_serum60_nozzle_0.4mm.png)](micrologger_adapter_serum60_nozzle_0.4mm.stl)
+### Adapter Serum160
 
-### micrologger_base_adapter_culture60_nozzle_0.4mm.stl
+[![](png/micrologger_adapter_serum160_nozzle_0.4mm.png)](stl/micrologger_adapter_serum160_nozzle_0.4mm.stl)
 
-[![](png/micrologger_base_adapter_culture60_nozzle_0.4mm.png)](micrologger_base_adapter_culture60_nozzle_0.4mm.stl)
+### Adapter Serum60
 
-### micrologger_base_bottle_adapter_0.4mm.stl
+[![](png/micrologger_adapter_serum60_nozzle_0.4mm.png)](stl/micrologger_adapter_serum60_nozzle_0.4mm.stl)
 
-[![](png/micrologger_base_bottle_adapter_0.4mm.png)](micrologger_base_bottle_adapter_0.4mm.stl)
+## Base
 
-### micrologger_device_nozzle_0.4mm.stl
+### Base Adapter Culture60
 
-[![](png/micrologger_device_nozzle_0.4mm.png)](micrologger_device_nozzle_0.4mm.stl)
+[![](png/micrologger_base_adapter_culture60_nozzle_0.4mm.png)](stl/micrologger_base_adapter_culture60_nozzle_0.4mm.stl)
 
-### micrologger_light_adapter_down_nozzle_0.4mm.stl
+### Base Bottle Adapter
 
-[![](png/micrologger_light_adapter_down_nozzle_0.4mm.png)](micrologger_light_adapter_down_nozzle_0.4mm.stl)
+[![](png/micrologger_base_bottle_adapter_nozzle_0.4mm.png)](stl/micrologger_base_bottle_adapter_nozzle_0.4mm.stl)
 
-### micrologger_light_adapter_up_nozzle_0.4mm.stl
+## Light
 
-[![](png/micrologger_light_adapter_up_nozzle_0.4mm.png)](micrologger_light_adapter_up_nozzle_0.4mm.stl)
+### Light Adapter Down
 
-### micrologger_stirrer_nozzle_0.4mm.stl
+[![](png/micrologger_light_adapter_down_nozzle_0.4mm.png)](stl/micrologger_light_adapter_down_nozzle_0.4mm.stl)
 
-[![](png/micrologger_stirrer_nozzle_0.4mm.png)](micrologger_stirrer_nozzle_0.4mm.stl)
+### Light Adapter Up
+
+[![](png/micrologger_light_adapter_up_nozzle_0.4mm.png)](stl/micrologger_light_adapter_up_nozzle_0.4mm.stl)
+
+## Stirrer
+
+### Stirrer
+
+[![](png/micrologger_stirrer_nozzle_0.4mm.png)](stl/micrologger_stirrer_nozzle_0.4mm.stl)

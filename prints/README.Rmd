@@ -16,13 +16,8 @@ knitr::opts_chunk$set(
 
 # 3D printed µLogger parts
 
-
-## Tube Adapters
-
-
 ```{r}
 #| echo: false
-#| results: asis
 # define the path to the OpenSCAD executable
 openscad_path <- "openscad"
 
@@ -37,7 +32,7 @@ convert_stl_to_png <- function(stl, png, overwrite = FALSE) {
     "-o",
     png,
     "--imgsize=1024,1024",
-    "--colorscheme=Nature",
+    "--colorscheme=Starnight",
     "--autocenter",
     "--viewall",
     sprintf("-D 'stl=\"%s\"'", stl),
@@ -53,15 +48,41 @@ convert_stl_to_png <- function(stl, png, overwrite = FALSE) {
 results <-
   tibble::tibble(
     stl = list.files("stl", pattern = "\\.stl$"),
-    png = gsub("\\.stl$", ".png", stl),
+    label = stl |>
+      stringr::str_replace("^micrologger_(.*)_nozzle(.*)$", "\\1") |>
+      stringr::str_replace_all(stringr::fixed("_"), " ") |>
+      stringr::str_to_title(),
+    type = stl |>
+      stringr::str_replace("^micrologger_([^_]+)(.*)$", "\\1") |>
+      stringr::str_to_title(),
+    png = stl |>
+      stringr::str_replace("\\.stl$", ".png"),
     result = purrr::map2(
       file.path("stl", stl),
       file.path("png", png),
       convert_stl_to_png
     )
   )
+```
 
+```{r}
+#| echo: false
+#| results: asis
 # generate output
-sprintf("### %s\n\n[![](png/%s)](%s)", results$stl, results$png, results$stl) |>
+results |>
+  dplyr::mutate(type = factor(type) |> forcats::fct_relevel("Device")) |>
+  dplyr::arrange(type) |>
+  dplyr::summarise(
+    .by = "type",
+    imgs = sprintf(
+      "### %s\n\n[![](png/%s)](stl/%s)",
+      label,
+      png,
+      stl
+    ) |>
+      paste(collapse = "\n\n"),
+    code = sprintf("## %s\n\n%s\n\n", type[1], imgs)
+  ) |>
+  dplyr::pull(code) |>
   cat(sep = "\n\n")
 ```
