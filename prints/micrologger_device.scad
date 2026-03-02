@@ -954,8 +954,8 @@ module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter,
 
 //device();
 //stirrer_magnet_holder($stirrer_magnet_diameter_medium);
-//bottle_base();
-bottle_adapter($adapter_hungate);
+bottle_base();
+//bottle_adapter($adapter_hungate);
 //bottle_adapter($adapter_balch);
 //bottle_adapter($adapter_gl45_100ml);
 //bottle_adapter($adapter_serum_160ml);
