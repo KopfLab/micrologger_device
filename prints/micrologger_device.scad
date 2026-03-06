@@ -413,9 +413,9 @@ module device(spokes = true) {
     translate([-$holder_notch_width/2, -$holder_notch_length/2 + y * $holder_notch_position, -$e])
     cube([$holder_notch_width, $holder_notch_length, $holder_bottom_thickness + $2e]);
 
-    // base adapter attachment screws (already on path of main spokes)
+    // base adapter attachment screws (already on path of main spokes, i.e. no extra spokes required)
     for (x = [-1, 1]) {
-      translate([x * $holder_base_adapter_screws_distance/2 * cos(0), 0, -$e])
+      translate([x * $holder_base_adapter_screws_distance/2, 0, -$e])
         machine_screw($holder_base_adapter_screws_type, $holder_bottom_thickness + $2e, countersink = false, tolerance = $screw_threadable_tolerance);
     }
 
@@ -933,16 +933,17 @@ module with_wedge_cutout(dangle = 0, zoffset = -$e) {
 
 /** bottle base **/
 
-$bottle_base_thickness = 4.0; // thickness of bottle adapter base
+$bottle_base_thickness = 3.0; // thickness of bottle adapter base
 $bottle_base_expand = 1.15; // expanding for tight fit
 $bottle_base_gap = 2; // gap to edge (in mm)
 $bottle_clip_position = 0.8 * $holder_inner_diameter; // position of clip
 $bottle_clip_stretch = 5; // y stretch of clip
-$bottle_base_center_diameter = 16; // the hole in the center
-$bottle_base_outer_diameter = 28; // the outside diameter
+$bottle_base_screw_attachment_diameter = get_screw($holder_base_adapter_screws_type)[1] + 2 * $screw_hole_tolerance + 2 * $wall; // diameter around the screw hole
+$bottle_base_center_diameter = 15; // the hole in the center
+$bottle_base_outer_diameter = $holder_base_adapter_screws_distance - 2 * get_screw($holder_base_adapter_screws_type)[1]; // the outside diameter
 $bottle_base_notch_gap = $nozzle;
 
-// make the botte base adapter
+// make the bottle base adapter
 module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter, outer_diameter = $bottle_base_outer_diameter + 2 * $wall, height = $bottle_base_thickness, notch_thickness = 2 * $holder_bottom_thickness) {
   connector = $holder_notch_position + $holder_notch_length/2 - outer_diameter/2 + $wall/2 - $bottle_base_notch_gap/2;
   difference() {
@@ -959,12 +960,29 @@ module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter,
         }
         translate([0, 0, -$e])
           cylinder(d = inner_diameter , h = height + $2e);
-        // spokes
-        if (spokes) {
-          rotate([0, 0, 90])
-            translate([0, 0, -$e])
-              cube([$spokes, outer_diameter/2 + $e, height + $2e]);
-        }
+      }
+      // screw attachments
+      for (x = [-1, 1]) {
+        translate([x * $holder_base_adapter_screws_distance/2, 0, 0])
+          rotate([0, 0, x * 90])
+            union() {
+              // core
+              linear_extrude(height)
+                translate([-$bottle_base_screw_attachment_diameter/2, 0, 0])
+                  square([$bottle_base_screw_attachment_diameter, $bottle_base_screw_attachment_diameter/2]);
+              linear_extrude(height)
+                circle(d = $bottle_base_screw_attachment_diameter);
+              // smooth edges to ring for
+              linear_extrude(height)
+              for (x = [0, 1]) {
+                mirror([x, 0, 0])
+                  translate([$bottle_base_screw_attachment_diameter/2, 0, 0])
+                    difference() {
+                      square($bottle_base_screw_attachment_diameter/2);
+                      translate([$bottle_base_screw_attachment_diameter/2, 0, 0]) circle(d = $bottle_base_screw_attachment_diameter);
+                    }
+              }
+          }   
       }
       // notches
       for (a = [0, 180])
@@ -972,8 +990,28 @@ module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter,
           translate([-($holder_notch_width - $bottle_base_notch_gap)/2, -$holder_notch_length/2 + $bottle_base_notch_gap/2 - $holder_notch_position, -notch_thickness])
             cube([$holder_notch_width - $bottle_base_notch_gap, $holder_notch_length - 3 * $bottle_base_notch_gap, notch_thickness]);
     }
+
+    // screw holes
+    for (x = [-1, 1]) {
+      translate([x * $holder_base_adapter_screws_distance/2, 0, -$e])
+        machine_screw($holder_base_adapter_screws_type, height + $2e, countersink = false, tolerance = $screw_hole_tolerance);
+    }
     // spokes
     if (spokes) {
+      // ring left side
+      translate([0, 0, -$e])
+        rotate([0, 0, 180])
+          cube([($holder_base_adapter_screws_distance - $bottle_base_screw_attachment_diameter)/2 - 2 * $n_walls * $nozzle, $spokes, height + $2e]);
+      // ring right side
+      translate([0, 0, -$e])
+          cube([$holder_base_adapter_screws_distance/2 + $bottle_base_screw_attachment_diameter/2 + $e, $spokes, height + $2e]);
+      // screw adapters
+      for (x = [-1, 1]) {
+        translate([x * ($holder_base_adapter_screws_distance - $bottle_base_screw_attachment_diameter)/2 , 0, -$e])
+          rotate([0, 0, -x * 90])
+            cube([$spokes, $bottle_base_screw_attachment_diameter + $e, height + $2e]);
+      }
+      // noches
       for (y = [-1, 1])
         translate([-$spokes/2, -(connector - $wall/2)/2 + y * ($holder_notch_position + $holder_notch_length/2 - $bottle_base_notch_gap/2 - connector/2 + $wall/4), 0])
           cube([$spokes, connector - $wall/2, height + $e]);
@@ -988,7 +1026,7 @@ module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter,
 
 /** standard prints **/
 
-device();
+//device();
 //stirrer_magnet_holder($stirrer_magnet_diameter_medium);
 //bottle_base();
 //bottle_adapter($adapter_hungate);
@@ -1002,8 +1040,8 @@ device();
 //light_adapter_up();
 
 /** speciality parts - 60mL culture tube base anchor for motor free use (i.e. tube supported only) **/
-// union() {
-//   bottle_base(inner_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, outer_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, height = $holder_base_height );
-//   crush_ribs_ring(vial_diameter = $adapter_culture_60ml, height = $holder_base_height);
-// }
+union() {
+  bottle_base(inner_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, outer_diameter = $adapter_culture_60ml + 2 * $wall + 2 * $bottle_base_gap, height = $holder_base_height );
+  crush_ribs_ring(vial_diameter = $adapter_culture_60ml, height = $holder_base_height);
+}
 
