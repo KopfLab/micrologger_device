@@ -19,6 +19,7 @@ $screw_vertical_stretch = 0.5; // vertical stretch
 $layer_height = 0.25;
 $spokes = 0.05; // width of print enhancement spokes
 $nozzle = 0.4; // nozzle width for spacing decisions
+$n_walls = 8; // number of walls printed
 
 // holder overall sizes
 $holder_inner_diameter = 62; // fix inner diameter for adapter compability
@@ -35,10 +36,12 @@ $holder_feet_location = [54, 180, 306]; // angle locations
 $holder_gap_width = 4; // gap for bottle view
 $holder_feet_diameter = get_screw($holder_feet_screw_type)[1] + 2 * $holder_feet_screw_wall;
 $holder_vent_diameter = $holder_inner_diameter - 15;
-$holder_vent_width = 2.5;
+$holder_vent_width = 2.7;
 $holder_notch_width = 2.5;
 $holder_notch_length = 8;
 $holder_notch_position = $holder_vent_diameter/2 + $holder_vent_width/2;
+$holder_base_adapter_screws_distance = 38; // distance between the screws
+$holder_base_adapter_screws_type = "M3"; // screw type
 
 // stirrer
 $stirrer_hole_diameter = 29; // diameter of the center hole for the magnetic stirrer (fits the largest stirrer at ~27mm)
@@ -88,7 +91,7 @@ module device(spokes = true) {
 
     union() {
       // ring
-      with_base_magnets(top = $holder_total_height, spokes = spokes)
+      with_base_magnets(top = $holder_total_height, spokes = spokes, ridges = true, last_layer = true)
         cylinder(d = $holder_inner_diameter + 2 * $wall, h = $holder_total_height);
 
       // feet threads
@@ -121,10 +124,10 @@ module device(spokes = true) {
           translate([0, 0, -$e])
             cylinder(d = get_screw($holder_feet_screw_type)[1] + $screw_threadable_tolerance, h = $holder_feet_screw_thread_height + $2e);
 
-          // spokes
+          // foot base spokes
           if (spokes) {
-            translate([-$spokes/2, -$holder_feet_diameter, -$e])
-              cube([$spokes, $holder_feet_diameter, $holder_bottom_thickness + $e], center = false);
+            translate([-$spokes/2, -($holder_feet_diameter + $e)/2, -$e])
+              cube([$spokes, $holder_feet_diameter + $2e, $holder_bottom_thickness + $e], center = false);
           }
         }
       }
@@ -142,19 +145,24 @@ module device(spokes = true) {
                 cube([$beam_block_inner_width, $beam_block_total_depth + $e, $holder_total_height - $beam_block_roof], center = false);
               // spokes
               if (spokes) {
-                spoke = [$beam_block_outer_width, $spokes, $beam_block_roof - $layer_height];
-                translate([-$beam_block_outer_width/2 + $wall/2, $beam_block_total_depth - $beam_block_depth/2, $holder_total_height - $beam_block_roof])
+                // roof spokes (minus last layer)
+                translate([-$beam_block_outer_width/2 - $wall, $beam_block_total_depth - $beam_block_depth/2, $holder_total_height - $beam_block_roof])
                 distribute_along_y(
-                  spoke, length = $beam_block_depth, pad_left = 0
+                  size = [$beam_block_outer_width, $spokes, $beam_block_roof - $layer_height],
+                  length = $beam_block_depth, pad_left = 0
                 );
+                // // covering the arc to the inner block FIXME
+                // translate([-$beam_block_outer_width/2, ($beam_block_total_depth - $beam_block_depth)/2, $holder_total_height - $beam_block_roof])
+                // distribute_along_y(
+                //   size = [$beam_block_outer_width + $2e, $spokes, $beam_block_roof - $layer_height],
+                //   length =  $beam_block_total_depth - $beam_block_depth
+                // );
                 // last layer
-                /*
                 translate([0, 0, $holder_total_height - $layer_height])
                 distribute_along_x(
                   size = [$spokes, $beam_block_total_depth, $layer_height + $e],
                   length = $beam_block_outer_width
                 );
-                */
               }
               // sloped supports
               rotate([0, -90, 0])
@@ -200,26 +208,38 @@ module device(spokes = true) {
                 // cutouts
                 translate([-$sensor_block_inner_width/2, 0, $sensor_block_floor])
                   cube([$sensor_block_inner_width, $sensor_block_total_depth + $e, $holder_total_height - $sensor_block_roof - $sensor_block_floor], center = false);
-                // roof spokes
+                // spokes
                 if (spokes) {
+
+                  // base spokes
+                  difference() {
+                    distribute_along_x(
+                      size = [$spokes, $sensor_block_total_depth, 2 *$layer_height],
+                      length = $sensor_block_outer_width
+                    );
+                    translate([0, $sensor_block_total_depth/2 - $sensor_block_depth + ($n_walls - 1.5) * $nozzle, -$e])
+                    xy_center_cube([$holder_notch_width + (4 * $n_walls - 3) * $nozzle, $sensor_block_total_depth, 2 *$layer_height + $2e]);
+                  }
+
+
+                  // roof spokes (minus last layer)
                   translate([-$sensor_block_outer_width/2 + $wall/2, $sensor_block_total_depth - $sensor_block_depth/2, $holder_total_height - $sensor_block_roof])
                   distribute_along_y(
                     size = [$sensor_block_outer_width, $spokes, $sensor_block_roof - $layer_height],
                     length = $sensor_block_depth, pad_left = 0
                   );
+                  // covering the arc to the inner blok
                   translate([-$sensor_block_outer_width/2 + $e, ($sensor_block_total_depth - $sensor_block_depth)/2, $holder_total_height - $sensor_block_roof])
                   distribute_along_y(
                     size = [$sensor_block_outer_width + $2e, $spokes, $sensor_block_roof - $layer_height],
                     length = $sensor_block_total_depth - $sensor_block_depth
                   );
-                  // last layer
-                  /*
+                  // roof spokes last layer
                   translate([0, 0, $holder_total_height - $layer_height])
                   distribute_along_x(
                     size = [$spokes, $sensor_block_total_depth, $layer_height + $e],
                     length = $sensor_block_outer_width
                   );
-                  */
                 }
 
                 /*
@@ -312,7 +332,7 @@ module device(spokes = true) {
               -$spokes/2 + x1 * $sensor_block_screws_x,
               0,
               $holder_bottom_thickness])
-            cube([$spokes, $sensor_block_total_depth - $wall, $holder_total_height - $holder_bottom_thickness - $sensor_block_floor - $sensor_block_roof], center = false);
+            cube([$spokes, $sensor_block_total_depth - $wall, $holder_total_height - $holder_bottom_thickness - $sensor_block_roof], center = false);
         }
         translate([0, $sensor_block_total_depth/2, $holder_total_height - $sensor_block_screws_z[0] - $block_attachment_screws_diameter/2 - $screw_vertical_stretch])
           xy_center_cube([$sensor_block_outer_width, 2 * $sensor_block_total_depth, $block_attachment_screws_diameter + 2 * $screw_vertical_stretch]);
@@ -333,18 +353,28 @@ module device(spokes = true) {
           xy_center_cube([$beam_block_outer_width, 2 * $beam_block_total_depth, $block_attachment_screws_diameter + 2 * $screw_vertical_stretch]);
       }
       // spokes for stirrer cutout
-      translate([$holder_vent_diameter/2, $spokes/2, -$e])
-        rotate([0, 0, 180])
-          cube([$holder_inner_radius + $holder_vent_diameter/2 + $wall, $spokes, $holder_feet_screw_thread_height + $e], center = false);
+      translate([-$holder_vent_diameter/2 - $holder_vent_width, $spokes/2, -$e])
+          cube([$holder_vent_diameter + 2 * $holder_vent_width, $spokes, $holder_feet_screw_thread_height + $e], center = false);
       // spokes for motor attachment screws
       rotate([0, 0, $stirrer_screw_rotation])
-      translate([0, 0, -$e])
-        xy_center_cube([$stirrer_screw_distance, $spokes, $holder_bottom_thickness + $2e]);
+        translate([0, 0, -$e])
+          difference() {
+            xy_center_cube([$holder_inner_diameter + 4 * $wall, $spokes, $holder_bottom_thickness + $2e]);
+            translate([0, 0, -$e])
+              xy_center_cube([$stirrer_hole_diameter + (5 * $n_walls - 4) * $nozzle, $spokes + $2e, $holder_bottom_thickness + 2 * $2e]);
+          }
+      // spokes to meet the motor attachment screws
+      rotate([0, 0, $stirrer_screw_rotation])
+        translate([0, 0, -$e])
+           xy_center_cube([$stirrer_hole_diameter + ($n_walls - 4) * $nozzle, $spokes, $holder_bottom_thickness + $2e]);
       // spokes for tri-supports
       for (angle = $holder_feet_location)
         rotate([0, 0, -90 + angle])
           translate([-$spokes/2, 0, $holder_bottom_thickness])
             cube([$spokes, $holder_inner_radius + $holder_feet_diameter/2, $holder_feet_screw_thread_height - $holder_bottom_thickness + $e], center = false);
+      // spokes to seam
+      translate([-$spokes/2, -$holder_inner_radius - $holder_vent_diameter/2, -$e])
+        cube([$spokes, $holder_inner_radius, $holder_bottom_thickness + $2e], center = false);
     }
 
     // gap below ir tunnel
@@ -382,6 +412,12 @@ module device(spokes = true) {
     for (y = [-1, 1])
     translate([-$holder_notch_width/2, -$holder_notch_length/2 + y * $holder_notch_position, -$e])
     cube([$holder_notch_width, $holder_notch_length, $holder_bottom_thickness + $2e]);
+
+    // base adapter attachment screws (already on path of main spokes)
+    for (x = [-1, 1]) {
+      translate([x * $holder_base_adapter_screws_distance/2 * cos(0), 0, -$e])
+        machine_screw($holder_base_adapter_screws_type, $holder_bottom_thickness + $2e, countersink = false, tolerance = $screw_threadable_tolerance);
+    }
 
     // stirrer attachment screws
     for (x = [-1, 1]) {
@@ -952,9 +988,9 @@ module bottle_base(spokes = true, inner_diameter = $bottle_base_center_diameter,
 
 /** standard prints **/
 
-//device();
+device();
 //stirrer_magnet_holder($stirrer_magnet_diameter_medium);
-bottle_base();
+//bottle_base();
 //bottle_adapter($adapter_hungate);
 //bottle_adapter($adapter_balch);
 //bottle_adapter($adapter_gl45_100ml);
