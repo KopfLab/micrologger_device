@@ -1,4 +1,4 @@
-#define SDDS_PARTICLE_DEBUG 1
+// #define SDDS_PARTICLE_DEBUG 1
 
 // self-describing data structure (SDDS) tree
 #include "uMicroLogger.h"
@@ -13,7 +13,7 @@ TserialSpike serialSpike(micrologger, 115200);
 static TparticleSpike particleSpike(
     micrologger,   // SDDS tree
     "micrologger", // device type
-    10201          // device version (1.0.0= 10000, 2.23.2 = 22302)
+    10303          // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
 // logging
@@ -31,17 +31,20 @@ void setup()
     particleSpike.setup(
         {// set default publishing intervals for anything that should be different from publish::OFF
          // --> all variables that are stored in EEPROM (saveeval option) should report all changes
-         {publish::IMMEDIATELY, sdds::opt::saveval},
+         {publish::EACH, sdds::opt::saveval},
+         // --> last save should always be reported
+         {publish::ALWAYS, &particleSystem().state.lastSave_dt},
          // --> device connect/disconnect should be published immediately
-         {publish::IMMEDIATELY, &micrologger.device},
-         // --> errors should always be published
-         {publish::IMMEDIATELY, &micrologger.stirrer.error},
-         {publish::IMMEDIATELY, &micrologger.lights.error},
-         //{publish::IMMEDIATELY, &micrologger.OD.beamError},
+         {publish::EACH, &micrologger.device},
+         // --> top level errors should always be published
+         {publish::EACH, &micrologger.stirrer.error},
+         {publish::EACH, &micrologger.lights.error},
+         {publish::EACH, &micrologger.sensor.error},
+         {publish::EACH, &micrologger.environment.error},
          // --> all floats should inherit from the globalInterval
-         {publish::INHERIT, {sdds::Ttype::FLOAT32, sdds::Ttype::FLOAT64}},
+         {publish::AVG_GLOBAL, {sdds::Ttype::FLOAT32, sdds::Ttype::FLOAT64}},
          // --> motor speed is an integer but should still inherit from the globalInterval
-         {publish::INHERIT, &micrologger.stirrer.speed_rpm}});
+         {publish::AVG_GLOBAL, &micrologger.stirrer.speed_rpm}});
 
     // add hardware menu after the particle spike so it does not have publish options
     micrologger.addDescr(hardware());
