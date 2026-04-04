@@ -139,7 +139,7 @@ private:
 
         // light status
         if (lights.status == TlightsStatus::on)
-            hardware().display.printLine(Tdisplay::line5Y, "Light:" + lights.intensity.to_string() + "%");
+            hardware().display.printLine(Tdisplay::line5Y, "Light:" + lights.intensity_percent.to_string() + "%");
         else if (lights.status == TlightsStatus::off)
             hardware().display.printLine(Tdisplay::line5Y, "Light:off");
         else if (lights.status == TlightsStatus::error)

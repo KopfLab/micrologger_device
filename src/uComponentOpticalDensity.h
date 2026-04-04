@@ -191,7 +191,7 @@ private:
                     }
                     reading.bgrd = zero.bgrd;
                     reading.signal = zero.signal;
-                    zero.last = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL);
+                    zero.last_dt = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL);
                     zero.valid = enums::TnoYes::yes;
                 }
                 else
@@ -414,7 +414,7 @@ public:
     class Tzero : public TmenuHandle
     {
     public:
-        sdds_var(Tstring, last, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), "never");
+        sdds_var(Tstring, last_dt, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), "never");
         sdds_var(enums::TnoYes, valid, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), enums::TnoYes::no);
         sdds_var(Tuint16, signal, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
         sdds_var(Tuint16, bgrd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
@@ -438,7 +438,7 @@ public:
         sdds_var(enums::TnoYes, automatic, sdds::opt::nothing, enums::TnoYes::yes); // not saved, always need to unlock to do manual changes
         sdds_var(Tuint16, max_ppt, sdds::opt::readonly);
         sdds_var(Tuint16, target_ppt, sdds::opt::saveval, 920);
-        sdds_var(Tuint32, gain_Ohm, sdds::opt::saveval);
+        sdds_var(Tuint32, gain_Ohm, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly));
         sdds_enum(set, error) Tstatus;
         sdds_var(Tstatus, status, sdds::opt::readonly);
         sdds_var(Thardware::Ti2cError, error, sdds::opt::readonly);

@@ -24,7 +24,7 @@ public:
     sdds_var(Tstatus, status, sdds::opt::readonly, Tstatus::off);
     sdds_var(Tevent, event, sdds::opt::readonly, Tevent::none);
     sdds_var(Thardware::Ti2cError, error, sdds::opt::readonly);
-    sdds_var(Tuint8, intensity, sdds::opt::saveval, 100);
+    sdds_var(Tuint8, intensity_percent, sdds::opt::saveval, 100);
     sdds_var(Tuint32, scheduleOn_sec, sdds::opt::saveval, 60 * 60 * 12);  // 12 hours on
     sdds_var(Tuint32, scheduleOff_sec, sdds::opt::saveval, 60 * 60 * 12); // 12 hours off
     sdds_var(Tuint16, scheduleOnStart_HHMM, sdds::opt::saveval, 1200);
@@ -159,7 +159,7 @@ private:
             light = false;
 
         // update light
-        (light) ? hardware().setLight(enums::ToffOn::on, intensity.value()) : hardware().setLight(enums::ToffOn::off);
+        (light) ? hardware().setLight(enums::ToffOn::on, intensity_percent.value()) : hardware().setLight(enums::ToffOn::off);
 
         // fan
         bool fan = false;
@@ -236,12 +236,12 @@ public:
         };
 
         // change light intensity
-        on(intensity)
+        on(intensity_percent)
         {
-            if (intensity == 0)
-                intensity = 1;
-            else if (intensity > 100)
-                intensity = 100;
+            if (intensity_percent == 0)
+                intensity_percent = 1;
+            else if (intensity_percent > 100)
+                intensity_percent = 100;
             else
                 update();
         };
