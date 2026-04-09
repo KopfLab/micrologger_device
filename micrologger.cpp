@@ -13,7 +13,7 @@ TserialSpike serialSpike(micrologger, 115200);
 static TparticleSpike particleSpike(
     micrologger,   // SDDS tree
     "micrologger", // device type
-    10303          // device version (1.0.0= 10000, 2.23.2 = 22302)
+    10401          // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
 // logging
@@ -44,7 +44,13 @@ void setup()
          // --> all floats should inherit from the globalInterval
          {publish::AVG_GLOBAL, {sdds::Ttype::FLOAT32, sdds::Ttype::FLOAT64}},
          // --> motor speed is an integer but should still inherit from the globalInterval
-         {publish::AVG_GLOBAL, &micrologger.stirrer.speed_rpm}});
+         {publish::AVG_GLOBAL, &micrologger.stirrer.speed_rpm},
+         // --> don't report transmittance, and power, and standard devs by default
+         {publish::OFF, &micrologger.environment.power_V},
+         {publish::OFF, &micrologger.environment.powerReq_V},
+         {publish::OFF, &micrologger.sensor.reading.transmittance},
+         {publish::OFF, &micrologger.sensor.reading.transmittanceSd},
+         {publish::OFF, &micrologger.sensor.reading.ODSd}});
 
     // add hardware menu after the particle spike so it does not have publish options
     micrologger.addDescr(hardware());

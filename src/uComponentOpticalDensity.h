@@ -155,9 +155,15 @@ private:
                     break;
                 // save as zeroing value?
                 if (status == Tstatus::zeroing)
+                {
                     zero.signal = hardware().signal.value.value();
+                    zero.signalSd = hardware().signal.sdev.value();
+                }
                 else
+                {
                     reading.signal = hardware().signal.value.value();
+                    reading.signalSd = hardware().signal.sdev.value();
+                }
 
                 // saturated?
                 if (hardware().signal.error == Thardware::TsignalError::saturated && error == Terror::none)
@@ -183,6 +189,7 @@ private:
                 {
                     // finish zero
                     zero.bgrd = hardware().signal.value.value();
+                    zero.bgrdSd = hardware().signal.sdev.value();
                     if (zero.bgrd.value() > zero.signal.value())
                     {
                         // bgrd is larger than signal! something is wrong
@@ -190,7 +197,9 @@ private:
                         break;
                     }
                     reading.bgrd = zero.bgrd;
+                    reading.bgrdSd = zero.bgrdSd;
                     reading.signal = zero.signal;
+                    reading.signalSd = zero.signalSd;
                     zero.last_dt = Time.format(Time.now(), TIME_FORMAT_ISO8601_FULL);
                     zero.valid = enums::TnoYes::yes;
                 }
@@ -198,20 +207,35 @@ private:
                 {
                     // finish read
                     reading.bgrd = hardware().signal.value.value();
+                    reading.bgrdSd = hardware().signal.sdev.value();
                     if (reading.bgrd > reading.signal)
                         reading.signal = reading.bgrd; // = 0 transmittance
                     hardware().recordSignal(enums::ToffOn::off);
                 }
                 // finish calculations and return to idle
-                if (reading.signal == reading.bgrd)
+                if (reading.signal <= reading.bgrd)
                 {
-                    reading.transmittance = 0.0;  // no signal left
-                    reading.OD = Tfloat32::nan(); // not a number
+                    reading.transmittance = 0.0;               // no signal left
+                    reading.transmittanceSd = Tfloat32::nan(); // undefined
+                    reading.OD = Tfloat32::nan();              // undefined
+                    reading.ODSd = Tfloat32::nan();            // undefined
                 }
                 else
                 {
-                    reading.transmittance = static_cast<dtypes::float32>((reading.signal.value() - reading.bgrd.value())) / (zero.signal.value() - zero.bgrd.value());
+                    // calculate transmittance
+                    dtypes::float32 numerator = static_cast<dtypes::float32>(reading.signal.value() - reading.bgrd.value());
+                    dtypes::float32 denominator = static_cast<dtypes::float32>(zero.signal.value() - zero.bgrd.value());
+                    reading.transmittance = numerator / denominator;
+
+                    // stick with variances to avoid repeat squrt calculations
+                    dtypes::float32 variance_num = static_cast<dtypes::float32>(reading.signalSd.value() * reading.signalSd.value() + reading.bgrdSd.value() * reading.bgrdSd.value());
+                    dtypes::float32 variance_denom = static_cast<dtypes::float32>(zero.signalSd.value() * zero.signalSd.value() + zero.bgrdSd.value() * zero.bgrdSd.value());
+                    dtypes::float32 intermediate = sqrt(variance_num / (numerator * numerator) + variance_denom / (denominator * denominator));
+                    reading.transmittanceSd = reading.transmittance.value() * intermediate;
+
+                    // calculate optical density
                     reading.OD = -log10(reading.transmittance.value());
+                    reading.ODSd = intermediate / log(10.0f);
                 }
                 if (error != Terror::none && error != Terror::saturated)
                     error = Terror::none;
@@ -404,9 +428,9 @@ public:
         sdds_var(Tuint16, warmup_ms, sdds::opt::saveval, 200);                        // beam warmup (how long to wait whenever the beam is turned on)
         sdds_var(Tstring, nextRead, sdds::opt::readonly);
         sdds_var(Tuint16, signal, sdds::opt::readonly, 0);
-        sdds_var(Tuint16, signalSd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
+        sdds_var(Tuint16, signalSd, sdds::opt::readonly, 0);
         sdds_var(Tuint16, bgrd, sdds::opt::readonly, 0);
-        sdds_var(Tuint16, bgrdSd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
+        sdds_var(Tuint16, bgrdSd, sdds::opt::readonly, 0);
         sdds_var(Tfloat32, transmittance, sdds::opt::readonly, Tfloat32::nan());
         sdds_var(Tfloat32, transmittanceSd, sdds::opt::readonly, Tfloat32::nan());
         sdds_var(Tfloat32, OD, sdds::opt::readonly, Tfloat32::nan());
