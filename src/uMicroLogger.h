@@ -127,49 +127,50 @@ private:
             hardware().display.printLine(Tdisplay::line3Y, buf, Tdisplay::offsetX);
         }
 
-        // data information
-        if (particleSystem().publishing.publish == TonOff::ON)
-        {
-            hardware().display.printLine(Tdisplay::line4Y, "data: 0%"); // FIXME
-        }
-        else
-        {
-            hardware().display.printLine(Tdisplay::line4Y, "Data: off");
-        }
-
         // light status
         if (lights.status == TlightsStatus::on)
-            hardware().display.printLine(Tdisplay::line5Y, "Light:" + lights.intensity_percent.to_string() + "%");
+            hardware().display.printLine(Tdisplay::line4Y, "Light:" + lights.intensity_percent.to_string() + "%");
         else if (lights.status == TlightsStatus::off)
-            hardware().display.printLine(Tdisplay::line5Y, "Light:off");
+            hardware().display.printLine(Tdisplay::line4Y, "Light:off");
         else if (lights.status == TlightsStatus::error)
-            hardware().display.printLine(Tdisplay::line5Y, "Light:ERR");
+            hardware().display.printLine(Tdisplay::line4Y, "Light:ERR");
 
         // light state
         if (lights.event != TlightsEvent::none)
-            hardware().display.printLine(Tdisplay::line5Y, lights.event.to_string(), Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line4Y, lights.event.to_string(), Tdisplay::offsetX);
         else if (lights.state == TlightsState::on)
-            hardware().display.printLine(Tdisplay::line5Y, "always on", Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line4Y, "always on", Tdisplay::offsetX);
         else if (lights.state == TlightsState::off)
-            hardware().display.printLine(Tdisplay::line5Y, "always off", Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line4Y, "always off", Tdisplay::offsetX);
         else if (lights.state == TlightsState::schedule)
-            hardware().display.printLine(Tdisplay::line5Y, lights.scheduleInfo.c_str(), Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line4Y, lights.scheduleInfo.c_str(), Tdisplay::offsetX);
 
         // fan status
         if (lights.fan.status == TlightsStatus::on)
-            hardware().display.printLine(Tdisplay::line6Y, "Fan:on");
+            hardware().display.printLine(Tdisplay::line5Y, "Fan:on");
         else if (lights.fan.status == TlightsStatus::off)
-            hardware().display.printLine(Tdisplay::line6Y, "Fan:off");
+            hardware().display.printLine(Tdisplay::line5Y, "Fan:off");
         else if (lights.fan.status == TlightsStatus::error)
-            hardware().display.printLine(Tdisplay::line6Y, "Fan:ERR");
+            hardware().display.printLine(Tdisplay::line5Y, "Fan:ERR");
 
         // fan state
         if (lights.fan.state == TfanState::on)
-            hardware().display.printLine(Tdisplay::line6Y, "always on", Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line5Y, "always on", Tdisplay::offsetX);
         else if (lights.fan.state == TfanState::off)
-            hardware().display.printLine(Tdisplay::line6Y, "always off", Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line5Y, "always off", Tdisplay::offsetX);
         else if (lights.fan.state == TfanState::withLight)
-            hardware().display.printLine(Tdisplay::line6Y, "with light", Tdisplay::offsetX);
+            hardware().display.printLine(Tdisplay::line5Y, "with light", Tdisplay::offsetX);
+
+        // data information
+        hardware().display.printLine(Tdisplay::line6Y, "Publish:");
+        if (particleSystem().publishing.publish == TonOff::ON)
+        {
+            hardware().display.printLine(Tdisplay::line6Y, dtypes::string("in ") + particleSystem().publishing.nextGlobalPublish.c_str(), Tdisplay::offsetX);
+        }
+        else
+        {
+            hardware().display.printLine(Tdisplay::line6Y, "off", Tdisplay::offsetX);
+        }
 
         hardware().display.drawLayoutLines();
     }

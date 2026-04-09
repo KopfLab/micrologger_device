@@ -404,9 +404,13 @@ public:
         sdds_var(Tuint16, warmup_ms, sdds::opt::saveval, 200);                        // beam warmup (how long to wait whenever the beam is turned on)
         sdds_var(Tstring, nextRead, sdds::opt::readonly);
         sdds_var(Tuint16, signal, sdds::opt::readonly, 0);
+        sdds_var(Tuint16, signalSd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
         sdds_var(Tuint16, bgrd, sdds::opt::readonly, 0);
+        sdds_var(Tuint16, bgrdSd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
         sdds_var(Tfloat32, transmittance, sdds::opt::readonly, Tfloat32::nan());
+        sdds_var(Tfloat32, transmittanceSd, sdds::opt::readonly, Tfloat32::nan());
         sdds_var(Tfloat32, OD, sdds::opt::readonly, Tfloat32::nan());
+        sdds_var(Tfloat32, ODSd, sdds::opt::readonly, Tfloat32::nan());
     };
     sdds_var(Treading, reading);
 
@@ -417,7 +421,9 @@ public:
         sdds_var(Tstring, last_dt, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), "never");
         sdds_var(enums::TnoYes, valid, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), enums::TnoYes::no);
         sdds_var(Tuint16, signal, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
+        sdds_var(Tuint16, signalSd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
         sdds_var(Tuint16, bgrd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
+        sdds_var(Tuint16, bgrdSd, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly), 0);
     };
     sdds_var(Tzero, zero);
 
@@ -663,7 +669,7 @@ public:
             {
                 char buf[16]; // snprintf buffer
                 dtypes::uint32 diff = static_cast<dtypes::uint32>(round((FnextRead - millis()) / 1000.));
-                if (diff > 59)
+                if (diff > 60)
                     snprintf(buf, sizeof(buf), "%dm%ds", diff / 60, diff % 60);
                 else
                     snprintf(buf, sizeof(buf), "%ds", diff);
