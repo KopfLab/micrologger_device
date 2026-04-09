@@ -13,7 +13,7 @@ TserialSpike serialSpike(micrologger, 115200);
 static TparticleSpike particleSpike(
     micrologger,   // SDDS tree
     "micrologger", // device type
-    10401          // device version (1.0.0= 10000, 2.23.2 = 22302)
+    10403          // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
 // logging

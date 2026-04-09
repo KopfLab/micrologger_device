@@ -70,8 +70,8 @@ public:
                     if (error != Terror::none)
                         error = Terror::none;
                 }
-                value = mean;
                 sdev = static_cast<dtypes::uint16>(round(FsignalStats.stdDev()));
+                value = mean;
                 FsignalStats.reset();
             }
             FreadTimer.start(interval_ms);

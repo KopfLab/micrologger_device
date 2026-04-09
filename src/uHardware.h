@@ -97,7 +97,7 @@ public:
     class Tgain : public TmenuHandle
     {
     public:
-        sdds_var(Tuint32, base_Ohm, sdds::opt::saveval, 10000); // base resistance in the amplification ciruct
+        sdds_var(Tuint32, base_Ohm, sdds::opt::saveval, 56000); // base resistance in the amplification circuit, sensor board version 1
         sdds_var(Tuint16, steps);                               // gain steps
         sdds_var(Tuint32, total_Ohm, sdds::opt::readonly);      // total gain of the amplifier circuit
         sdds_var(Ti2cError, error, sdds::opt::readonly);        // i2c error
@@ -156,6 +156,8 @@ public:
         // figure out individual digipots for requested gain
         dtypes::uint16 maxSteps = dpot1.maxSteps + dpot2.maxSteps - 1; // one step fewer as they are always both set (not independently)
         dtypes::uint16 dpot1_steps, dpot2_steps;
+        if (_steps > maxSteps)
+            _steps = maxSteps;
         if (_steps > dpot1.maxSteps)
         {
             dpot1_steps = dpot1.maxSteps;

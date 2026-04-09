@@ -89,6 +89,8 @@ private:
                 snprintf(buf, sizeof(buf), "OD:no data");
             hardware().display.printLine(Tdisplay::line1Y, buf);
         }
+        else if (sensor.status == TodStatus::waiting)
+            hardware().display.printLine(Tdisplay::line1Y, "Zero ready");
         else
             hardware().display.printLine(Tdisplay::line1Y, "SAT:" + sensor.reading.saturation_ppt.to_string());
 
@@ -97,6 +99,8 @@ private:
             hardware().display.printLine(Tdisplay::line1Y, sensor.error.to_string(), Tdisplay::offsetX);
         else if (sensor.zero.valid != enums::TnoYes::yes && sensor.status == TodStatus::idle)
             hardware().display.printLine(Tdisplay::line1Y, "zero me", Tdisplay::offsetX);
+        else if (sensor.zero.valid != enums::TnoYes::yes && sensor.status == TodStatus::waiting)
+            hardware().display.printLine(Tdisplay::line1Y, dtypes::string("in ") + sensor.reading.nextRead.c_str(), Tdisplay::offsetX);
         else if (sensor.zero.valid == enums::TnoYes::yes && sensor.status == TodStatus::idle)
             hardware().display.printLine(Tdisplay::line1Y, dtypes::string("in ") + sensor.reading.nextRead.c_str(), Tdisplay::offsetX);
         else
