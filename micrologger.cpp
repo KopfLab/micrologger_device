@@ -13,15 +13,20 @@ TserialSpike serialSpike(micrologger, 115200);
 static TparticleSpike particleSpike(
     micrologger,   // SDDS tree
     "micrologger", // device type
-    10400          // device version (1.0.0= 10000, 2.23.2 = 22302)
+    10401          // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
 // logging
 SerialLogHandler logHandler(
     LOG_LEVEL_WARN, // WARN for non-app messages
     {
-        {"app", LOG_LEVEL_TRACE} // TRACE for app
-    });
+        {"app",
+#ifdef SDDS_PARTICLE_DEBUG
+         LOG_LEVEL_TRACE
+#else
+         LOG_LEVEL_INFO
+#endif
+        }});
 
 // setup
 void setup()
