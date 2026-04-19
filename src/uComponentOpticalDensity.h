@@ -135,7 +135,8 @@ private:
                     break;
 
                 // pause lights
-                (*Flights).action = TcomponentLights::Taction::pause;
+                if (reading.stopLights == enums::TnoYes::yes)
+                    (*Flights).action = TcomponentLights::Taction::pause;
 
                 // turn beam on and wait for warmup period
                 hardware().setBeam(enums::ToffOn::on);
@@ -324,7 +325,8 @@ private:
                 hardware().setGainSteps(0);
 
                 // pause lights
-                (*Flights).action = TcomponentLights::Taction::pause;
+                if (reading.stopLights == enums::TnoYes::yes)
+                    (*Flights).action = TcomponentLights::Taction::pause;
 
                 // turn beam on if not already on and wait for warmup period
                 FbeamWasOn = beam.status == Tbeam::Tstatus::on;
@@ -455,6 +457,7 @@ public:
         sdds_var(Tuint32, readInterval_ms, sdds::opt::saveval, 1000 * 60 * 2);        // how often to read (in milliseconds)
         sdds_var(enums::TnoYes, vortex, sdds::opt::saveval, enums::TnoYes::no);       // reading.vortex before reading?
         sdds_var(enums::TnoYes, stopStirrer, sdds::opt::saveval, enums::TnoYes::yes); // stop stirrer before read?
+        sdds_var(enums::TnoYes, stopLights, sdds::opt::saveval, enums::TnoYes::yes);  // stop lights before read?
         sdds_var(Tuint32, wait_ms, sdds::opt::saveval, 0);                            // how long to wait after reading.vortex/stirrer stop
         sdds_var(Tuint32, warmup_ms, sdds::opt::saveval, 3000);                       // beam warmup (how long to wait whenever the beam is turned on)
         sdds_var(Tuint32, cooldown_ms, sdds::opt::saveval, 500);                      // beam cooldown (how long to wait after the beam is off to read the background)
@@ -678,7 +681,7 @@ public:
             // are we switching back to idle?
             if (status == Tstatus::idle)
             {
-                // resume stirrer and lights (they manage what that means - nothing if they're off)
+                // resume stirrer and lights (they manage what that means - nothing if they're off or have not been paused)
                 if (Fstirrer)
                     (*Fstirrer).action = TcomponentStirrer::Taction::resume;
                 if (Flights)
