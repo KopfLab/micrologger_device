@@ -114,7 +114,7 @@ public:
     // speed tolerance: based on the calibration slopes of ~0.7 steps/rpm --> 1/0.7 = 1.4 rpm/step --> aim for targetSpeed +/- 2)
     sdds_var(Tuint8, autoAdjustSpeedTolerance_rpm, sdds::opt::saveval, static_cast<dtypes::uint8>(ceil(1.0f / Fmavg)));
     sdds_var(Tuint16, speedCheckInterval_ms, sdds::opt::saveval, 50);
-    sdds_var(Tuint16, readInterval_ms, sdds::opt::saveval, 500);
+    sdds_var(Tuint32, readInterval_ms, sdds::opt::saveval, 500);
     sdds_enum(none, noResponse, notInitialized) Terror;
     sdds_var(Terror, error, sdds::opt::readonly);
 

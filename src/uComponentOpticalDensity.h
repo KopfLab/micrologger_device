@@ -452,12 +452,12 @@ public:
     {
     public:
         sdds_var(Tuint16, saturation_ppt, sdds::opt::readonly);                       // current signal saturation in parts per thousand
-        sdds_var(Tuint16, readInterval_ms, sdds::opt::saveval, 60000);                // how often to read
+        sdds_var(Tuint32, readInterval_ms, sdds::opt::saveval, 1000 * 60 * 2);        // how often to read (in milliseconds)
         sdds_var(enums::TnoYes, vortex, sdds::opt::saveval, enums::TnoYes::no);       // reading.vortex before reading?
         sdds_var(enums::TnoYes, stopStirrer, sdds::opt::saveval, enums::TnoYes::yes); // stop stirrer before read?
-        sdds_var(Tuint16, wait_ms, sdds::opt::saveval, 0);                            // how long to wait after reading.vortex/stirrer stop
-        sdds_var(Tuint16, warmup_ms, sdds::opt::saveval, 3000);                       // beam warmup (how long to wait whenever the beam is turned on)
-        sdds_var(Tuint16, cooldown_ms, sdds::opt::saveval, 500);                      // beam cooldown (how long to wait after the beam is off to read the background)
+        sdds_var(Tuint32, wait_ms, sdds::opt::saveval, 0);                            // how long to wait after reading.vortex/stirrer stop
+        sdds_var(Tuint32, warmup_ms, sdds::opt::saveval, 3000);                       // beam warmup (how long to wait whenever the beam is turned on)
+        sdds_var(Tuint32, cooldown_ms, sdds::opt::saveval, 500);                      // beam cooldown (how long to wait after the beam is off to read the background)
         sdds_var(Tstring, nextRead, sdds::opt::readonly);
         sdds_var(Tuint16, signal, sdds::opt::readonly, 0);
         sdds_var(Tuint16, signalSd, sdds::opt::readonly, 0);
@@ -498,7 +498,7 @@ public:
     {
     public:
         sdds_var(enums::TnoYes, automatic, sdds::opt::nothing, enums::TnoYes::yes); // not saved, always need to unlock to do manual changes
-        sdds_var(Tuint16, zeroPause_ms, sdds::opt::saveval, 60000);                 // how long to pause after automatic gain adjustment before zeroing
+        sdds_var(Tuint32, zeroPause_ms, sdds::opt::saveval, 60000);                 // how long to pause after automatic gain adjustment before zeroing
         sdds_var(Tuint16, max_ppt, sdds::opt::readonly);
         sdds_var(Tuint16, target_ppt, sdds::opt::saveval, 920);
         sdds_var(Tuint32, gain_Ohm, sdds_joinOpt(sdds::opt::saveval, sdds::opt::readonly));

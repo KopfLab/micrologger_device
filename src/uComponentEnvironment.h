@@ -22,7 +22,7 @@ private:
 
 public:
     // sdds vars
-    sdds_var(Tuint16, readInterval_ms, sdds::opt::saveval, 1000); // how often to read the temperature
+    sdds_var(Tuint32, readInterval_ms, sdds::opt::saveval, 1000); // how often to read the temperature
     sdds_var(Tfloat32, temperature_C, sdds::opt::readonly);
     sdds_var(Tfloat32, power_V, sdds::opt::readonly);
     sdds_var(Tfloat32, powerReq_V, sdds::opt::saveval, 20.0); // what is the minimum power requirement?
