@@ -15,7 +15,7 @@ $extra_tolerance_2D = [$extra_tolerance, $extra_tolerance]; // tolerance in 2 d
 $screw_hole_tolerance = 0.45 + $extra_tolerance; // tolerance for screw holes
 $screw_threadable_tolerance = 0; // tolerance for screw holes that can be threaded into
 
-// controller box
+// controller box (designed for print with a 0.5 mm nozzle)
 // depth:
 //  - display recess: 1.0 mm
 //  - display + board height: 4.0mm
@@ -296,8 +296,8 @@ module module_controller_magnet_holder() {
 }
 
 // render modules
-module_controller_front();
-translate([0, 0, $box_size[2] + 5])
-rotate([180, 0, 0])
+//module_controller_front();
+// translate([0, 0, $box_size[2] + 5])
+// rotate([180, 0, 0])
 module_controller_back();
-!module_controller_magnet_holder();
+//module_controller_magnet_holder();
