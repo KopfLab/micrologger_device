@@ -47,7 +47,7 @@ private:
             hardware().display.drawIcon(no_wifi_icon, no_wifi_icon_width);
 
         // publishing? (don't show the "not publishing", it's not as informative)
-        if (particleSystem().publishing.publish == TonOff::ON)
+        if (particleSystem().publishing.record == TonOff::ON)
             hardware().display.drawIcon(publishing_icon, publishing_icon_width);
 
         // device name
@@ -167,7 +167,7 @@ private:
 
         // data information
         hardware().display.printLine(Tdisplay::line6Y, "Publish:");
-        if (particleSystem().publishing.publish == TonOff::ON)
+        if (particleSystem().publishing.record == TonOff::ON)
         {
             hardware().display.printLine(Tdisplay::line6Y, dtypes::string("in ") + particleSystem().publishing.nextGlobalPublish.c_str(), Tdisplay::offsetX);
         }

@@ -19,7 +19,7 @@ public:
 
 private:
     // keep track of publishing to detect when it switches from OFF to ON
-    bool FisPublishing = particleSystem().publishing.publish == sdds::enums::OnOff::ON;
+    bool FisPublishing = particleSystem().publishing.record == sdds::enums::OnOff::ON;
 
     // current speed setting
     dtypes::uint16 FspeedTarget = 0;
@@ -253,13 +253,13 @@ public:
 
         // reset motor error when publish is turned on
         // this ensures it gets logged when the next error occurs
-        on(particleSystem().publishing.publish)
+        on(particleSystem().publishing.record)
         {
-            if (!FisPublishing && particleSystem().publishing.publish == sdds::enums::OnOff::ON)
+            if (!FisPublishing && particleSystem().publishing.record == sdds::enums::OnOff::ON)
             {
                 error = Thardware::TmotorError::none;
             }
-            FisPublishing = particleSystem().publishing.publish == sdds::enums::OnOff::ON;
+            FisPublishing = particleSystem().publishing.record == sdds::enums::OnOff::ON;
         };
 
         // update motor error from hardware

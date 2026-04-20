@@ -22,7 +22,7 @@ public:
 
 private:
     // keep track of publishing to detect when it switches from OFF to ON
-    bool FisPublishing = particleSystem().publishing.publish == sdds::enums::OnOff::ON;
+    bool FisPublishing = particleSystem().publishing.record == sdds::enums::OnOff::ON;
 
     // other components that need to be paused by this one
     TcomponentStirrer *Fstirrer = nullptr;
