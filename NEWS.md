@@ -10,6 +10,7 @@ NB:
 - optical density `reading.stopLights` added for users to decide whether lights turn off or stay on during OD reads (default is stopLights = yes)
 - system `state.autoSendOnStartup` added for users to decide whether to send the state snapshot whenenver a device that's recording starts up (e.g. after power cycling), default is ON
 - introduce particle variable `getSddsSystem` as convenience access piont that returns the system variable tree only (~800 bytes in size) except for the variable publish intervals (which can be any size)
+- change default read interavl to 2 min and default publish interval to 20 min
 
 # version 1.4.0
 
