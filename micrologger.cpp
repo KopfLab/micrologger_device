@@ -11,9 +11,10 @@ TserialSpike serialSpike(micrologger, 115200);
 // particle spike for particle communication (with sdds name and version)
 #include "uParticleSpike.h"
 static TparticleSpike particleSpike(
-    micrologger,   // SDDS tree
-    "micrologger", // device type
-    10500          // device version (1.0.0= 10000, 2.23.2 = 22302)
+    micrologger,       // SDDS tree
+    "micrologger",     // device type
+    "microloggerData", // data event
+    10501              // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
 // logging
