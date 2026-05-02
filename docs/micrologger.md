@@ -17,6 +17,7 @@
 ## I2C addresses:
 
  - MCP4652 (dual trimpot): 0x2C if address pins tied to ground
+ - MCP5241 (single trimpot): 0x2C if address pins tied to ground
  - I2C display: 0x3c
  - IR temperature sensor: 0x5a
  - tmp117 temperature sensor: 0x48
