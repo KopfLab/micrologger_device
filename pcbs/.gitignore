@@ -15,6 +15,7 @@ pcbway_production
 *.bak
 fp-info-cache
 _autosave*
+.history
 
 # Explicitly include
 !*.pdf
