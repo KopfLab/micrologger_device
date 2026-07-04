@@ -26,12 +26,66 @@ Modular Internet Controllable Real-time Optical-density Loggers (µLoggers) are 
 
 ## Features
 
-- easily extensible framework for implementing cloud-connected µLoggers based on the secure and well-established Particle [Photon 2](https://docs.particle.io/reference/datasheets/wi-fi/photon-2-datasheet/) platform
-- constructs JSON-formatted data logs for flexible recording in spreadsheets or databases via cloud webhooks
-- build-in data averaging and error calculation
-- built-in support for remote control via cloud commands
-- built-in support for device state management (device locking, logging behavior, data read and log frequency, etc.)
-- built-in connectivity management with data caching during offline periods - Photon memory typically allows caching of 50-100 logs to bridge device downtime of several hours
+- **Continuous optical-density logging** — a narrow-band beam LED and an OPT101 photodetector with automatically optimized amplifier gain measure the light transmission across the culture vessel; the firmware computes optical density (−log₁₀ of transmittance) at user-defined intervals, propagates a standard-deviation error onto every reading, and stores the per-vessel zero reference on the device so it survives power outages.
+- **Magnetic stirring & vortexing** — a built-in brushless motor drives a magnetically coupled stirrer with configurable speed, acceleration/deceleration ramps, and a vortex (pulse-agitation) mode; stirring can automatically pause or vortex around each optical-density read.
+- **Swappable, magnetically secured vessel adapters** — 3D-printed adapters hold vessels from 18 mm / 15 mL culture tubes up to GL45 100 mL bottles (including Balch/Hungate tubes and serum bottles) with a radial spring mechanism, and accept stacking add-ons such as the illumination adapter.
+- **Optional illumination for phototrophs** — a dimmable light adapter with permanent on/off or scheduled (repeating daily-cycle) operation and a light-synced cooling fan.
+- **Temperature & power monitoring** — on-board TMP117 temperature sensing at the vessel holder plus supply-voltage monitoring with under-voltage warnings on the display.
+- **At-a-glance local display** — the WiFi controller sits outside the incubator, links to the reader over a single cable, and shows live optical density, stir speed, temperature, connectivity, and publishing status on an OLED; it mounts magnetically to any metal surface.
+- **Real-time cloud connectivity** — built on the Particle [Photon 2](https://docs.particle.io/reference/datasheets/wi-fi/photon-2-datasheet/); publishes JSON data logs via cloud webhooks (the `microloggerData` event) for recording into spreadsheets or databases, averages data over configurable intervals, and caches logs during offline periods to bridge device downtime.
+- **Self-describing & remotely controllable** — the entire device state is exposed as a self-describing data structure (SDDS) that the [sddsParticle](https://github.com/KopfLab/sddsParticle) web GUI (or the Particle CLI/API) can browse and control, with persisted settings, one-shot actions, and per-variable publish intervals.
+- **Open & modular** — component-based, easily extensible C++ firmware (separate `sensor`, `stirrer`, `lights`, and `environment` components), open [KiCad](https://www.kicad.org/) hardware, and open [OpenSCAD](https://openscad.org/) 3D-printable mechanical parts.
+
+## Hardware
+
+A µLogger is built from four custom circuit boards, designed in [KiCad](https://www.kicad.org/) with sources under [`pcbs/`](pcbs). For each board the board layout is shown below (click it to open the full schematic / wiring diagram as a PDF).
+
+### Controller board — the µLogger "brain"
+
+A Particle Photon 2 for WiFi and control, the OLED status display, the 24 V power input with supply-voltage monitoring, the controller-version code pins, and the single-cable connector to the reader (the vessel holder).
+
+<a href="pcbs/controller_board/controller_board.pdf"><img src="pcbs/controller_board/controller_board.svg" alt="controller board layout" width="480"></a>
+
+*→ [Controller board wiring diagram (PDF)](pcbs/controller_board/controller_board.pdf)*
+
+### Sensor board
+
+Mounted in the vessel holder: the OPT101 photodiode/transimpedance amplifier with a two-stage digital-potentiometer gain circuit (MCP4017 + AD5246), the TCA9534 I2C IO expander (reader-connection detection plus beam and indicator LEDs), and the measurement-beam LED. The board version is read back over the IO expander.
+
+<a href="pcbs/sensor_board/sensor_board.pdf"><img src="pcbs/sensor_board/sensor_board.svg" alt="sensor board layout" width="480"></a>
+
+*→ [Sensor board wiring diagram (PDF)](pcbs/sensor_board/sensor_board.pdf)*
+
+### LED board
+
+The optional illumination adapter: the light LEDs driven by a PCA9633 PWM controller for dimming, together with the cooling fan.
+
+<a href="pcbs/led_board/led_board.pdf"><img src="pcbs/led_board/led_board.svg" alt="LED board layout" width="480"></a>
+
+*→ [LED board wiring diagram (PDF)](pcbs/led_board/led_board.pdf)*
+
+### Temperature board
+
+A TMP117 precision temperature sensor placed at the vessel holder.
+
+<a href="pcbs/temperature_board/temperature_board.pdf"><img src="pcbs/temperature_board/temperature_board.svg" alt="temperature board layout" width="480"></a>
+
+*→ [Temperature board wiring diagram (PDF)](pcbs/temperature_board/temperature_board.pdf)*
+
+## 3D printed parts
+
+The vessel holder, stirrer, controller enclosure, and all vessel adapters are 3D-printable. The STL files live in [`prints/stl/`](prints/stl) and the parametric source models are the [OpenSCAD](https://openscad.org/) files [`prints/micrologger_device.scad`](prints/micrologger_device.scad) and [`prints/micrologger_controller.scad`](prints/micrologger_controller.scad). File names ending in `_nozzle_0.4mm` are optimized for a 0.4 mm printer nozzle.
+
+[![µLogger device](prints/png/micrologger_device_nozzle_0.4mm.png)](prints/README.md)
+
+The parts fall into a few groups:
+
+- **Device body & stirrer** — the high-strength vessel-holder body (`micrologger_device_*`, designed to be printed in carbon-fibre-reinforced filament) that houses the sensor/beam optics, and the magnetically coupled `micrologger_stirrer_*`.
+- **Vessel adapters** — magnetically secured, radially sprung adapters sized for specific culturing vessels: `balch`, `hungate`, `culture60`, `gl45`, `serum60`/`serum120`/`serum160`, plus the `base_*` adapters that go into the base of the vessel holder for small vial sizes.
+- **Light adapters** — `micrologger_light_adapter_up`/`_down` for the optional illumination add-on.
+- **Controller enclosure** — `micrologger_controller_body`, `micrologger_controller_back`, and `micrologger_controller_magnet_holder` for the "brain" controller box.
+
+👉 See [**`prints/README.md`**](prints/README.md) for the complete list of all printable parts with rendered previews.
 
 ## Building, flashing & monitoring
 
