@@ -15,6 +15,10 @@
 
 [![](png/micrologger_adapter_culture60_nozzle_0.4mm.png)](stl/micrologger_adapter_culture60_nozzle_0.4mm.stl)
 
+## Adapter Culture60 Tight
+
+[![](png/micrologger_adapter_culture60_tight_nozzle_0.4mm.png)](stl/micrologger_adapter_culture60_tight_nozzle_0.4mm.stl)
+
 ## Adapter Gl45
 
 [![](png/micrologger_adapter_gl45_nozzle_0.4mm.png)](stl/micrologger_adapter_gl45_nozzle_0.4mm.stl)
@@ -31,6 +35,10 @@
 
 [![](png/micrologger_adapter_serum160_nozzle_0.4mm.png)](stl/micrologger_adapter_serum160_nozzle_0.4mm.stl)
 
+## Adapter Serum160 Tight
+
+[![](png/micrologger_adapter_serum160_tight_nozzle_0.4mm.png)](stl/micrologger_adapter_serum160_tight_nozzle_0.4mm.stl)
+
 ## Adapter Serum60
 
 [![](png/micrologger_adapter_serum60_nozzle_0.4mm.png)](stl/micrologger_adapter_serum60_nozzle_0.4mm.stl)
@@ -42,6 +50,18 @@
 ## Base Bottle Adapter
 
 [![](png/micrologger_base_bottle_adapter_nozzle_0.4mm.png)](stl/micrologger_base_bottle_adapter_nozzle_0.4mm.stl)
+
+## Controller Back
+
+[![](png/micrologger_controller_back_nozzle_0.5mm.png)](stl/micrologger_controller_back_nozzle_0.5mm.stl)
+
+## Controller Body
+
+[![](png/micrologger_controller_body_nozzle_0.5mm.png)](stl/micrologger_controller_body_nozzle_0.5mm.stl)
+
+## Controller Magnet Holder
+
+[![](png/micrologger_controller_magnet_holder_nozzle_0.5mm.png)](stl/micrologger_controller_magnet_holder_nozzle_0.5mm.stl)
 
 ## Light Adapter Down
 
