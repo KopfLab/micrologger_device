@@ -96,6 +96,9 @@ jobs:
               mv $aux ${{ inputs.program }}
             fi
           done
+          echo "Removing bundled library example sketches (their setup()/loop() collide with the app)"
+          find ${{ inputs.program }} -type d -name examples -prune -exec rm -rf {} +
+          find ${{ inputs.program }} -name '*.ino' -delete
 
       - name: Compile in cloud (on master)
         if: ${{ github.ref == 'refs/heads/master' }}
