@@ -66,9 +66,7 @@ The optional illumination adapter: the light LEDs driven by a PCA9633 PWM contro
 
 ### Temperature board
 
-A TMP117 precision temperature sensor placed at the vessel holder.
-
-<a href="pcbs/temperature_board/temperature_board.pdf"><img src="pcbs/temperature_board/temperature_board.svg" alt="temperature board layout" width="480"></a>
+A simple TMP117 precision temperature sensor placed at the vessel holder.
 
 *→ [Temperature board wiring diagram (PDF)](pcbs/temperature_board/temperature_board.pdf)*
 
