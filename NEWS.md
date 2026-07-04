@@ -3,8 +3,10 @@ NB:
  - version updates at the 0.x level usually require a state reset because they change/add/remove state variables, i.e. should never be done in the middle of an experiment. 
  - version changes at the 0.0.x level can be flashed at any time. They do make state changes and thus will resume their current state correctly after flash+restart.
 
-# version 1.5.0
 
+# version 1.5.1
+
+- publish on the `microloggerData` event instead of `sddsData` for microloggers
 - rename `publishing.publish` to `publishing.record` to clarify how it relates to GUI recording on/off
 - hardware `signal.calculation` added with two possible values: `mean` (default, average signal values) or `mode` (determine peak of the signal values)
 - optical density `reading.stopLights` added for users to decide whether lights turn off or stay on during OD reads (default is stopLights = yes)

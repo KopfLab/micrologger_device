@@ -1,5 +1,4 @@
 [![microloggger](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-micrologger.yaml/badge.svg?branch=main)](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-micrologger.yaml)
-[![blink](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-blink.yaml/badge.svg?branch=main)](https://github.com/KopfLab/micrologger_device/actions/workflows/compile-blink.yaml)
 
 # *µLogger*
 

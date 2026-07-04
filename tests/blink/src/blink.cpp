@@ -4,50 +4,59 @@
 #include "uMultask.h"
 
 // LED controller
-class Tled : public TmenuHandle{
+class Tled : public TmenuHandle
+{
 
     using TonOff = sdds::enums::OnOff;
     Ttimer timer;
-    public:
 
-        // on by default
-        sdds_var(TonOff, led, 0)
-        sdds_var(TonOff, blink, 0, TonOff::e::ON)
-        sdds_var(Tuint16, onTime, 0, 1000)
-        sdds_var(Tuint16, offTime, 0, 1000)
+public:
+    // on by default
+    sdds_var(TonOff, led);
+    sdds_var(TonOff, blink, sdds::opt::saveval, TonOff::e::ON);
+    sdds_var(Tuint16, onTime, sdds::opt::saveval, 500);
+    sdds_var(Tuint16, offTime, sdds::opt::saveval, 500);
 
-        Tled(){
-            pinMode(LED_BUILTIN, OUTPUT);
+    Tled()
+    {
+        pinMode(LED_BUILTIN, OUTPUT);
 
-            on(led){
-                (led == TonOff::e::ON) ?
-                    digitalWrite(LED_BUILTIN, HIGH):
-                    digitalWrite(LED_BUILTIN, LOW);
-            };
+        on(sdds::setup()){
+            // blink.callbacks()->emit();
+        };
 
-            on(blink){
-                (blink == TonOff::e::ON) ?
-                    timer.start(0):
-                    timer.stop();
-            };
+        on(led)
+        {
+            (led == TonOff::e::ON) ? digitalWrite(LED_BUILTIN, HIGH) : digitalWrite(LED_BUILTIN, LOW);
+        };
 
-            on(timer){
-                if (led == TonOff::e::ON){
-                    led = TonOff::e::OFF;
-                    timer.start(offTime);
-                } else {
-                    led = TonOff::e::ON;
-                    timer.start(onTime);
-                }
-            };
-        }
+        on(blink)
+        {
+            (blink == TonOff::e::ON) ? timer.start(0) : timer.stop();
+        };
+
+        on(timer)
+        {
+            if (led == TonOff::e::ON)
+            {
+                led = TonOff::e::OFF;
+                timer.start(offTime);
+            }
+            else
+            {
+                led = TonOff::e::ON;
+                timer.start(onTime);
+            }
+        };
+    }
 };
 
 // self-describing data structure (SDDS) tree
-class TsddsTree : public TmenuHandle{
-    public:
-        sdds_var(Tled,led)
-        TsddsTree(){}
+class TsddsTree : public TmenuHandle
+{
+public:
+    sdds_var(Tled, beam)
+        TsddsTree() {}
 } sddsTree;
 
 // serial spike for communication via serial (with baud rate)
@@ -59,13 +68,15 @@ TserialSpike serialSpike(sddsTree, 115200);
 static TparticleSpike particleSpike(sddsTree, "blink", 1);
 
 // setup
-void setup(){
+void setup()
+{
     // setup particle spike
     particleSpike.setup();
 }
 
 // loop
-void loop(){
+void loop()
+{
     // handle all events
     TtaskHandler::handleEvents();
 }

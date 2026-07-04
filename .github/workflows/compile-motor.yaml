@@ -19,7 +19,7 @@ jobs:
         # CHANGE program and specify lib/aux and non-default src as needed
         program:
           - name: 'motor'
-            lib: 'SDDS'
+            lib: 'SDDS SDDS_particleSpike'
             aux: 'src/uHardwareMotorNidec24H.h'
         # CHANGE platforms as needed
         platform: 
