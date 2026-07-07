@@ -17,17 +17,19 @@ public:
         R5k = 5000,
         R10k = 10000,
         R50k = 50000,
-        R100k = 100000
+        R100k = 100000,
+        R1M = 1000000
     };
 
-private:
+protected:
     // low level interactions with the chip via I2C
+    // (virtual so derived classes with a different protocol, e.g. AD5241, can override them)
 
     /**
      * @brief read the register value
      * @return error code from Wire.endTransmission() or custom error code 0xff if uint8_t request failed
      */
-    uint8_t readRegister(uint8_t *_value)
+    virtual uint8_t readRegister(uint8_t *_value)
     {
         uint8_t transmitCode = SYSTEM_ERROR_NONE;
         // lock for thread safety
@@ -51,7 +53,7 @@ private:
      * @brief write the register value
      * @return error code from Wire.endTransmission()
      */
-    uint8_t writeRegister(uint8_t _value)
+    virtual uint8_t writeRegister(uint8_t _value)
     {
         uint8_t transmitCode = SYSTEM_ERROR_NONE;
         // lock for thread safety
@@ -64,6 +66,7 @@ private:
         return transmitCode;
     }
 
+private:
     /**
      * @brief reads the wiper value
      */
@@ -144,7 +147,7 @@ public:
     sdds_var(Tuint32, resistance_Ohm, sdds::opt::readonly, 0);
 
     // public vars (no need to be sdds vars)
-    dtypes::uint8 maxSteps = 127;
+    dtypes::uint8 maxSteps = 0;           // maximal step number
     dtypes::uint32 maxResistance_Ohm = 0; // maximal resistance (in Ohm)
 
     // constructor
@@ -160,8 +163,9 @@ public:
     }
 
     // default i2c address in init
-    void init(Resistance _resistance, uint8_t _i2cAddress)
+    void init(uint8_t _i2cAddress, uint8_t _maxSteps, Resistance _resistance)
     {
+        maxSteps = _maxSteps;
         maxResistance_Ohm = static_cast<dtypes::uint32>(_resistance);
         ThardwareI2C::init(_i2cAddress);
     }

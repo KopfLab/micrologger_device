@@ -12,6 +12,7 @@
 #include "uHardwareIOExpanderTCA9534.h"
 #include "uHardwareRheostatMCP4017.h"
 #include "uHardwareRheostatAD5246.h"
+#include "uHardwareRheostatAD5241.h"
 #include "uHardwarePwmPCA9633.h"
 #include "uHardwareSensorOPT101.h"
 #include "uHardwareSensorTMP117.h"
@@ -68,14 +69,40 @@ private:
         expander.action = Ti2cAction::read;
         if (expander.error == Ti2cError::none)
         {
-            uint8_t b0 = expander.value6 == TioValue::HIGH ? 1 : 0;
+            uint8_t b0 = expander.value8 == TioValue::HIGH ? 1 : 0;
             uint8_t b1 = expander.value7 == TioValue::HIGH ? 1 : 0;
-            uint8_t b2 = expander.value8 == TioValue::HIGH ? 1 : 0;
+            uint8_t b2 = expander.value6 == TioValue::HIGH ? 1 : 0;
             uint8_t version = (b2 << 2) | (b1 << 1) | b0;
             return version + 1;
         }
         // error
         return 0;
+    }
+
+    // gain dpot helpers ------------------------------------------------------------------
+    // The secondary gain dpot depends on the sensor board version: dpot2 (AD5246, 100 kOhm)
+    // on v1, dpot3 (AD5241, 1 MOhm) on v2. Until the version is known (before the expander
+    // connects) we default to the v1 layout.
+
+    // is the 1 MOhm dpot3 (AD5241) the available secondary gain pot on this sensor board? yes, starting at sensor PCB version 2
+    bool hasHighGainDpot() { return pcbVersions.sensor >= 2; }
+
+    // total resistance the gain dpots can add on top of the base resistance
+    dtypes::uint32 dpotMaxResistance_Ohm()
+    {
+        return dpot1.maxResistance_Ohm + (hasHighGainDpot() ? dpot3.maxResistance_Ohm : dpot2.maxResistance_Ohm);
+    }
+
+    // maximum number of gain steps. Steps are always counted in fine (dpot1-sized) units so
+    // the scale stays uniform and monotonic regardless of the secondary pot's step size.
+    dtypes::uint16 maxGainSteps()
+    {
+        if (hasHighGainDpot())
+            // dpot3 (1 MOhm) + dpot1 (100 kOhm) expressed in dpot1-sized steps
+            return static_cast<dtypes::uint16>(round(static_cast<double>(dpotMaxResistance_Ohm()) * dpot1.maxSteps / dpot1.maxResistance_Ohm));
+        else
+            // two equal 100 kOhm pots in series (they share one midpoint step)
+            return dpot1.maxSteps + dpot2.maxSteps - 1;
     }
 
 public:
@@ -91,8 +118,12 @@ public:
     sdds_var(ThardwareDisplay, display);
     sdds_var(ThardwareIOExpander, expander);
     // digital pots
+    // dpot1 (MCP4017, 100 kOhm) is present on every sensor board; the secondary gain pot
+    // depends on the sensor board version: dpot2 (AD5246, 100 kOhm) on v1, dpot3 (AD5241,
+    // 1 MOhm) on v2. Only the one populated on the connected board is ever sent I2C commands.
     sdds_var(ThardwareRheostatMCP4017, dpot1);
     sdds_var(ThardwareRheostatAD5246, dpot2);
+    sdds_var(ThardwareRheostatAD5241, dpot3);
     // overall gain
     class Tgain : public TmenuHandle
     {
@@ -136,8 +167,8 @@ public:
     void setGain(dtypes::uint32 _ohm)
     {
         dtypes::uint16 _steps;
-        dtypes::uint16 maxSteps = dpot1.maxSteps + dpot2.maxSteps - 1; // one step fewer as they are always both set (not independently)
-        dtypes::uint32 maxGain = gain.base_Ohm.value() + dpot1.maxResistance_Ohm + dpot2.maxResistance_Ohm;
+        dtypes::uint16 maxSteps = maxGainSteps();
+        dtypes::uint32 maxGain = gain.base_Ohm.value() + dpotMaxResistance_Ohm();
         // figure out steps for requested gain
         if (gain.base_Ohm.value() > _ohm)
             _steps = 0; // requested gain lower than minimum
@@ -145,43 +176,77 @@ public:
             _steps = maxSteps; // requested gain higher than maximum
         else
         {
-            _steps = static_cast<dtypes::uint16>(round(static_cast<double>((_ohm - gain.base_Ohm.value())) * maxSteps / (dpot1.maxResistance_Ohm + dpot2.maxResistance_Ohm)));
+            _steps = static_cast<dtypes::uint16>(round(static_cast<double>((_ohm - gain.base_Ohm.value())) * maxSteps / dpotMaxResistance_Ohm()));
         }
         setGainSteps(_steps);
     }
 
-    // set circuit gain (by steps)
+    // set circuit gain (by steps, counted in fine dpot1-sized steps)
     void setGainSteps(dtypes::uint16 _steps)
     {
-        // figure out individual digipots for requested gain
-        dtypes::uint16 maxSteps = dpot1.maxSteps + dpot2.maxSteps - 1; // one step fewer as they are always both set (not independently)
-        dtypes::uint16 dpot1_steps, dpot2_steps;
+        dtypes::uint16 maxSteps = maxGainSteps();
         if (_steps > maxSteps)
             _steps = maxSteps;
-        if (_steps > dpot1.maxSteps)
+
+        // figure out the individual digipot steps for the requested gain
+        dtypes::uint16 dpot1_steps, dpot2_steps, dpot3_steps;
+        if (hasHighGainDpot())
         {
-            dpot1_steps = dpot1.maxSteps;
-            dpot2_steps = _steps - dpot1.maxSteps + 1; // above 0
+            // >= v2: the coarse high gain 1 MOhm pot (dpot3) is set first (its step is ~10x larger)
+            // then the fine 100 kOhm pot (dpot1) trims the remainder.
+            // convert the fine-step count into a target resistance
+            dtypes::uint32 target_Ohm = static_cast<dtypes::uint32>(round(static_cast<double>(_steps) * dpotMaxResistance_Ohm() / maxSteps));
+            // largest dpot3 setting that does not overshoot the target (floor via truncation)
+            dtypes::uint32 dpot3_calc = static_cast<dtypes::uint32>(static_cast<double>(target_Ohm) * dpot3.maxSteps / dpot3.maxResistance_Ohm);
+            dpot3_steps = (dpot3_calc > dpot3.maxSteps) ? dpot3.maxSteps : static_cast<dtypes::uint16>(dpot3_calc);
+            dtypes::uint32 dpot3_Ohm = static_cast<dtypes::uint32>(round(static_cast<double>(dpot3_steps) * dpot3.maxResistance_Ohm / dpot3.maxSteps));
+            // fine-tune the remainder with dpot1
+            dtypes::uint32 remainder_Ohm = (target_Ohm > dpot3_Ohm) ? (target_Ohm - dpot3_Ohm) : 0;
+            dtypes::uint32 dpot1_calc = static_cast<dtypes::uint32>(round(static_cast<double>(remainder_Ohm) * dpot1.maxSteps / dpot1.maxResistance_Ohm));
+            dpot1_steps = (dpot1_calc > dpot1.maxSteps) ? dpot1.maxSteps : static_cast<dtypes::uint16>(dpot1_calc);
+            dpot2_steps = 0;
         }
         else
         {
-            dpot1_steps = _steps;
-            dpot2_steps = 0;
+            // v1: two equal 100 kOhm pots (dpot1 then dpot2) in series
+            if (_steps > dpot1.maxSteps)
+            {
+                dpot1_steps = dpot1.maxSteps;
+                dpot2_steps = _steps - dpot1.maxSteps + 1; // above 0
+            }
+            else
+            {
+                dpot1_steps = _steps;
+                dpot2_steps = 0;
+            }
+            dpot3_steps = 0;
         }
-        // set steps via I2C
+
+        // set steps on dpot1 (always present) via I2C
         dpot1.steps = dpot1_steps;
         dpot1.action = ThardwareI2C::Taction::write;
+        // keep both secondary pots in sync in the data model, but only send I2C to the one
+        // actually populated on this sensor board (leave the absent one silent)
         dpot2.steps = dpot2_steps;
-        dpot2.action = ThardwareI2C::Taction::write;
+        dpot3.steps = dpot3_steps;
+        if (hasHighGainDpot())
+            dpot3.action = ThardwareI2C::Taction::write;
+        else
+            dpot2.action = ThardwareI2C::Taction::write;
+
         // reset signal stats
         signal.reset();
-        // update error information
+
+        // update error information (only the dpots present on this board are relevant)
         if (dpot1.error != Ti2cError::none && gain.error != dpot1.error)
             gain.error = dpot1.error;
-        else if (dpot2.error != Ti2cError::none && gain.error != dpot2.error)
+        else if (!hasHighGainDpot() && dpot2.error != Ti2cError::none && gain.error != dpot2.error)
             gain.error = dpot2.error;
+        else if (hasHighGainDpot() && dpot3.error != Ti2cError::none && gain.error != dpot3.error)
+            gain.error = dpot3.error;
         else if (gain.error != Ti2cError::none)
             gain.error = Ti2cError::none;
+
         // update steps and total gain
         if (gain.error != Ti2cError::none)
         {
@@ -193,7 +258,7 @@ public:
             // no error
             if (gain.steps != _steps)
                 gain.steps = _steps;
-            gain.total_Ohm = gain.base_Ohm.value() + dpot1.resistance_Ohm + dpot2.resistance_Ohm;
+            gain.total_Ohm = gain.base_Ohm.value() + dpot1.resistance_Ohm + (hasHighGainDpot() ? dpot3.resistance_Ohm : dpot2.resistance_Ohm);
         }
     }
 
@@ -294,6 +359,7 @@ public:
             expander.init();
             dpot1.init(ThardwareRheostatMCP4017::Resistance::R100k);
             dpot2.init(ThardwareRheostatAD5246::Resistance::R100k);
+            dpot3.init(ThardwareRheostatAD5241::Resistance::R1M);
             dimmer.init(ThardwarePwmPCA9633::Driver::EXTN);
             motor.init(MICROLOGGER_SPEED_PIN, MICROLOGGER_DECODER_PIN);
             signal.init(MICROLOGGER_SIGNAL_PIN);
@@ -326,15 +392,21 @@ public:
                 i2cState = Thardware::TioMode::OUTPUT_ON;
                 expander.action = Thardware::Ti2cAction::write;
 
-                // make sure to write configuration for dimmer and dpots on connect
+                // make sure to write configuration for dimmer and dpot1 on connect
                 fanLightAction = Ti2cAction::write;
                 dpot1.action = Ti2cAction::write;
-                dpot2.action = Ti2cAction::write;
 
                 // figure out sensor board version on connect
                 uint8_t version = getSensorBoardVersion();
                 if (pcbVersions.sensor != version)
                     pcbVersions.sensor = version;
+
+                // write the secondary gain pot that is actually populated on this sensor
+                // board (dpot2/AD5246 on v1, dpot3/AD5241 on v2), leave the absent one silent
+                if (version == 2)
+                    dpot3.action = Ti2cAction::write;
+                else
+                    dpot2.action = Ti2cAction::write;
             }
             else
             {
@@ -344,6 +416,7 @@ public:
                     fanLightAction = Ti2cAction::disconnect;
                     dpot1.action = Ti2cAction::disconnect;
                     dpot2.action = Ti2cAction::disconnect;
+                    dpot3.action = Ti2cAction::disconnect;
                 }
             }
         };

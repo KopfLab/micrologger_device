@@ -14,7 +14,7 @@ static TparticleSpike particleSpike(
     micrologger,       // SDDS tree
     "micrologger",     // device type
     "microloggerData", // data event
-    10501              // device version (1.0.0= 10000, 2.23.2 = 22302)
+    10600              // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
 // logging
