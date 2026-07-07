@@ -1776,7 +1776,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.analog.com/media/en/technical-documentation/data-sheets/AD5241_5242.pdf"
+		(property "Datasheet" "https://www.analog.com/media/en/technical-documentation/data-sheets/ad5241_ad5242.pdf"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)

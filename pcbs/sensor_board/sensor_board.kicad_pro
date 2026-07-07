@@ -651,7 +651,7 @@
         "uuid": "2e363057-5f2b-4813-9b6e-20c9934d11ef"
       }
     ],
-    "used_designators": "#PWR46,C5",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
@@ -662,7 +662,7 @@
   ],
   "text_variables": {
     "PROJ_AUTHOR": "Sebastian Kopf",
-    "PROJ_REV": "2.0",
+    "PROJ_REV": "2.1",
     "PROJ_TITLE": "µLogger Sensor Board"
   },
   "tuning_profiles": {

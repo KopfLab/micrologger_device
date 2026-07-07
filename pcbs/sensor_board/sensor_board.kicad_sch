@@ -6,7 +6,7 @@
 	(paper "User" 394.056 251.612)
 	(title_block
 		(title "${PROJ_TITLE}")
-		(date "2025-11-22")
+		(date "2026-07-07")
 		(rev "${PROJ_REV}")
 		(comment 1 "https://creativecommons.org/licenses/by-sa/4.0/")
 		(comment 2 "Released under the Creative Commons Share-Alike 4.0 License")
@@ -6703,9 +6703,9 @@
 		)
 		(uuid "23072dcd-c0e9-48f5-bde7-cfe71a2e0bf9")
 	)
-	(text "this was 10 kOhm originally (in 1.4) but\nhas now moved to 56 kOhm for the other\nLEDs (600nm and 880nm) but if we have\na 1 MOhm secondary digipot in there, should go back\nto 10 kOhm! (so total range is 10 kOhm to 1.1 MOhm)\n\nNote: 1.4 version PCBs were retroactively upgraded\nto 56 kOhm"
+	(text "Note for R4: 1.4 version PCBs were retroactively\nupgraded to 56 kOhm, later version are back to \n10 kOhm since the 1  MOhm amplifier covers the range."
 		(exclude_from_sim no)
-		(at 209.804 267.208 0)
+		(at 239.776 259.842 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7044,6 +7044,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ebbe9bf7-cd17-4165-9c29-453add5c954b")
+	)
+	(junction
+		(at 233.68 207.01)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "fddac311-8d51-4657-9c42-cb8fceb0372b")
 	)
 	(no_connect
 		(at 193.04 204.47)
@@ -7638,16 +7644,6 @@
 			(type solid)
 		)
 		(uuid "4ea335f4-ca9f-4470-9892-af2cf6a12237")
-	)
-	(wire
-		(pts
-			(xy 254 179.07) (xy 254 176.53)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4ebc611f-9701-4aa1-8507-d6974a5bce31")
 	)
 	(wire
 		(pts
@@ -8640,6 +8636,16 @@
 			(type default)
 		)
 		(uuid "e6805342-2346-4215-b23b-6bd8f9cb7a46")
+	)
+	(wire
+		(pts
+			(xy 233.68 207.01) (xy 233.68 209.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e719cc61-80a3-42fe-885a-873842715b15")
 	)
 	(wire
 		(pts
@@ -12118,84 +12124,6 @@
 			(project "sensor_board"
 				(path "/2e363057-5f2b-4813-9b6e-20c9934d11ef"
 					(reference "#PWR23")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "symbols:+5V")
-		(at 233.68 209.55 270)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "31d56535-2624-4630-a1a8-22d67e913ff6")
-		(property "Reference" "#PWR045"
-			(at 229.87 209.55 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+5V"
-			(at 237.49 209.55 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.5 1.5)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" ""
-			(at 233.68 209.55 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 233.68 209.55 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 233.68 209.55 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "8c3a452a-0527-4e91-bb8f-4fb70f73d9dd")
-		)
-		(instances
-			(project "sensor_board"
-				(path "/2e363057-5f2b-4813-9b6e-20c9934d11ef"
-					(reference "#PWR045")
 					(unit 1)
 				)
 			)
@@ -17274,7 +17202,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.analog.com/media/en/technical-documentation/data-sheets/AD5241_5242.pdf"
+		(property "Datasheet" "https://www.analog.com/media/en/technical-documentation/data-sheets/ad5241_ad5242.pdf"
 			(at 233.68 209.55 0)
 			(hide yes)
 			(show_name no)
@@ -17297,7 +17225,7 @@
 			)
 		)
 		(property "MPN" "AD5241BRZ1M"
-			(at 212.852 190.754 0)
+			(at 212.852 213.106 0)
 			(show_name no)
 			(do_not_autoplace yes)
 			(effects
