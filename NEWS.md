@@ -4,6 +4,21 @@ NB:
  - version changes at the 0.0.x level can be flashed at any time. They do make state changes and thus will resume their current state correctly after flash+restart.
 
 
+# version 1.6.1
+
+- fix `sensor.gain.gain_Ohm` not being restored correctly after a restart on sensor board version 2+. The components resumed their state at the moment the I2C expander first connected, which happened just *before* the sensor board version is detected. State resume now waits until `HARDWARE.pcbVersions.sensor` is known.
+- the gain readback no longer writes back into `sensor.gain.gain_Ohm` while the gain hardware is in an error state, so a failed dpot write can never erase the stored gain
+- note: devices running 1.6.0 on a version 2+ sensor board have a corrupted gain saved in their state. After flashing, run `sensor.action=optimizeGain` once and save the state to restore a sensible value.
+
+# version 1.6.0
+
+- support for sensor board version 2+, where the secondary gain potentiometer is a 1 MOhm AD5241 (`HARDWARE.dpot3`) instead of the 100 kOhm AD5246 (`HARDWARE.dpot2`) used on version 1 boards. The sensor board version is detected over I2C whenever the IO expander connects and only the potentiometer actually populated on the board is ever sent I2C commands.
+- new hardware variable `HARDWARE.dpot3` (AD5241) added to the tree
+- maximum gain extended from ~256 kOhm to ~1.11 MOhm on sensor board version 2+
+- gain steps are now always counted in fine (`dpot1`-sized) units so the gain scale stays uniform and monotonic no matter which secondary potentiometer is populated
+- `HARDWARE.gain.base_Ohm` default changed from 56 kOhm (sensor board version 1) to 10 kOhm (sensor board version 2+)
+- fixes the sensor board version bit order (expander pins 6 and 8 were swapped, so versions were read back reversed)
+
 # version 1.5.1
 
 - publish on the `microloggerData` event instead of `sddsData` for microloggers

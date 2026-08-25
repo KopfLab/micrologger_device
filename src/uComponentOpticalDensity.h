@@ -539,8 +539,10 @@ public:
             if (status == Tstatus::optimizing || particleSystem().startup != TparticleSystem::TstartupStatus::complete)
                 return;
 
-            // update gain with actual hardware gain
-            if (gain.gain_Ohm != hardware().gain.total_Ohm)
+            // update gain with actual hardware gain (never while the hardware is in error,
+            // the reported total is not meaningful then and would erase the stored gain)
+            if (hardware().gain.error == Thardware::Ti2cError::none &&
+                gain.gain_Ohm != hardware().gain.total_Ohm)
             {
                 gain.gain_Ohm = hardware().gain.total_Ohm;
             }

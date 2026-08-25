@@ -207,6 +207,16 @@ public:
             hardware().i2cValue.signalEvents();
         };
 
+        // the sensor board version is only detected once the i2c expander connects, and that
+        // detection happens after i2cValue is set to ON (the expander's own connect handler
+        // writes the pin values first). Resuming state before the version is known would
+        // restore the gain with the wrong digital potentiometer layout, so re-trigger the
+        // resume as soon as the version becomes available.
+        on(hardware().pcbVersions.sensor)
+        {
+            hardware().i2cValue.signalEvents();
+        };
+
         // keep connection status updated and resume state whenever we reconnect
         on(hardware().i2cValue)
         {
@@ -214,7 +224,10 @@ public:
             {
                 if (device != enums::TconStatus::connected)
                     device = enums::TconStatus::connected;
-                if (particleSystem().startup == TparticleSystem::TstartupStatus::complete)
+                // only resume once the sensor board version is known (0 = not yet detected),
+                // the gain restore depends on which gain dpots are populated on the board
+                if (particleSystem().startup == TparticleSystem::TstartupStatus::complete &&
+                    hardware().pcbVersions.sensor > 0)
                 {
                     environment.resumeState();
                     stirrer.resumeState();
