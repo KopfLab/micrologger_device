@@ -680,8 +680,10 @@ public:
 
         on(status)
         {
-            // are we switching back to idle?
-            if (status == Tstatus::idle)
+            // are we switching back to idle? or waiting to zero after an automatic gain adjustment?
+            // (waiting: the zero runs the full read sequence incl. vortex/stir stop again, so stirring and
+            // lights have to be back to normal in the meantime, just like before any other read)
+            if (status == Tstatus::idle || status == Tstatus::waiting)
             {
                 // resume stirrer and lights (they manage what that means - nothing if they're off or have not been paused)
                 if (Fstirrer)
@@ -707,9 +709,10 @@ public:
         {
             if (Freading == TreadingStages::ZERO_WAIT_FOR_GAIN)
             {
-                // start the zero
+                // start the zero (same sequence as a regular read: vortex / stir stop / wait / warmup ...)
                 status = Tstatus::zeroing;
                 Freading = TreadingStages::READ_START;
+                process();
             }
         };
 
