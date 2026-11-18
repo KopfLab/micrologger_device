@@ -40,11 +40,22 @@ private:
         hardware().display.setCursor(0, 0);
         char buf[16]; // snprintf buffer
 
-        // wifi?
-        if (particleSystem().internet == TparticleSystem::TinternetStatus::connected)
-            hardware().display.drawIcon(wifi_icon, wifi_icon_width);
-        else
-            hardware().display.drawIcon(no_wifi_icon, no_wifi_icon_width);
+        // wifi? (nothing at all if wifi is turned off)
+#if Wiring_WiFi
+        if (particleSystem().wifi.state == TonOff::ON)
+#endif
+        {
+            if (particleSystem().internet == TparticleSystem::TinternetStatus::connected)
+                hardware().display.drawIcon(wifi_icon, wifi_icon_width);
+            else
+                hardware().display.drawIcon(no_wifi_icon, no_wifi_icon_width);
+        }
+
+#if Wiring_BLE
+        // bluetooth client (e.g. the SDDS browser) connected?
+        if (particleSystem().bluetooth.status == TparticleSystem::Tbluetooth::Tstatus::connected)
+            hardware().display.drawIcon(bluetooth_icon, bluetooth_icon_width);
+#endif
 
         // publishing? (don't show the "not publishing", it's not as informative)
         if (particleSystem().publishing.record == TonOff::ON)
