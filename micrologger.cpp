@@ -17,6 +17,22 @@ static TparticleSpike particleSpike(
     10700              // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
+// stirrer speed averaging: while the stirrer is paused (e.g. for an OD read) or vortexing, the
+// published (averaged) stirrer speed should only reflect the regular stirring
+// --> suspend the averaging of speed_rpm during those events (the live value is not affected)
+class TstirrerSpeedAveraging
+{
+public:
+    TstirrerSpeedAveraging()
+    {
+        on(micrologger.stirrer.event)
+        {
+            particleSpike.suspendAveraging(micrologger.stirrer.speed_rpm,
+                                           micrologger.stirrer.event != TcomponentStirrer::Tevent::none);
+        };
+    }
+} stirrerSpeedAveraging;
+
 // logging
 SerialLogHandler logHandler(
     LOG_LEVEL_WARN, // WARN for non-app messages
