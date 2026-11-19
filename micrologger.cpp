@@ -14,24 +14,69 @@ static TparticleSpike particleSpike(
     micrologger,       // SDDS tree
     "micrologger",     // device type
     "microloggerData", // data event
-    10700              // device version (1.0.0= 10000, 2.23.2 = 22302)
+    10800              // device version (1.0.0= 10000, 2.23.2 = 22302)
 );
 
-// stirrer speed averaging: while the stirrer is paused (e.g. for an OD read) or vortexing, the
-// published (averaged) stirrer speed should only reflect the regular stirring
-// --> suspend the averaging of speed_rpm during those events (the live value is not affected)
-class TstirrerSpeedAveraging
+// stirrer speed data: the published (averaged) stirrer speed should only average steady stirring,
+// every speed transition (acceleration/deceleration for pauses, vortexing, setpoint changes,
+// start/stop) is delimited by single data points (n = 1) instead of being averaged in:
+//  1. transition starts: the average so far (if it has at least 2 values), then the last speed
+//     before the transition as a single point; averaging is suspended
+//  2. transition finished + one motor read interval (so the measured speed is a fresh reading):
+//     the speed as a single point; averaging resumes (also during a pause or at the vortex peak)
+// These data points pause the burst timer, i.e. they ride along with the next regular burst instead
+// of triggering additional publishes. The live value of speed_rpm is not affected.
+class TstirrerSpeedData
 {
-public:
-    TstirrerSpeedAveraging()
+    using Tstirrer = TcomponentStirrer;
+    Ttimer FsettleTimer;
+    bool Framping = false;
+
+    static bool isRamping()
     {
-        on(micrologger.stirrer.event)
+        auto &status = micrologger.stirrer.status;
+        return status == Tstirrer::Tstatus::accelerating || status == Tstirrer::Tstatus::decelerating;
+    }
+
+    static void point() { particleSpike.publishValue(micrologger.stirrer.speed_rpm, true); }
+
+public:
+    TstirrerSpeedData()
+    {
+        on(micrologger.stirrer.status)
         {
-            particleSpike.suspendAveraging(micrologger.stirrer.speed_rpm,
-                                           micrologger.stirrer.event != TcomponentStirrer::Tevent::none);
+            auto &speed = micrologger.stirrer.speed_rpm;
+            bool ramping = isRamping();
+            if (ramping && !Framping)
+            {
+                // 1. transition starts
+                if (FsettleTimer.running())
+                {
+                    // previous transition still settling (averaging not resumed yet) --> just the point
+                    FsettleTimer.stop();
+                }
+                else
+                {
+                    particleSpike.suspendAveraging(speed, true);
+                    particleSpike.publishAverage(speed, true, 2);
+                }
+                point();
+            }
+            else if (!ramping && Framping)
+            {
+                // transition finished --> wait for a fresh speed reading
+                FsettleTimer.start(hardware().motor.readInterval_ms);
+            }
+            Framping = ramping;
+        };
+        on(FsettleTimer)
+        {
+            // 2. settled
+            point();
+            particleSpike.suspendAveraging(micrologger.stirrer.speed_rpm, false);
         };
     }
-} stirrerSpeedAveraging;
+} stirrerSpeedData;
 
 // logging
 SerialLogHandler logHandler(
@@ -65,8 +110,9 @@ void setup()
          {publish::EACH, &micrologger.environment.error},
          // --> all floats should inherit from the globalInterval
          {publish::AVG_GLOBAL, {sdds::Ttype::FLOAT32, sdds::Ttype::FLOAT64}},
-         // --> motor speed is an integer but should still inherit from the globalInterval
-         {publish::AVG_GLOBAL, &micrologger.stirrer.speed_rpm},
+         // --> motor speed is not recorded by default (set SYSTEM.publishing.varIntervals_ms.stirrer.speed_rpm
+         //     to -1 to record its average over the global interval with the transition data points, see above)
+         {publish::OFF, &micrologger.stirrer.speed_rpm},
          // --> don't report transmittance, and power, and standard devs by default
          {publish::OFF, &micrologger.environment.power_V},
          {publish::OFF, &micrologger.environment.powerReq_V},

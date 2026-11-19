@@ -4,15 +4,20 @@ NB:
  - version changes at the 0.0.x level can be flashed at any time. They do make state changes and thus will resume their current state correctly after flash+restart.
 
 
+# version 1.8.0
+
+- update to SDDS_particleSpike 0.4.0: new saveable setting `SYSTEM.publishing.bursts.maxPoints` (default 512) queues a burst for publishing as soon as it reaches that many data points. New read-only `SYSTEM.publishing.bursts.points` shows how many data points are in the current burst. This changes the state structure, i.e. requires a state reset.
+- the published (averaged) stirrer speed `stirrer.speed_rpm` now only averages steady stirring. Every speed transition (pauses for OD reads, vortexing, setpoint changes, start/stop) is excluded from the average and instead delimited by single data points (`n: 1`): when a transition starts, the average so far (if it has at least 2 values) and the last speed before the transition; when it is finished (+ one motor read interval for a fresh speed reading), the new speed, after which averaging resumes (also during pauses and at the vortex peak). These points do not trigger extra publishes, they are sent with the next regular burst. The live `speed_rpm` still shows the actual speed. (requires SDDS_particleSpike 0.4.0)
+- the stirrer speed `stirrer.speed_rpm` is no longer recorded by default (`varIntervals_ms` = `0`); set `SYSTEM.publishing.varIntervals_ms.stirrer.speed_rpm` to `-1` to record it as described below
+
 # version 1.7.0
 
 - **requires a state reset** (the `SYSTEM` tree changed with the SDDS_particleSpike update, see its NEWS for details)
-- bluetooth access to the SDDS tree (e.g. with the SDDS browser at https://sdds.kopflab.org or `rake sddsBrowser` in SDDS_particleSpike), with `SYSTEM.bluetooth` (`state`, `status`, `connection`); bluetooth clients also set the device time if it has none yet (local wifi only, no cloud)
+- bluetooth access to the SDDS tree (e.g. with the SDDS browser at https://devices.kopflab.org or `rake sddsBrowser` in SDDS_particleSpike), with `SYSTEM.bluetooth` (`state`, `status`, `connection`); bluetooth clients also set the device time if it has none yet (local wifi only, no cloud)
 - `SYSTEM.wifi` submenu: turn wifi on/off (`state`, saved), `status`, `mac`, `network`, `signal_percent` and a `setup` submenu to add or replace wifi networks (e.g. via bluetooth); `SYSTEM.action` no longer has `disconnect`/`reconnect`
 - `SYSTEM.vitals.timeSource` shows where the device time came from (`cloud`, `bluetooth`)
 - data recorded while offline is kept until the device is online (split into bursts that fit into a cloud event, oldest data discarded only when RAM runs low) and can be downloaded via bluetooth with the SDDS browser (*Fetch device data*) without removing it from the queue
 - averaged values with a single data point in an interval are now published with `n = 1` (previously without `n`, like a discrete value)
-- the published (averaged) stirrer speed `stirrer.speed_rpm` no longer includes the periods when the stirrer is paused (e.g. for OD reads, including spin down/up) or vortexing; the speed values before a pause are kept in the average. The live `speed_rpm` still shows the actual speed. (requires the SDDS_particleSpike update with `suspendAveraging`)
 - fix zeroing with automatic gain adjustment: the stirrer (and lights) now resume their normal operation during the pause between the gain adjustment and the zero (`sensor.gain.zeroPause_ms`), so the zero goes through the same stir/vortex/stop sequence under the same conditions as every regular read (previously the stirrer stayed stopped for the entire pause). The zero also starts right when the pause is over.
 - display: no wifi symbol at all when wifi is turned off (`SYSTEM.wifi.state=OFF`), bluetooth symbol while a bluetooth client is connected
 
